@@ -33,7 +33,7 @@ function Footer() {
           });
         }
       } catch (error) {
-        console.error('Error fetching contact data:', error);
+        console.log('Error fetching contact data:', error);
       }
     };
 
@@ -43,7 +43,7 @@ function Footer() {
         const response = await axios.get(`${BACKEND_URL}/show-roadmap-topic`,{withCredentials:true});
         setBootcamps(response.data);
       } catch (error) {
-        console.error('Failed to fetch bootcamps:', error);
+        console.log('Failed to fetch bootcamps:', error);
       }
     };
 
