@@ -5,6 +5,9 @@ import { useSelector, useDispatch } from "react-redux";
 import axios from "axios";
 import { clearUser } from "../redux/userSlice";
 import { useNavigate } from "react-router-dom";
+import { BACKEND_URL } from "../../config/constant";
+
+
 
 function Navbar() {
   const dispatch = useDispatch();
@@ -20,7 +23,7 @@ function Navbar() {
   useEffect(() => {
     const fetchBootcamps = async () => {
       try {
-        const response = await axios.get("http://localhost:4000/show-roadmap-topic",{withCredentials:true});
+        const response = await axios.get(`${BACKEND_URL}/show-roadmap-topic`,{withCredentials:true});
         setBootcamps(response.data);
       } catch (error) {
         console.error("Failed to fetch bootcamps:", error);
@@ -31,7 +34,7 @@ function Navbar() {
 
   const handleSignOut = async () => {
     try {
-      await axios.post("http://localhost:4000/signout", {}, { withCredentials: true });
+      await axios.post(`${BACKEND_URL}/signout`, {}, { withCredentials: true });
       dispatch(clearUser());
       navigate("/signin");
     } catch (error) {

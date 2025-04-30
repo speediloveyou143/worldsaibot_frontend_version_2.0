@@ -6,6 +6,8 @@ import { useDispatch } from "react-redux";
 import axios from "axios";
 import { setUser } from "../redux/userSlice";
 import { useNavigate } from "react-router-dom";
+import { BACKEND_URL } from "../../config/constant";
+
 
 function Body() {
   const dispatch = useDispatch();
@@ -13,7 +15,7 @@ function Body() {
 
   const fetchUser = async () => {
     try {
-      const res = await axios.get("http://localhost:4000/profile",{withCredentials:true});
+      const res = await axios.get(`${BACKEND_URL}/profile`,{withCredentials:true});
       if (res.status === 200) {
         dispatch(setUser(res.data));
       }

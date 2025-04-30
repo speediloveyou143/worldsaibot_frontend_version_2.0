@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
+import { BACKEND_URL } from '../../config/constant';
 
 function Footer() {
   const currentYear = new Date().getFullYear();
@@ -19,7 +20,7 @@ function Footer() {
     // Fetch contact data
     const fetchContactData = async () => {
       try {
-        const response = await axios.get('http://localhost:4000/all-contacts',{withCredentials:true});
+        const response = await axios.get(`${BACKEND_URL}/all-contacts`,{withCredentials:true});
         const data = response.data[0];
         if (data) {
           setContactData({
@@ -39,7 +40,7 @@ function Footer() {
     // Fetch bootcamps
     const fetchBootcamps = async () => {
       try {
-        const response = await axios.get('http://localhost:4000/show-roadmap-topic');
+        const response = await axios.get(`${BACKEND_URL}/show-roadmap-topic`,{withCredentials:true});
         setBootcamps(response.data);
       } catch (error) {
         console.error('Failed to fetch bootcamps:', error);
