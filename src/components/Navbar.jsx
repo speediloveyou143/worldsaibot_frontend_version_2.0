@@ -43,7 +43,7 @@ function Navbar() {
 
   return (
     <>
-      <div className="navbar fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-[#702CF6]/80 to-[#4B0082]/80 backdrop-blur-xl shadow-lg text-xs sm:text-[13px] h-14 sm:h-16 border-b border-white/20 sm:from-[#702CF6]/60 sm:to-[#4B0082]/60 sm:backdrop-blur-lg">
+      <div className="navbar fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-[#702CF6]/80 to-[#4B0082]/80 backdrop-blur-xl shadow-lg text-xs sm:text-[11px] h-14 sm:h-16 border-b border-white/20 sm:from-[#702CF6]/60 sm:to-[#4B0082]/60 sm:backdrop-blur-lg">
         <div className="navbar-start">
           <div className="dropdown">
             <div
@@ -152,12 +152,12 @@ function Navbar() {
           {!user && (
             <div className="flex gap-1 px-2 sm:px-4">
               <Link to="signin">
-                <button className="px-4 py-2.5 sm:px-6 sm:py-2 bg-white text-[#702CF6] rounded-lg hover:bg-gray-100 transition-all shadow-md hover:shadow-lg text-xs sm:text-sm whitespace-nowrap">
+                <button className="px-4 py-2 sm:px-6 sm:py-2 bg-white text-[#702CF6] rounded-lg hover:bg-gray-100 transition-all shadow-md hover:shadow-lg text-xs sm:text-sm whitespace-nowrap">
                   SIGN IN
                 </button>
               </Link>
               <Link to="signup">
-                <button className="px-4 py-2.5 sm:px-6 sm:py-2 bg-purple-700 text-white rounded-lg hover:bg-purple-800 transition-all shadow-md hover:shadow-lg text-xs sm:text-sm whitespace-nowrap">
+                <button className="px-4 py-2 sm:px-6 sm:py-2 bg-purple-700 text-white rounded-lg hover:bg-purple-800 transition-all shadow-md hover:shadow-lg text-xs sm:text-sm whitespace-nowrap">
                   SIGN UP
                 </button>
               </Link>
