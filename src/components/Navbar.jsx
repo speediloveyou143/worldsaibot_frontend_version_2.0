@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
@@ -6,8 +5,6 @@ import axios from "axios";
 import { clearUser } from "../redux/userSlice";
 import { useNavigate } from "react-router-dom";
 import { BACKEND_URL } from "../../config/constant";
-
-
 
 function Navbar() {
   const dispatch = useDispatch();
@@ -23,7 +20,7 @@ function Navbar() {
   useEffect(() => {
     const fetchBootcamps = async () => {
       try {
-        const response = await axios.get(`${BACKEND_URL}/show-roadmap-topic`,{withCredentials:true});
+        const response = await axios.get(`${BACKEND_URL}/show-roadmap-topic`, { withCredentials: true });
         setBootcamps(response.data);
       } catch (error) {
         console.error("Failed to fetch bootcamps:", error);
@@ -47,17 +44,17 @@ function Navbar() {
   return (
     <>
       <div className="navbar fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-[#702CF6] to-[#4B0082] shadow-lg text-[13px]">
-        <div className="navbar-start ">
+        <div className="navbar-start">
           <div className="dropdown">
             <div
               tabIndex={0}
               role="button"
-              className="btn btn-ghost lg:hidden text-white hover:bg-purple-600/20"
+              className="btn btn-ghost lg:hidden text-white hover:bg-purple-600/20 p-2"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="h-5 w-5"
+                className="h-5 w-5 md:h-4 md:w-4"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -66,11 +63,16 @@ function Navbar() {
               </svg>
             </div>
           </div>
-          <Link
-            to="/"
-            className="text-2xl font-bold text-white antialiased hover:text-gray-200 transition-colors px-4"
-          >
-            WorldsAIbot
+          <Link to="/" className="flex items-center gap-2 px-4 md:px-2">
+            {/* Fancy "W" Logo in a Pure Circle using Span */}
+            <span
+                className="font-3xl md:text-3xl font-bold text-[blue] rotate-[21deg] bg-[white] px-[8px] py-[4px] rounded-[50%]"
+              >
+                W
+              </span>
+            <span className="text-2xl md:text-xl font-bold text-white antialiased hover:text-gray-200 transition-colors">
+              WAB AI
+            </span>
           </Link>
         </div>
 
@@ -79,7 +81,7 @@ function Navbar() {
             <li>
               <Link
                 to="/"
-                className={`px-4 py-2 text-white hover:bg-purple-600/20 rounded-lg transition-all ${
+                className={`px-4 py-2 text-white hover:bg-purple-600/20 rounded-lg transition-all text-sm ${
                   isActive("/") ? "bg-gradient-to-r from-[#8A2BE2] to-[#4B0082]" : ""
                 }`}
               >
@@ -89,7 +91,7 @@ function Navbar() {
             <li>
               <Link
                 to="/courses"
-                className={`px-4 py-2 text-white hover:bg-purple-600/80 rounded-lg transition-all ${
+                className={`px-4 py-2 text-white hover:bg-purple-600/20 rounded-lg transition-all text-sm ${
                   isActive("/courses") ? "bg-gradient-to-r from-[#8A2BE2] to-[#4B0082]" : ""
                 }`}
               >
@@ -99,7 +101,7 @@ function Navbar() {
             <li>
               <button
                 onClick={() => setIsModalOpen(true)}
-                className={`px-4 py-2 text-white hover:bg-purple-600/20 rounded-lg transition-all flex items-center gap-1 ${
+                className={`px-4 py-2 text-white hover:bg-purple-600/20 rounded-lg transition-all text-sm flex items-center gap-1 ${
                   isActive("/free-class") ? "bg-gradient-to-r from-[#8A2BE2] to-[#4B0082]" : ""
                 }`}
               >
@@ -109,7 +111,7 @@ function Navbar() {
             <li>
               <Link
                 to="/about-us"
-                className={`px-4 py-2 text-white hover:bg-purple-600/20 rounded-lg transition-all ${
+                className={`px-4 py-2 text-white hover:bg-purple-600/20 rounded-lg transition-all text-sm ${
                   isActive("/about-us") ? "bg-gradient-to-r from-[#8A2BE2] to-[#4B0082]" : ""
                 }`}
               >
@@ -119,7 +121,7 @@ function Navbar() {
             <li>
               <Link
                 to="/products"
-                className={`px-4 py-2 text-white hover:bg-purple-600/20 rounded-lg transition-all ${
+                className={`px-4 py-2 text-white hover:bg-purple-600/20 rounded-lg transition-all text-sm ${
                   isActive("/products") ? "bg-gradient-to-r from-[#8A2BE2] to-[#4B0082]" : ""
                 }`}
               >
@@ -129,7 +131,7 @@ function Navbar() {
             <li>
               <Link
                 to="/carrers"
-                className={`px-4 py-2 text-white hover:bg-purple-600/20 rounded-lg transition-all ${
+                className={`px-4 py-2 text-white hover:bg-purple-600/20 rounded-lg transition-all text-sm ${
                   isActive("/carrers") ? "bg-gradient-to-r from-[#8A2BE2] to-[#4B0082]" : ""
                 }`}
               >
@@ -139,7 +141,7 @@ function Navbar() {
             <li>
               <Link
                 to="/contact"
-                className={`px-4 py-2 text-white hover:bg-purple-600/20 rounded-lg transition-all ${
+                className={`px-4 py-2 text-white hover:bg-purple-600/20 rounded-lg transition-all text-sm ${
                   isActive("/contact") ? "bg-gradient-to-r from-[#8A2BE2] to-[#4B0082]" : ""
                 }`}
               >
@@ -151,39 +153,39 @@ function Navbar() {
 
         <div className="navbar-end">
           {!user && (
-            <div className="flex gap-2 px-4">
+            <div className="flex gap-2 px-4 md:px-2">
               <Link to="signin">
-                <button className="px-4 py-1.5 bg-white text-[#702CF6] rounded-lg hover:bg-gray-100 transition-all shadow-md hover:shadow-lg text-sm whitespace-nowrap">
+                <button className="px-4 py-1.5 md:px-3 md:py-1 bg-white text-[#702CF6] rounded-lg hover:bg-gray-100 transition-all shadow-md hover:shadow-lg text-sm md:text-xs whitespace-nowrap">
                   SIGN IN
                 </button>
               </Link>
               <Link to="signup">
-                <button className="px-4 py-1.5 bg-purple-700 text-white rounded-lg hover:bg-purple-800 transition-all shadow-md hover:shadow-lg text-sm whitespace-nowrap">
+                <button className="px-4 py-1.5 md:px-3 md:py-1 bg-purple-700 text-white rounded-lg hover:bg-purple-800 transition-all shadow-md hover:shadow-lg text-sm md:text-xs whitespace-nowrap">
                   SIGN UP
                 </button>
               </Link>
             </div>
           )}
           {user && (
-            <div className="dropdown dropdown-end px-4">
+            <div className="dropdown dropdown-end px-4 md:px-2">
               <div
                 tabIndex={0}
                 role="button"
-                className="w-10 h-10 rounded-full bg-purple-700 flex justify-center items-center hover:bg-purple-800 transition-all cursor-pointer"
+                className="w-10 h-10 md:w-8 md:h-8 rounded-full bg-purple-700 flex justify-center items-center hover:bg-purple-800 transition-all cursor-pointer"
               >
-                <h1 className="text-lg font-bold text-white uppercase">
-                  {name[0] + name[1]}
+                <h1 className="text-lg md:text-base font-bold text-white uppercase">
+                  {name ? name[0] + name[1] : "U"}
                 </h1>
               </div>
               <ul
                 tabIndex={0}
-                className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-gradient-to-b from-[#1a1a1a] to-[#000000] rounded-lg w-52 space-y-1"
+                className="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-gradient-to-b from-[#1a1a1a] to-[#000000] rounded-lg w-52 md:w-44 space-y-1"
               >
                 <li>
                   <Link
                     to={role === "student" ? "/student-dashboard/profile" : "/admin-dashboard"}
                     onClick={() => document.activeElement.blur()}
-                    className="text-white hover:bg-purple-600/20"
+                    className="text-white hover:bg-purple-600/20 text-sm"
                   >
                     Dashboard
                   </Link>
@@ -191,7 +193,7 @@ function Navbar() {
                 <li>
                   <a
                     onClick={handleSignOut}
-                    className="text-white hover:bg-purple-600/20 cursor-pointer"
+                    className="text-white hover:bg-purple-600/20 text-sm cursor-pointer"
                   >
                     Sign Out
                   </a>
@@ -206,9 +208,8 @@ function Navbar() {
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
           <div
-            className="relative bg-gradient-to-b from-[#1a1a1a] to-[#000000] rounded-xl p-6 w-full max-w-md 
-            border-2 border-transparent bg-clip-padding 
-            animate-glow"
+            className="relative bg-gradient-to-b from-[#1a1a1a] to-[#000000] rounded-xl p-6 md:p-4 w-full max-w-md md:max-w-sm 
+            border-2 border-transparent bg-clip-padding animate-glow"
           >
             <style>
               {`
@@ -237,14 +238,14 @@ function Navbar() {
                 }
               `}
             </style>
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold text-white tracking-wide">Bootcamps</h2>
+            <div className="flex justify-between items-center mb-4 md:mb-3">
+              <h2 className="text-2xl md:text-xl font-bold text-white tracking-wide">Bootcamps</h2>
               <button
                 onClick={() => setIsModalOpen(false)}
                 className="text-white hover:text-purple-300 transition-colors"
               >
                 <svg
-                  className="w-7 h-7"
+                  className="w-6 h-6 md:w-5 md:h-5"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -258,17 +259,17 @@ function Navbar() {
                 </svg>
               </button>
             </div>
-            <div className="space-y-3">
+            <div className="space-y-2">
               {bootcamps.map((bootcamp) => (
                 <Link
                   key={bootcamp.id}
                   to={`/free-class/${bootcamp.id}`}
                   onClick={() => setIsModalOpen(false)}
-                  className="block px-4 py-3 text-white bg-gradient-to-r from-[#2a2a2a] to-[#1a1a1a] 
+                  className="block px-3 py-2 md:px-2 md:py-1.5 text-white bg-gradient-to-r from-[#2a2a2a] to-[#1a1a1a] 
                     rounded-lg transition-all duration-300 ease-in-out 
                     hover:scale-105 hover:bg-gradient-to-r hover:from-[#8A2BE2] hover:to-[#4B0082] 
                     hover:shadow-[0_0_15px_rgba(138,43,226,0.6)] 
-                    active:scale-95 active:shadow-inner text-center font-medium"
+                    active:scale-95 active:shadow-inner text-center font-medium text-sm md:text-xs"
                 >
                   {bootcamp.roadMapName}
                 </Link>
@@ -279,15 +280,15 @@ function Navbar() {
       )}
 
       <div
-        className={`fixed top-16 left-0 h-full w-64 bg-gradient-to-b from-[#1a1a1a] to-[#000000] shadow-lg z-40 transform transition-transform duration-300 ease-in-out ${
+        className={`fixed top-16 left-0 h-full w-56 md:w-48 bg-gradient-to-b from-[#1a1a1a] to-[#000000] shadow-lg z-40 transform transition-transform duration-300 ease-in-out ${
           isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        <div className="p-4 space-y-2">
+        <div className="p-3 md:p-2 space-y-2">
           <Link
             to="/"
             onClick={() => setIsMobileMenuOpen(false)}
-            className={`block text-white hover:bg-purple-600/20 rounded-lg transition-all p-2 ${
+            className={`block text-white hover:bg-purple-600/20 rounded-lg transition-all p-2 md:p-1.5 text-sm ${
               isActive("/") ? "bg-gradient-to-r from-[#8A2BE2] to-[#4B0082]" : ""
             }`}
           >
@@ -296,7 +297,7 @@ function Navbar() {
           <Link
             to="/courses"
             onClick={() => setIsMobileMenuOpen(false)}
-            className={`block text-white hover:bg-purple-600/80 rounded-lg transition-all p-2 ${
+            className={`block text-white hover:bg-purple-600/20 rounded-lg transition-all p-2 md:p-1.5 text-sm ${
               isActive("/courses") ? "bg-gradient-to-r from-[#8A2BE2] to-[#4B0082]" : ""
             }`}
           >
@@ -308,7 +309,7 @@ function Navbar() {
                 setIsModalOpen(true);
                 setIsMobileMenuOpen(false);
               }}
-              className="w-full text-left text-white p-2 hover:bg-purple-600/20 rounded-lg"
+              className="w-full text-left text-white p-2 md:p-1.5 hover:bg-purple-600/20 rounded-lg text-sm"
             >
               BOOTCAMPS
             </button>
@@ -316,7 +317,7 @@ function Navbar() {
           <Link
             to="/about-us"
             onClick={() => setIsMobileMenuOpen(false)}
-            className={`block text-white hover:bg-purple-600/20 rounded-lg transition-all p-2 ${
+            className={`block text-white hover:bg-purple-600/20 rounded-lg transition-all p-2 md:p-1.5 text-sm ${
               isActive("/about-us") ? "bg-gradient-to-r from-[#8A2BE2] to-[#4B0082]" : ""
             }`}
           >
@@ -325,7 +326,7 @@ function Navbar() {
           <Link
             to="/products"
             onClick={() => setIsMobileMenuOpen(false)}
-            className={`block text-white hover:bg-purple-600/20 rounded-lg transition-all p-2 ${
+            className={`block text-white hover:bg-purple-600/20 rounded-lg transition-all p-2 md:p-1.5 text-sm ${
               isActive("/products") ? "bg-gradient-to-r from-[#8A2BE2] to-[#4B0082]" : ""
             }`}
           >
@@ -334,7 +335,7 @@ function Navbar() {
           <Link
             to="/carrers"
             onClick={() => setIsMobileMenuOpen(false)}
-            className={`block text-white hover:bg-purple-600/20 rounded-lg transition-all p-2 ${
+            className={`block text-white hover:bg-purple-600/20 rounded-lg transition-all p-2 md:p-1.5 text-sm ${
               isActive("/carrers") ? "bg-gradient-to-r from-[#8A2BE2] to-[#4B0082]" : ""
             }`}
           >
@@ -343,7 +344,7 @@ function Navbar() {
           <Link
             to="/contact"
             onClick={() => setIsMobileMenuOpen(false)}
-            className={`block text-white hover:bg-purple-600/20 rounded-lg transition-all p-2 ${
+            className={`block text-white hover:bg-purple-600/20 rounded-lg transition-all p-2 md:p-1.5 text-sm ${
               isActive("/contact") ? "bg-gradient-to-r from-[#8A2BE2] to-[#4B0082]" : ""
             }`}
           >
