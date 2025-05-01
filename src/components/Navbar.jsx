@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
@@ -44,18 +43,18 @@ function Navbar() {
 
   return (
     <>
-      <div className="navbar fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-[#702CF6] to-[#4B0082] shadow-lg text-xs sm:text-[13px]">
+      <div className="navbar fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-[#702CF6] to-[#4B0082] shadow-lg text-xs sm:text-[13px] h-14 sm:h-16">
         <div className="navbar-start">
           <div className="dropdown">
             <div
               tabIndex={0}
               role="button"
-              className="btn btn-ghost lg:hidden text-white hover:bg-purple-600/20 p-1 sm:p-2"
+              className="btn btn-ghost lg:hidden text-white hover:bg-purple-600/20 p-1"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                className="h-4 w-4 sm:h-5 sm:w-5"
+                className="h-5 w-5"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -65,12 +64,10 @@ function Navbar() {
             </div>
           </div>
           <Link to="/" className="flex items-center gap-1 px-2 sm:px-4">
-             <span
-                className="font-3xl md:text-3xl font-bold text-[blue] rotate-[21deg] bg-[white] px-[7px] py-[4px] rounded-[50%]"
-              >
+            <span className="text-2xl sm:text-3xl font-bold text-white antialiased hover:text-gray-200 transition-colors flex items-center">
+              <span className="font-bold text-blue-600 rotate-[21deg] bg-white px-[6px] py-[2px] sm:px-[8px] sm:py-[4px] rounded-full mr-1">
                 W
               </span>
-            <span className="text-xl sm:text-2xl font-bold text-white antialiased hover:text-gray-200 transition-colors">
               WAB AI
             </span>
           </Link>
@@ -81,7 +78,7 @@ function Navbar() {
             <li>
               <Link
                 to="/"
-                className={`px-3 py-1.5 sm:px-4 sm:py-2 text-white hover:bg-purple-600/20 rounded-lg transition-all text-xs sm:text-sm ${
+                className={`px-3 py-1 sm:px-4 sm:py-2 text-white hover:bg-purple-600/20 rounded-lg transition-all text-xs sm:text-sm ${
                   isActive("/") ? "bg-gradient-to-r from-[#8A2BE2] to-[#4B0082]" : ""
                 }`}
               >
@@ -91,7 +88,7 @@ function Navbar() {
             <li>
               <Link
                 to="/courses"
-                className={`px-3 py-1.5 sm:px-4 sm:py-2 text-white hover:bg-purple-600/20 rounded-lg transition-all text-xs sm:text-sm ${
+                className={`px-3 py-1 sm:px-4 sm:py-2 text-white hover:bg-purple-600/20 rounded-lg transition-all text-xs sm:text-sm ${
                   isActive("/courses") ? "bg-gradient-to-r from-[#8A2BE2] to-[#4B0082]" : ""
                 }`}
               >
@@ -101,7 +98,7 @@ function Navbar() {
             <li>
               <button
                 onClick={() => setIsModalOpen(true)}
-                className={`px-3 py-1.5 sm:px-4 sm:py-2 text-white hover:bg-purple-600/20 rounded-lg transition-all text-xs sm:text-sm flex items-center gap-1 ${
+                className={`px-3 py-1 sm:px-4 sm:py-2 text-white hover:bg-purple-600/20 rounded-lg transition-all text-xs sm:text-sm flex items-center gap-1 ${
                   isActive("/free-class") ? "bg-gradient-to-r from-[#8A2BE2] to-[#4B0082]" : ""
                 }`}
               >
@@ -111,7 +108,7 @@ function Navbar() {
             <li>
               <Link
                 to="/about-us"
-                className={`px-3 py-1.5 sm:px-4 sm:py-2 text-white hover:bg-purple-600/20 rounded-lg transition-all text-xs sm:text-sm ${
+                className={`px-3 py-1 sm:px-4 sm:py-2 text-white hover:bg-purple-600/20 rounded-lg transition-all text-xs sm:text-sm ${
                   isActive("/about-us") ? "bg-gradient-to-r from-[#8A2BE2] to-[#4B0082]" : ""
                 }`}
               >
@@ -121,7 +118,7 @@ function Navbar() {
             <li>
               <Link
                 to="/products"
-                className={`px-3 py-1.5 sm:px-4 sm:py-2 text-white hover:bg-purple-600/20 rounded-lg transition-all text-xs sm:text-sm ${
+                className={`px-3 py-1 sm:px-4 sm:py-2 text-white hover:bg-purple-600/20 rounded-lg transition-all text-xs sm:text-sm ${
                   isActive("/products") ? "bg-gradient-to-r from-[#8A2BE2] to-[#4B0082]" : ""
                 }`}
               >
@@ -131,7 +128,7 @@ function Navbar() {
             <li>
               <Link
                 to="/carrers"
-                className={`px-3 py-1.5 sm:px-4 sm:py-2 text-white hover:bg-purple-600/20 rounded-lg transition-all text-xs sm:text-sm ${
+                className={`px-3 py-1 sm:px-4 sm:py-2 text-white hover:bg-purple-600/20 rounded-lg transition-all text-xs sm:text-sm ${
                   isActive("/carrers") ? "bg-gradient-to-r from-[#8A2BE2] to-[#4B0082]" : ""
                 }`}
               >
@@ -141,7 +138,7 @@ function Navbar() {
             <li>
               <Link
                 to="/contact"
-                className={`px-3 py-1.5 sm:px-4 sm:py-2 text-white hover:bg-purple-600/20 rounded-lg transition-all text-xs sm:text-sm ${
+                className={`px-3 py-1 sm:px-4 sm:py-2 text-white hover:bg-purple-600/20 rounded-lg transition-all text-xs sm:text-sm ${
                   isActive("/contact") ? "bg-gradient-to-r from-[#8A2BE2] to-[#4B0082]" : ""
                 }`}
               >
@@ -155,12 +152,12 @@ function Navbar() {
           {!user && (
             <div className="flex gap-1 px-2 sm:px-4">
               <Link to="signin">
-                <button className="px-2 py-1 sm:px-4 sm:py-1.5 bg-white text-[#702CF6] rounded-lg hover:bg-gray-100 transition-all shadow-md hover:shadow-lg text-xs sm:text-sm whitespace-nowrap">
+                <button className="px-3 py-1 sm:px-4 sm:py-1.5 bg-white text-[#702CF6] rounded-lg hover:bg-gray-100 transition-all shadow-md hover:shadow-lg text-xs sm:text-sm whitespace-nowrap">
                   SIGN IN
                 </button>
               </Link>
               <Link to="signup">
-                <button className="px-2 py-1 sm:px-4 sm:py-1.5 bg-purple-700 text-white rounded-lg hover:bg-purple-800 transition-all shadow-md hover:shadow-lg text-xs sm:text-sm whitespace-nowrap">
+                <button className="px-3 py-1 sm:px-4 sm:py-1.5 bg-purple-700 text-white rounded-lg hover:bg-purple-800 transition-all shadow-md hover:shadow-lg text-xs sm:text-sm whitespace-nowrap">
                   SIGN UP
                 </button>
               </Link>
@@ -280,15 +277,15 @@ function Navbar() {
       )}
 
       <div
-        className={`fixed top-14 sm:top-16 left-0 h-full w-40 sm:w-56 bg-gradient-to-b from-[#1a1a1a] to-[#000000] shadow-lg z-40 transform transition-transform duration-300 ease-in-out ${
+        className={`fixed top-14 left-0 h-full w-48 sm:w-56 bg-gradient-to-b from-[#1a1a1a] to-[#000000] shadow-lg z-40 transform transition-transform duration-300 ease-in-out ${
           isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        <div className="p-2 sm:p-3 space-y-1 sm:space-y-2">
+        <div className="p-3 space-y-2">
           <Link
             to="/"
             onClick={() => setIsMobileMenuOpen(false)}
-            className={`block text-white hover:bg-purple-600/20 rounded-lg transition-all p-1.5 sm:p-2 text-xs sm:text-sm ${
+            className={`block text-white hover:bg-purple-600/20 rounded-lg transition-all p-2 text-sm ${
               isActive("/") ? "bg-gradient-to-r from-[#8A2BE2] to-[#4B0082]" : ""
             }`}
           >
@@ -297,7 +294,7 @@ function Navbar() {
           <Link
             to="/courses"
             onClick={() => setIsMobileMenuOpen(false)}
-            className={`block text-white hover:bg-purple-600/20 rounded-lg transition-all p-1.5 sm:p-2 text-xs sm:text-sm ${
+            className={`block text-white hover:bg-purple-600/20 rounded-lg transition-all p-2 text-sm ${
               isActive("/courses") ? "bg-gradient-to-r from-[#8A2BE2] to-[#4B0082]" : ""
             }`}
           >
@@ -309,7 +306,7 @@ function Navbar() {
                 setIsModalOpen(true);
                 setIsMobileMenuOpen(false);
               }}
-              className="w-full text-left text-white p-1.5 sm:p-2 hover:bg-purple-600/20 rounded-lg text-xs sm:text-sm"
+              className="w-full text-left text-white p-2 hover:bg-purple-600/20 rounded-lg text-sm"
             >
               BOOTCAMPS
             </button>
@@ -317,7 +314,7 @@ function Navbar() {
           <Link
             to="/about-us"
             onClick={() => setIsMobileMenuOpen(false)}
-            className={`block text-white hover:bg-purple-600/20 rounded-lg transition-all p-1.5 sm:p-2 text-xs sm:text-sm ${
+            className={`block text-white hover:bg-purple-600/20 rounded-lg transition-all p-2 text-sm ${
               isActive("/about-us") ? "bg-gradient-to-r from-[#8A2BE2] to-[#4B0082]" : ""
             }`}
           >
@@ -326,7 +323,7 @@ function Navbar() {
           <Link
             to="/products"
             onClick={() => setIsMobileMenuOpen(false)}
-            className={`block text-white hover:bg-purple-600/20 rounded-lg transition-all p-1.5 sm:p-2 text-xs sm:text-sm ${
+            className={`block text-white hover:bg-purple-600/20 rounded-lg transition-all p-2 text-sm ${
               isActive("/products") ? "bg-gradient-to-r from-[#8A2BE2] to-[#4B0082]" : ""
             }`}
           >
@@ -335,7 +332,7 @@ function Navbar() {
           <Link
             to="/carrers"
             onClick={() => setIsMobileMenuOpen(false)}
-            className={`block text-white hover:bg-purple-600/20 rounded-lg transition-all p-1.5 sm:p-2 text-xs sm:text-sm ${
+            className={`block text-white hover:bg-purple-600/20 rounded-lg transition-all p-2 text-sm ${
               isActive("/carrers") ? "bg-gradient-to-r from-[#8A2BE2] to-[#4B0082]" : ""
             }`}
           >
@@ -344,7 +341,7 @@ function Navbar() {
           <Link
             to="/contact"
             onClick={() => setIsMobileMenuOpen(false)}
-            className={`block text-white hover:bg-purple-600/20 rounded-lg transition-all p-1.5 sm:p-2 text-xs sm:text-sm ${
+            className={`block text-white hover:bg-purple-600/20 rounded-lg transition-all p-2 text-sm ${
               isActive("/contact") ? "bg-gradient-to-r from-[#8A2BE2] to-[#4B0082]" : ""
             }`}
           >
@@ -366,4 +363,3 @@ function Navbar() {
 }
 
 export default Navbar;
-
