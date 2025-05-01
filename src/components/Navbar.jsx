@@ -43,7 +43,7 @@ function Navbar() {
 
   return (
     <>
-      <div className="navbar fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-[#702CF6] to-[#4B0082] shadow-lg text-xs sm:text-[13px] h-14 sm:h-16">
+      <div className="navbar fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-[#702CF6] to-[#4B0082] shadow-lg text-xs sm:text-[13px] h-[10px] sm:h-[10px]">
         <div className="navbar-start">
           <div className="dropdown">
             <div
@@ -64,10 +64,11 @@ function Navbar() {
             </div>
           </div>
           <Link to="/" className="flex items-center gap-1 px-2 sm:px-4">
-            <span className="text-2xl sm:text-3xl font-bold text-white antialiased hover:text-gray-200 transition-colors flex items-center">
-              <span className="font-bold text-blue-600 rotate-[21deg] bg-white px-[6px] py-[2px] sm:px-[8px] sm:py-[4px] rounded-full mr-1">
-                W
-              </span>
+            <span className="text-xl sm:text-2xl font-bold text-white antialiased hover:text-gray-200 transition-colors flex items-center">
+            <span className="font-bold text-blue-600 w-[40px] h-[40px] text-center flex items-center justify-center rotate-[21deg] bg-white px-[6px] py-[2px] sm:px-[8px] sm:py-[4px] rounded-full mr-1">
+  W
+</span>
+
               WAB AI
             </span>
           </Link>
