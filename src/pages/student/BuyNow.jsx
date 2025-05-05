@@ -138,11 +138,11 @@ function BuyNow() {
     }
 
     const { courseName = "Unknown Course", price = 0, offerPrice = price, imageUrl = "", recordingId = "" } = courseData;
-    const finalPrice = offerPrice || price;
+    const finalPrice = Math.floor(offerPrice) || Math.floor(price);
 
     const options = {
       key: RAZORPAY_KEY,
-      amount: Math.floor(finalPrice * 100), // Amount in paise
+      amount: finalPrice * 100, // Amount in paise
       currency: "INR",
       name: "World's AI Bot",
       description: courseName,
@@ -231,7 +231,7 @@ function BuyNow() {
               </div>
               <div className="bg-gray-800 p-2 lg:p-6 rounded-lg shadow-lg border border-gray-700 hover:border-purple-500 transition-all">
                 <h2 className="text-lg lg:text-xl font-semibold text-purple-400">Free Internship</h2>
-                <p className="mt-1 lg:mt-2 text-gray-300">Get free internship opportunity</p>
+                <p className="mt-1 lg:mt-2 text-gray-300">Get free internship opportunity with certificate</p>
               </div>
             </div>
             <div className="mt-4 lg:mt-8">
