@@ -78,14 +78,14 @@ function CreateCourse() {
         showAlert(result, "error");
         return;
       }
+  
       const course = { ...formData };
-      const response = await axios.post(
-        `${BACKEND_URL}/create-course`,
-        course,
-        { withCredentials: true }
-      );
+      const response = await axios.post(`${BACKEND_URL}/create-course`, course, {
+        withCredentials: true,
+      });
+  
       if (response.status === 200) {
-        showAlert("Course created successfully!", "success");
+        showAlert(response.data.message, "success");
         setFormData({
           courseName: "",
           imageUrl: "",
@@ -98,11 +98,10 @@ function CreateCourse() {
           nextId: "",
           recordingId: "",
         });
-      } else {
-        showAlert("Course not created.", "error");
       }
     } catch (err) {
-      showAlert("Something went wrong while creating the course.", "error");
+      const message = err.response?.data?.message || "Something went wrong while creating the course.";
+      showAlert(message, "error");
     }
   };
 
