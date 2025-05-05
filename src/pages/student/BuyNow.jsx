@@ -142,7 +142,7 @@ function BuyNow() {
 
     const options = {
       key: RAZORPAY_KEY,
-      amount: finalPrice * 100, // Amount in paise
+      amount: Math.floor(finalPrice * 100), // Amount in paise
       currency: "INR",
       name: "World's AI Bot",
       description: courseName,
@@ -215,10 +215,10 @@ function BuyNow() {
               </div>
               <div className="bg-gray-800 p-2 lg:p-6 rounded-lg shadow-lg border border-gray-700 hover:border-purple-500 transition-all">
                 <h2 className="text-lg lg:text-xl font-semibold text-purple-400">Live Classes</h2>
-                <p className="mt-1 lg:mt-2 text-gray-300">Duration: {roadmapData.duration || "N/A"} hours</p>
+                <p className="mt-1 lg:mt-2 text-gray-300">Interactive live classes</p>
               </div>
               <div className="bg-gray-800 p-2 lg:p-6 rounded-lg shadow-lg border border-gray-700 hover:border-purple-500 transition-all">
-                <h2 className="text-lg lg:text-xl font-semibold text-purple-400">Lifetime Recording Access</h2>
+                <h2 className="text-lg lg:text-xl font-semibold text-purple-400">Recording Access</h2>
                 <p className="mt-1 lg:mt-2 text-gray-300">Revisit lessons anytime, anywhere.</p>
               </div>
               <div className="bg-gray-800 p-2 lg:p-6 rounded-lg shadow-lg border border-gray-700 hover:border-purple-500 transition-all">
@@ -284,7 +284,7 @@ function BuyNow() {
               Original Price: ₹{courseData.price || "0"}
             </h2>
             <h2 className="text-base lg:text-xl font-semibold text-purple-400">
-              Offer Price: ₹{(courseData.offerPrice || courseData.price || 0).toFixed(2)} (70% OFF)
+              Offer Price: ₹{Math.floor((courseData.offerPrice || courseData.price || 0).toFixed(2))} (70% OFF)
             </h2>
             <p className="text-gray-300 mt-1 lg:mt-2">
               Tax (5%): ₹{((courseData.offerPrice || courseData.price || 0) * 0.05).toFixed(2)}
@@ -293,7 +293,7 @@ function BuyNow() {
               Tax Discount: -₹{((courseData.offerPrice || courseData.price || 0) * 0.05).toFixed(2)}
             </p>
             <p className="text-lg lg:text-xl font-semibold text-purple-400 mt-2 lg:mt-4">
-              Total: ₹{(courseData.offerPrice || courseData.price || 0).toFixed(2)}
+              Total: ₹{Math.floor((courseData.offerPrice || courseData.price || 0).toFixed(2))}
             </p>
             <button
               className="w-full mt-2 lg:mt-6 text-white py-2 lg:py-3 rounded-lg font-semibold transition-all shadow-lg bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 hover:shadow-blue-500/50 disabled:opacity-50"
