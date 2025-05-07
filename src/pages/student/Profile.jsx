@@ -96,57 +96,97 @@ function Profile() {
   };
 
   return (
-    <div className="s-profile p-4 sm:p-8 bg-gray-950">
-      <div className="flex flex-col items-center">
-        <div className="avatar online placeholder mb-4">
-          <div className="bg-black text-white w-24 h-24 sm:w-32 sm:h-32 rounded-full flex items-center justify-center">
-            <span className="text-4xl sm:text-6xl font-bold uppercase">
-              {name.slice(0, 2).toUpperCase()}
-            </span>
-          </div>
-        </div>
-        <h1 className="text-2xl sm:text-4xl mb-2">{greeting}</h1>
-        <h1 className="text-xl sm:text-3xl mb-6">Welcome Back {name}!</h1>
-        <div className="w-full sm:w-3/6 bg-base-400 p-4 sm:p-7 rounded-2xl border-2 border-sky-500 s-form text-center">
-          <label className="input input-bordered flex items-center gap-2 mb-3">
-            Full Name:
-            <input
-              type="text"
-              className="grow"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
-          </label>
-          <label className="input input-bordered flex items-center gap-2 mb-3">
-            Mobile number:
-            <input
-              type="number"
-              className="grow"
-              value={number}
-              onChange={(e) => setNumber(e.target.value)}
-            />
-          </label>
-          <label className="input input-bordered flex items-center gap-2 mb-3">
-            College Name:
-            <input
-              type="text"
-              className="grow"
-              value={universityName}
-              onChange={(e) => setUniversityName(e.target.value)}
-            />
-          </label>
-          <p className={`mb-3 ${isSuccess ? 'text-green-500' : 'text-red-500'}`}>
-            {formError}
-          </p>
-          <button
-            className="btn w-full btn-info"
-            onClick={handleProfileSave}
-          >
-            Save Profile
-          </button>
+    <div className="s-profile p-6 sm:p-10 bg-gray-950 min-h-screen flex items-center justify-center">
+  <div className="flex flex-col items-center w-full max-w-2xl">
+    {/* Avatar Section */}
+    <div className="flex flex-col items-center mb-8">
+      <div className="avatar online placeholder mb-5">
+        <div className="bg-gradient-to-br from-blue-600 to-indigo-800 text-white w-28 h-28 sm:w-36 sm:h-36 rounded-full flex items-center justify-center shadow-lg">
+          <span className="text-5xl sm:text-7xl font-bold uppercase tracking-wider">
+            {name.slice(0, 2).toUpperCase()}
+          </span>
         </div>
       </div>
+      <h1 className="text-3xl sm:text-5xl font-bold text-center mb-2 bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent">
+        {greeting}
+      </h1>
+      <h2 className="text-xl sm:text-3xl text-gray-300 font-medium text-center">
+        Welcome back, <span className="text-white font-semibold">{name}</span>!
+      </h2>
     </div>
+
+    {/* Profile Form */}
+    <div className="w-full bg-gray-900 p-6 sm:p-8 rounded-xl border border-gray-700 shadow-xl backdrop-blur-sm bg-opacity-50">
+      <div className="space-y-2">
+        <div className="form-control">
+          <label className="label">
+            <span className="label-text text-gray-400">Full Name</span>
+          </label>
+          <input
+            type="text"
+            placeholder="Enter your full name"
+            className="input input-bordered w-full bg-gray-800 border-gray-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 text-white"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+        </div>
+
+        <div className="form-control">
+          <label className="label">
+            <span className="label-text text-gray-400">Mobile Number</span>
+          </label>
+          <input
+            type="tel"
+            placeholder="Enter your mobile number"
+            className="input input-bordered w-full bg-gray-800 border-gray-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 text-white"
+            value={number}
+            onChange={(e) => setNumber(e.target.value)}
+          />
+        </div>
+
+        <div className="form-control">
+          <label className="label">
+            <span className="label-text text-gray-400">College Name</span>
+          </label>
+          <input
+            type="text"
+            placeholder="Enter your college name"
+            className="input input-bordered w-full bg-gray-800 border-gray-700 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/50 text-white"
+            value={universityName}
+            onChange={(e) => setUniversityName(e.target.value)}
+          />
+        </div>
+
+        {/* Status Message */}
+        {formError && (
+          <div className={`mt-2 text-sm ${isSuccess ? 'text-green-400' : 'text-red-400'} flex items-center justify-center`}>
+            {isSuccess ? (
+              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+              </svg>
+            ) : (
+              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            )}
+            {formError}
+          </div>
+        )}
+
+        {/* Save Button */}
+        <button
+          className="btn w-full mt-6 bg-gradient-to-r from-blue-600 to-indigo-600 border-none text-white hover:from-blue-700 hover:to-indigo-700 shadow-lg transition-all duration-300 transform hover:scale-[1.02]"
+          onClick={handleProfileSave}
+        >
+          Save Profile
+          <svg className="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
   );
 }
 

@@ -1,10 +1,10 @@
-
 import React, { useState } from "react";
 import axios from "axios";
 import { SignupFormValidate } from "../../utils/signupFormvalidate";
 import { useNavigate } from 'react-router-dom';
 import { Link } from "react-router-dom";
 import { BACKEND_URL } from "../../../config/constant";
+
 function Signup() {
   const navigate = useNavigate();
   const [name, setName] = useState("");
@@ -41,157 +41,353 @@ function Signup() {
         setIsSuccess(true);
         setTimeout(() => {
           navigate('/signin');
-        }, 3000); // 3s for full animation
+        }, 3000);
       }
     } catch (err) {
-      setFormError(err.response?.data?.message || "Invalid credentials");
+      setFormError(err.response?.data?.message || "An error occurred during registration");
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <div className="min-h-screen flex items-start md:items-center justify-center p-2 bg-black relative overflow-hidden">
-      {/* Starry background */}
-      <div className="absolute inset-0 z-0">
+    <div className="min-h-screen flex items-start md:items-center justify-center p-4 bg-black relative overflow-hidden">
+      {/* Cosmic Background with Animated Particles */}
+      <div className="absolute inset-0 z-0 bg-gradient-to-br from-black via-purple-900/5 to-black overflow-hidden">
+        {/* Animated particles */}
+        {[...Array(30)].map((_, i) => (
+          <div 
+            key={i}
+            className="absolute rounded-full bg-white/5"
+            style={{
+              width: `${Math.random() * 5 + 1}px`,
+              height: `${Math.random() * 5 + 1}px`,
+              top: `${Math.random() * 100}%`,
+              left: `${Math.random() * 100}%`,
+              animation: `float ${Math.random() * 20 + 10}s linear infinite`,
+              animationDelay: `${Math.random() * 5}s`
+            }}
+          />
+        ))}
+        
+        {/* Star layers */}
         <div className="stars-layer layer1"></div>
         <div className="stars-layer layer2"></div>
         <div className="stars-layer layer3"></div>
-        <div className="stars-layer layer4"></div>
       </div>
 
-      <div className={`w-full max-w-lg bg-black/80 rounded-2xl shadow-lg p-6 ${isSuccess ? '' : 'border-2 border-sky-500'} relative z-10 mx-2 mt-8 md:mt-0`}>
-        {isSuccess ? (
-          <div className="flex justify-center items-center h-full">
-            <div className="success-planet">Success!</div>
-          </div>
-        ) : (
-          <>
-            <h1 className="text-2xl font-bold text-center text-white mb-2">
-              Sign Up for Free
-            </h1>
-            <p className="text-center text-gray-300 mb-4">
-              Learn with the first worldsAIbot
-            </p>
+      {/* Main Container */}
+      <div className="w-full max-w-6xl relative z-10 mx-2 mt-8 md:mt-0">
+        <div className="flex flex-col md:flex-row backdrop-blur-xl rounded-3xl shadow-2xl overflow-hidden bg-gradient-to-br from-gray-900/70 via-gray-800/60 to-gray-900/70 border border-white/10 transition-all duration-500">
+          {/* Left Side - Wab AI Description (Hidden on mobile) */}
+          <div className="hidden md:block w-full md:w-1/2 p-8">
+            <div className="h-full flex flex-col justify-between">
+              <div>
+                <div className="w-20 h-20 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-[50%] flex items-center justify-center mb-6 shadow-lg shadow-purple-500/30 ">
+                  <span className="text-white text-3xl font-bold tracking-tighter rotate-[21deg]">W</span>
+                </div>
+                <h1 className="text-4xl font-bold text-white mb-4">
+                  Welcome to <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-purple-500">Wab AI</span>
+                </h1>
+                <p className="text-gray-300/90 text-lg mb-8">
+                  The next generation of AI-powered solutions for your productivity and creativity.
+                </p>
+                
+                <div className="space-y-6">
+                  <div className="flex items-start">
+                    <div className="flex-shrink-0 mt-1">
+                      <div className="h-6 w-6 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 flex items-center justify-center">
+                        <svg className="h-4 w-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                      </div>
+                    </div>
+                    <div className="ml-3">
+                      <h3 className="text-lg font-medium text-white">Advanced AI Models</h3>
+                      <p className="mt-1 text-gray-300/90">
+                        Access cutting-edge artificial intelligence tailored to your needs.
+                      </p>
+                    </div>
+                  </div>
 
-            {formError && (
-              <div className="bg-red-100 border border-red-400 text-red-700 px-3 py-1 rounded-md mb-3 text-sm">
-                {formError}
-              </div>
-            )}
+                  <div className="flex items-start">
+                    <div className="flex-shrink-0 mt-1">
+                      <div className="h-6 w-6 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 flex items-center justify-center">
+                        <svg className="h-4 w-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                      </div>
+                    </div>
+                    <div className="ml-3">
+                      <h3 className="text-lg font-medium text-white">Secure Platform</h3>
+                      <p className="mt-1 text-gray-300/90">
+                        Enterprise-grade security and privacy for all your data.
+                      </p>
+                    </div>
+                  </div>
 
-            <div className="space-y-3">
-              <div className="flex flex-col space-y-1">
-                <label className="text-sm text-white">Full Name</label>
-                <div className="flex items-center bg-white/10 border border-gray-700 rounded-lg overflow-hidden">
-                  <span className="px-2 text-gray-400">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-                    </svg>
-                  </span>
-                  <input
-                    type="text"
-                    placeholder="John Doe"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    className="w-full p-2 outline-none bg-transparent text-white placeholder-gray-400"
-                  />
+                  <div className="flex items-start">
+                    <div className="flex-shrink-0 mt-1">
+                      <div className="h-6 w-6 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 flex items-center justify-center">
+                        <svg className="h-4 w-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                      </div>
+                    </div>
+                    <div className="ml-3">
+                      <h3 className="text-lg font-medium text-white">24/7 Support</h3>
+                      <p className="mt-1 text-gray-300/90">
+                        Our team is always ready to help you with any questions.
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              <div className="flex flex-col space-y-1">
-                <label className="text-sm text-white">Mobile Number</label>
-                <div className="flex items-center bg-white/10 border border-gray-700 rounded-lg overflow-hidden">
-                  <span className="px-2 text-gray-400">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                      <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
-                    </svg>
-                  </span>
-                  <input
-                    type="number"
-                    placeholder="1234567890"
-                    value={number}
-                    onChange={(e) => setNumber(e.target.value)}
-                    className="w-full p-2 outline-none bg-transparent text-white placeholder-gray-400"
-                  />
-                </div>
+              <div className="mt-8 pt-6 border-t border-white/10">
+                <p className="text-gray-300/90">
+                  Already have an account?{' '}
+                  <Link to="/signin" className="text-indigo-400 hover:text-indigo-300 hover:underline">
+                    Sign in here
+                  </Link>
+                </p>
               </div>
-
-              <div className="flex flex-col space-y-1">
-                <label className="text-sm text-white">Email</label>
-                <div className="flex items-center bg-white/10 border border-gray-700 rounded-lg overflow-hidden">
-                  <span className="px-2 text-gray-400">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                      <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
-                      <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
-                    </svg>
-                  </span>
-                  <input
-                    type="email"
-                    placeholder="john@example.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full p-2 outline-none bg-transparent text-white placeholder-gray-400"
-                  />
-                </div>
-              </div>
-
-              <div className="flex flex-col space-y-1">
-                <label className="text-sm text-white">Password</label>
-                <div className="flex items-center bg-white/10 border border-gray-700 rounded-lg overflow-hidden">
-                  <span className="px-2 text-gray-400">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
-                    </svg>
-                  </span>
-                  <input
-                    type="password"
-                    placeholder="********"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="w-full p-2 outline-none bg-transparent text-white placeholder-gray-400"
-                  />
-                </div>
-              </div>
-
-              <div className="flex flex-col space-y-1">
-                <label className="text-sm text-white">Confirm Password</label>
-                <div className="flex items-center bg-white/10 border border-gray-700 rounded-lg overflow-hidden">
-                  <span className="px-2 text-gray-400">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
-                    </svg>
-                  </span>
-                  <input
-                    type="password"
-                    placeholder="********"
-                    value={cPassword}
-                    onChange={(e) => setCPassword(e.target.value)}
-                    className="w-full p-2 outline-none bg-transparent text-white placeholder-gray-400"
-                  />
-                </div>
-              </div>
-
-              <button
-                onClick={handleSignUp}
-                disabled={loading}
-                className="w-full bg-sky-500 text-white py-2 rounded-lg hover:bg-sky-600 transition-all"
-              >
-                {loading ? "Signing Up..." : "Sign Up"}
-              </button>
-
-              <p className="text-center text-gray-300 mt-1 md:mt-2">
-                Already have an account?{" "}
-                <Link to="/signin" className="text-sky-500 hover:underline">
-                  Sign In
-                </Link>
-              </p>
             </div>
-          </>
-        )}
+          </div>
+
+          {/* Vertical Divider (Visible on large screens) */}
+          <div className="hidden md:block w-px bg-white/10"></div>
+
+          {/* Right Side - Form (Always visible) */}
+          <div className="w-full md:w-1/2 p-8 relative z-10" style={isSuccess ? { transform: 'scale(0.95)' } : { transform: 'scale(1)' }}>
+            {isSuccess ? (
+              <div className="flex flex-col items-center justify-center py-12 px-4">
+                {/* Animated Success Checkmark */}
+                <div className="relative mb-8">
+                  <div className="w-32 h-32 bg-gradient-to-br from-emerald-400 to-teal-600 rounded-full flex items-center justify-center shadow-lg shadow-emerald-500/30">
+                    <svg 
+                      className="h-20 w-20 text-white animate-checkmark"
+                      viewBox="0 0 52 52" 
+                      fill="none"
+                    >
+                      <circle cx="26" cy="26" r="25" fill="none" stroke="currentColor" strokeWidth="2"/>
+                      <path 
+                        className="animate-checkmark-path"
+                        stroke="currentColor" 
+                        strokeWidth="4" 
+                        strokeLinecap="round"
+                        d="M14.1 27.2l7.1 7.2 16.7-16.8"
+                      />
+                      </svg>
+                    </div>
+                    <div className="absolute -inset-4 rounded-full border-2 border-teal-400/30 animate-ping-slow opacity-0"></div>
+                  </div>
+                  
+                  <h2 className="text-3xl font-bold text-white text-center mb-2">
+                    Welcome Aboard!
+                  </h2>
+                  <p className="text-gray-300 text-center max-w-md">
+                    Your account has been successfully created. Redirecting you to sign in...
+                  </p>
+                  
+                  {/* Progress bar */}
+                  <div className="w-full bg-white/10 rounded-full h-1.5 mt-6 overflow-hidden">
+                    <div 
+                      className="bg-gradient-to-r from-emerald-400 to-teal-600 h-1.5 rounded-full animate-progress" 
+                      style={{ animationDuration: '3s' }}
+                    ></div>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  {/* Logo and Header */}
+                  <div className="text-center mb-8">
+                    <h1 className="text-3xl font-bold text-white mb-2">
+                      Create Your <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-purple-500">Account</span>
+                    </h1>
+                    <p className="text-gray-300/90">
+                      Join our community of learners and innovators
+                    </p>
+                  </div>
+
+                  {/* Error Message */}
+                  {formError && (
+                    <div className="bg-red-500/10 border border-red-500/30 text-red-300 px-4 py-3 rounded-xl mb-6 text-sm flex items-start">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 mt-0.5 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                      </svg>
+                      <span>{formError}</span>
+                    </div>
+                  )}
+
+                  {/* Form Fields */}
+                  <div className="space-y-5">
+                    <div className="space-y-1.5">
+                      <label className="text-sm font-medium text-gray-300/90 flex items-center">
+                        Full Name
+                        <span className="text-red-400 ml-1">*</span>
+                      </label>
+                      <div className="flex items-center bg-white/5 border border-white/10 rounded-xl overflow-hidden transition-all duration-200 focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/30 hover:border-white/20">
+                        <span className="px-3 text-gray-400">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                          </svg>
+                        </span>
+                        <input
+                          type="text"
+                          placeholder="John Doe"
+                          value={name}
+                          onChange={(e) => setName(e.target.value)}
+                          className="w-full p-3 outline-none bg-transparent text-white placeholder-gray-400/70"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="text-sm font-medium text-gray-300/90 flex items-center">
+                        Mobile Number
+                        <span className="text-red-400 ml-1">*</span>
+                      </label>
+                      <div className="flex items-center bg-white/5 border border-white/10 rounded-xl overflow-hidden transition-all duration-200 focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/30 hover:border-white/20">
+                        <span className="px-3 text-gray-400">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
+                          </svg>
+                        </span>
+                        <input
+                          type="tel"
+                          placeholder="1234567890"
+                          value={number}
+                          onChange={(e) => setNumber(e.target.value)}
+                          className="w-full p-3 outline-none bg-transparent text-white placeholder-gray-400/70"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="text-sm font-medium text-gray-300/90 flex items-center">
+                        Email
+                        <span className="text-red-400 ml-1">*</span>
+                      </label>
+                      <div className="flex items-center bg-white/5 border border-white/10 rounded-xl overflow-hidden transition-all duration-200 focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/30 hover:border-white/20">
+                        <span className="px-3 text-gray-400">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+                            <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+                          </svg>
+                        </span>
+                        <input
+                          type="email"
+                          placeholder="john@example.com"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          className="w-full p-3 outline-none bg-transparent text-white placeholder-gray-400/70"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="text-sm font-medium text-gray-300/90 flex items-center">
+                        Password
+                        <span className="text-red-400 ml-1">*</span>
+                      </label>
+                      <div className="flex items-center bg-white/5 border border-white/10 rounded-xl overflow-hidden transition-all duration-200 focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/30 hover:border-white/20">
+                        <span className="px-3 text-gray-400">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+                          </svg>
+                        </span>
+                        <input
+                          type="password"
+                          placeholder="••••••••"
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          className="w-full p-3 outline-none bg-transparent text-white placeholder-gray-400/70"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-1.5">
+                      <label className="text-sm font-medium text-gray-300/90 flex items-center">
+                        Confirm Password
+                        <span className="text-red-400 ml-1">*</span>
+                      </label>
+                      <div className="flex items-center bg-white/5 border border-white/10 rounded-xl overflow-hidden transition-all duration-200 focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/30 hover:border-white/20">
+                        <span className="px-3 text-gray-400">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+                          </svg>
+                        </span>
+                        <input
+                          type="password"
+                          placeholder="••••••••"
+                          value={cPassword}
+                          onChange={(e) => setCPassword(e.target.value)}
+                          className="w-full p-3 outline-none bg-transparent text-white placeholder-gray-400/70"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Terms and Conditions */}
+                    <div className="flex items-start mt-4">
+                      <div className="flex items-center h-5">
+                        <input
+                          id="terms"
+                          name="terms"
+                          type="checkbox"
+                          className="h-4 w-4 rounded border-white/20 bg-white/5 text-indigo-500 focus:ring-indigo-500"
+                        />
+                      </div>
+                      <div className="ml-3 text-sm">
+                        <label htmlFor="terms" className="text-gray-300/90">
+                          I agree to the{' '}
+                          <a href="#" className="text-indigo-400 hover:text-indigo-300 hover:underline">
+                            Terms of Service
+                          </a>{' '}
+                          and{' '}
+                          <a href="#" className="text-indigo-400 hover:text-indigo-300 hover:underline">
+                            Privacy Policy
+                          </a>
+                        </label>
+                      </div>
+                    </div>
+
+                    {/* Sign Up Button */}
+                    <button
+                      onClick={handleSignUp}
+                      disabled={loading}
+                      className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white py-3.5 rounded-xl font-medium hover:opacity-90 transition-all duration-300 flex items-center justify-center shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/30 mt-4"
+                    >
+                      {loading ? (
+                        <>
+                          <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          </svg>
+                          Creating Account...
+                        </>
+                      ) : (
+                        "Sign Up Now"
+                      )}
+                    </button>
+                  </div>
+
+                  {/* Sign in option (shown on mobile only) */}
+                  <div className="mt-8 pt-6 border-t border-white/10 md:hidden">
+                    <p className="text-gray-300/90 text-center">
+                      Already have an account?{' '}
+                      <Link to="/signin" className="text-indigo-400 hover:text-indigo-300 hover:underline">
+                        Sign in here
+                      </Link>
+                    </p>
+                  </div>
+                </>
+              )}
+          </div>
+        </div>
       </div>
 
-      {/* CSS for starry background and success planet */}
+      {/* CSS Animations */}
       <style jsx>{`
         .stars-layer {
           position: absolute;
@@ -208,30 +404,24 @@ function Signup() {
 
         .layer1 {
           opacity: 1;
-          animation-duration: 20s;
+          animation-duration: 25s;
           background-size: 1200px 1200px;
-          filter: blur(2px);
+          filter: blur(0.8px);
         }
 
         .layer2 {
-          opacity: 0.8;
-          animation-duration: 15s;
+          opacity: 0.7;
+          animation-duration: 20s;
           background-size: 800px 800px;
           transform: scale(1.2);
+          filter: blur(0.4px);
         }
 
         .layer3 {
-          opacity: 0.6;
-          animation-duration: 10s;
+          opacity: 0.5;
+          animation-duration: 15s;
           background-size: 500px 500px;
           transform: scale(1.5);
-        }
-
-        .layer4 {
-          opacity: 0.4;
-          animation-duration: 5s;
-          background-size: 300px 300px;
-          transform: scale(2);
         }
 
         @keyframes deep-stars {
@@ -245,151 +435,74 @@ function Signup() {
           }
         }
 
-        .success-planet {
-          width: 120px;
-          height: 120px;
-          background: #00ff00; /* Pure green */
-          border-radius: 50%;
-          color: #000000; /* Black text */
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 24px;
-          font-weight: bold;
-          position: absolute;
-          animation: travel-rotate 2s ease-out forwards, burst 1s ease-out 2s forwards;
-        }
-
-        /* Pseudo-elements for burst chunks */
-        .success-planet::before,
-        .success-planet::after,
-        .success-planet > span::before,
-        .success-planet > span::after {
-          content: '';
-          position: absolute;
-          width: 20px;
-          height: 20px;
-          background: #00ff00;
-          border-radius: 50%;
-          opacity: 0;
-        }
-
-        .success-planet > span::before {
-          content: '';
-        }
-
-        .success-planet > span::after {
-          content: '';
-        }
-
-        @keyframes travel-rotate {
+        @keyframes float {
           0% {
-            transform: translate(-300px, 200px) rotate(0deg) scale(0.5);
+            transform: translateY(0) translateX(0);
+            opacity: 0;
+          }
+          10% {
             opacity: 1;
           }
-          25% {
-            transform: translate(0, -200px) rotate(720deg) scale(1); /* Top center */
+          90% {
             opacity: 1;
+          }
+          100% {
+            transform: translateY(-100vh) translateX(20px);
+            opacity: 0;
+          }
+        }
+
+        @keyframes ping-slow {
+          0% {
+            transform: scale(0.8);
+            opacity: 0.8;
+          }
+          70%, 100% {
+            transform: scale(1.3);
+            opacity: 0;
+          }
+        }
+
+        .animate-ping-slow {
+          animation: ping-slow 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+        }
+
+        .animate-checkmark {
+          animation: checkmark-scale 0.3s ease-in-out both;
+        }
+
+        .animate-checkmark-path {
+          stroke-dasharray: 48;
+          stroke-dashoffset: 48;
+          animation: checkmark-stroke 0.5s cubic-bezier(0.65, 0, 0.45, 1) 0.3s forwards;
+        }
+
+        @keyframes checkmark-stroke {
+          100% {
+            stroke-dashoffset: 0;
+          }
+        }
+
+        @keyframes checkmark-scale {
+          0%, 100% {
+            transform: none;
           }
           50% {
-            transform: translate(300px, 200px) rotate(1440deg) scale(1.2); /* Bottom right */
-            opacity: 1;
-          }
-          75% {
-            transform: translate(-150px, 0) rotate(2160deg) scale(1); /* Left middle */
-            opacity: 1;
-          }
-          100% {
-            transform: translate(0, 0) rotate(2880deg) scale(1); /* Center */
-            opacity: 1;
+            transform: scale3d(1.1, 1.1, 1);
           }
         }
 
-        @keyframes burst {
+        .animate-progress {
+          animation: progress-bar 3s linear forwards;
+        }
+
+        @keyframes progress-bar {
           0% {
-            transform: scale(1);
-            opacity: 1;
+            width: 0%;
           }
           100% {
-            transform: scale(0);
-            opacity: 0;
+            width: 100%;
           }
-        }
-
-        @keyframes burst-chunk1 {
-          0% {
-            opacity: 0;
-            transform: translate(0, 0);
-          }
-          10% {
-            opacity: 1;
-            transform: translate(0, 0);
-          }
-          100% {
-            opacity: 0;
-            transform: translate(-60px, -60px);
-          }
-        }
-
-        @keyframes burst-chunk2 {
-          0% {
-            opacity: 0;
-            transform: translate(0, 0);
-          }
-          10% {
-            opacity: 1;
-            transform: translate(0, 0);
-          }
-          100% {
-            opacity: 0;
-            transform: translate(60px, 60px);
-          }
-        }
-
-        @keyframes burst-chunk3 {
-          0% {
-            opacity: 0;
-            transform: translate(0, 0);
-          }
-          10% {
-            opacity: 1;
-            transform: translate(0, 0);
-          }
-          100% {
-            opacity: 0;
-            transform: translate(-60px, 60px);
-          }
-        }
-
-        @keyframes burst-chunk4 {
-          0% {
-            opacity: 0;
-            transform: translate(0, 0);
-          }
-          10% {
-            opacity: 1;
-            transform: translate(0, 0);
-          }
-          100% {
-            opacity: 0;
-            transform: translate(60px, -60px);
-          }
-        }
-
-        .success-planet::before {
-          animation: burst-chunk1 1s ease-out 2s forwards;
-        }
-
-        .success-planet::after {
-          animation: burst-chunk2 1s ease-out 2s forwards;
-        }
-
-        .success-planet > span::before {
-          animation: burst-chunk3 1s ease-out 2s forwards;
-        }
-
-        .success-planet > span::after {
-          animation: burst-chunk4 1s ease-out 2s forwards;
         }
       `}</style>
     </div>

@@ -161,9 +161,10 @@ const Careers = () => {
       {/* Alert Component */}
       {alert && (
         <div
-          className={`fixed bottom-4 right-4 px-4 py-3 rounded-lg text-white shadow-lg transition-all duration-300 z-[50] ${
-            alert.type === 'success' ? 'bg-green-600' : 'bg-red-600'
-          } flex flex-col w-80`}
+        className={`fixed bottom-4 right-4 px-4 py-3 rounded-lg text-white shadow-lg transition-all duration-300 z-[50] ${
+          alert.type === 'success' ? 'bg-green-600' : 'bg-red-600'
+        } flex flex-col w-80 ${alert.visible ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+        
         >
           <div className="flex items-center space-x-2">
             <span className="flex-1">{alert.message}</span>

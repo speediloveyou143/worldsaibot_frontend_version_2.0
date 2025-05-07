@@ -59,7 +59,7 @@ function Footer() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
             <div className="space-y-6">
               <h3 className="text-xl font-bold bg-gradient-to-r from-purple-400 to-fuchsia-400 bg-clip-text text-transparent">
-                WorldsAi Bot
+                WAB AI
               </h3>
               <p className="text-gray-400">
                 Transforming careers through AI-powered education and mentorship.

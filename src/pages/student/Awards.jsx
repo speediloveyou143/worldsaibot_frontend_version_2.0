@@ -498,7 +498,7 @@ function Awards() {
               : alert.type === 'info'
               ? 'bg-blue-600'
               : 'bg-red-600'
-          } flex flex-col w-80`}
+          } flex flex-col w-80 ${alert.visible ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
         >
           <div className="flex items-center space-x-2">
             <span className="flex-1">{alert.message}</span>

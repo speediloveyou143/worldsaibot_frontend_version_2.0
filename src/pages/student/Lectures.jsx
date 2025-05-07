@@ -78,7 +78,7 @@ function Lectures() {
         : alert.type === 'info'
         ? 'bg-blue-600'
         : 'bg-red-600'
-    } flex flex-col w-80 sm:bottom-4 sm:right-4 sm:top-auto sm:left-auto sm:translate-x-0 opacity-100`}
+    } flex flex-col w-80 ${alert.visible ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
   >
     <div className="flex items-center space-x-2">
       <span className="flex-1">{alert.message}</span>
