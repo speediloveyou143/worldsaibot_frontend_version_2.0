@@ -90,20 +90,21 @@ function ProtectedRoute({ element: Element, allowedRole }) {
 
 // Separate component for routes
 function AppRoutes(props) {
+  console.log(props)
   return (
     <Routes>
       <Route path="/" element={<Body data={props.bootcamps} />}>
         <Route index element={<Home {...props}/>} />
-        <Route path="/courses" element={<Courses />} />
+        <Route path="/courses" element={<Courses {...props.bannerData}/>} />
         <Route path="/contact" element={<Contact {...props.bannerData}/>} />
-        <Route path="/about-us" element={<About />} />
-        <Route path="/carrers" element={<Carrers />} />
-        <Route path="/products" element={<Products />} />
+        <Route path="/about-us" element={<About {...props.bannerData}/>} />
+        <Route path="/carrers" element={<Carrers {...props.bannerData}/>} />
+        <Route path="/products" element={<Products {...props.bannerData}/>} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/signin" element={<Signin />} />
         <Route path="/buy-now/:id/:courseId" element={<BuyNow />} />
-        <Route path="/privacy-policy" element={<Terms />} />
-        <Route path="/free-class/:id" element={<FreeClass />} />
+        <Route path="/privacy-policy" element={<Terms/>} />
+        <Route path="/free-class/:id" element={<FreeClass {...props.bannerData}/>} />
         <Route path="/register-successful" element={<Thanks />} />
         <Route path="/reset-password-request" element={<ResetPasswordRequest />} />
 

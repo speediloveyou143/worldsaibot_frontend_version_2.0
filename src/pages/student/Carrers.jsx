@@ -3,7 +3,7 @@ import axios from 'axios';
 import Footer from '../../components/Footer';
 import { BACKEND_URL } from '../../../config/constant';
 
-const Careers = () => {
+const Careers = (props) => {
   const [departments, setDepartments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [emailLoading, setEmailLoading] = useState(true);
@@ -288,7 +288,7 @@ const Careers = () => {
         </div>
       </div>
 
-      <Footer />
+      <Footer {...props} />
     </div>
   );
 };

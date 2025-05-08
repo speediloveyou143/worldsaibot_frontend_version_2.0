@@ -5,7 +5,7 @@ import { Country, State } from "country-state-city";
 import Footer from '../../components/Footer';
 import { BACKEND_URL } from '../../../config/constant';
 
-const FreeClass = () => {
+const FreeClass = (props) => {
   const navigate = useNavigate();
   const { id } = useParams();
   const [timeLeft, setTimeLeft] = useState({
@@ -67,7 +67,7 @@ const FreeClass = () => {
     const fetchBootcamp = async () => {
       try {
         showAlert("Loading bootcamp data...", "info");
-        const response = await axios.get(`${BACKEND_URL}/show-bootcamp/${id}`);
+        const response = await axios.get(`${BACKEND_URL}/show-bootcamp/${id}`,{withCredentials:true});
         setBootcampData(response.data);
         setFormData((prev) => ({
           ...prev,
@@ -406,7 +406,7 @@ const FreeClass = () => {
         </div>
       </section>
 
-      <Footer />
+      <Footer {...props}/>
 
       <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black to-transparent backdrop-blur-sm border-t border-blue-900/30">
         <div className="container mx-auto flex flex-col md:flex-row items-center justify-between gap-4">

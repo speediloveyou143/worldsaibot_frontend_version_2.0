@@ -3,7 +3,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import Footer from '../../components/Footer';
 
-const About = () => {
+const About = (props) => {
   const courses = [
     {
       title: 'AI & Machine Learning',
@@ -123,7 +123,7 @@ const About = () => {
       </div>
 
 
-      <Footer />
+      <Footer {...props}/>
     </div>
   );
 };

@@ -245,10 +245,10 @@ const Home = (props) => {
               </button>
             </div>
             <div className="space-y-3">
-              {props.bootcamps||[].map((bootcamp) => (
+              {(props.bootcamps||[]).map((bootcamp) => (
                 <Link
-                  key={bootcamp._id}
-                  to={`/free-class/${bootcamp._id}`}
+                  key={bootcamp.id}
+                  to={`/free-class/${bootcamp.id}`}
                   onClick={() => setIsModalOpen(false)}
                   className="block px-4 py-3 text-white bg-gradient-to-r from-[#2a2a2a] to-[#1a1a1a] 
                     rounded-lg transition-all duration-300 ease-in-out 

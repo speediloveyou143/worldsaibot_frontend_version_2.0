@@ -175,7 +175,7 @@ function Footer(props) {
                 </button>
               </div>
               <div className="space-y-3">
-                {props.bootcamps.map((bootcamp) => (
+                {(props.bootcamps||[]).map((bootcamp) => (
                   <Link
                     key={bootcamp.id}
                     to={`/free-class/${bootcamp.id}`}

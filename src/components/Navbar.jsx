@@ -246,7 +246,7 @@ function Navbar(props) {
               </button>
             </div>
             <div className="space-y-2">
-              {props.bootcamps||[].map((bootcamp) => (
+              {(props.data||[]).map((bootcamp) => (
                 <Link
                   key={bootcamp.id}
                   to={`/free-class/${bootcamp.id}`}

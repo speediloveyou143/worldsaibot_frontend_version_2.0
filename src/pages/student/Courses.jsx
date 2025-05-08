@@ -1,11 +1,11 @@
 import React from 'react'
 import Footer from '../../components/Footer'
 import CourseCards from '../../components/CourseCards'
-function Courses() {
+function Courses(props) {
   return (
     <div>
       <CourseCards/>
-      <Footer/>
+      <Footer {...props}/>
     </div>
   )
 }

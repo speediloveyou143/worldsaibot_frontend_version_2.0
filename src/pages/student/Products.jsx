@@ -2,7 +2,7 @@
 import React from 'react';
 import Footer from '../../components/Footer';
 
-const Products = () => {
+const Products = (props) => {
   const products = [
     {
       category: 'AI-Powered Development',
@@ -154,7 +154,7 @@ const Products = () => {
           </div>
         </div>
       </div>
-      <Footer />
+      <Footer {...props}/>
     </div>
   );
 };

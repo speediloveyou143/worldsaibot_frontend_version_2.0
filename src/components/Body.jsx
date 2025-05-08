@@ -33,7 +33,7 @@ function Body(props) {
 
   return (
     <div>
-      <Navbar bootcamps={props.data}/>
+      <Navbar {...props}/>
       <Outlet />
     </div>
   );
