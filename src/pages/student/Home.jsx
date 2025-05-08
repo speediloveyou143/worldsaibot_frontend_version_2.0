@@ -4,16 +4,10 @@ import axios from 'axios';
 import Footer from '../../components/Footer';
 import { BACKEND_URL } from '../../../config/constant';
 
-const Home = () => {
+const Home = (props) => {
   const [companies, setCompanies] = useState([]);
   const [videos, setVideos] = useState([]);
   const [hoverIndex, setHoverIndex] = useState(null);
-  const [bannerData, setBannerData] = useState({
-    offer: '🎉 Special Launch Offer - Enroll Now!',
-    heading: 'Transform Your Future',
-    tag: 'Join 10,000+ learners mastering in-demand skills with our AI-powered platform.',
-  });
-  const [bootcamps, setBootcamps] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [alert, setAlert] = useState(null);
   const [progress, setProgress] = useState(100);
@@ -53,29 +47,6 @@ const Home = () => {
   }, [alert]);
 
   useEffect(() => {
-    // Fetch banner data
-    const fetchBannerData = async () => {
-      try {
-        showAlert("Loading banner data...", "info");
-        const response = await axios.get(`${BACKEND_URL}/all-contacts`,{withCredentials:true});
-        const data = response.data[0];
-        if (data) {
-          setBannerData({
-            offer: data.offer || '🎉 Special Launch Offer - Enroll Now!',
-            heading: data.heading || 'Transform Your Future',
-            tag: data.tag || 'Join 10,000+ learners mastering in-demand skills with our AI-powered platform.',
-          });
-          showAlert("Banner data loaded successfully!", "success");
-        } else {
-          showAlert("No banner data available.", "info");
-        }
-      } catch (error) {
-        showAlert(
-          error.response?.data?.message || "Failed to fetch banner data.",
-          "error"
-        );
-      }
-    };
 
     // Fetch companies
     const fetchCompanies = async () => {
@@ -112,26 +83,8 @@ const Home = () => {
         setVideos([]);
       }
     };
-
-    // Fetch bootcamps
-    const fetchBootcamps = async () => {
-      try {
-        showAlert("Loading bootcamps...", "info");
-        const response = await axios.get(`${BACKEND_URL}/show-roadmap-topic`);
-        setBootcamps(response.data);
-        showAlert("Bootcamps loaded successfully!", "success");
-      } catch (error) {
-        showAlert(
-          error.response?.data?.message || "Failed to fetch bootcamps.",
-          "error"
-        );
-      }
-    };
-
-    fetchBannerData();
     fetchCompanies();
     fetchVideos();
-    fetchBootcamps();
   }, []);
 
   useEffect(() => {
@@ -193,16 +146,16 @@ const Home = () => {
         <div className="relative z-10 px-4 max-w-5xl mx-auto text-center">
           <div className="mb-8 transform hover:scale-105 transition-transform">
             <span className="inline-block my-5 px-6 py-2 text-lg shadow-xl rounded-[23px] bg-blue-900/20 border border-blue-800/30 hover:border-blue-600/50">
-              {bannerData.offer}
+              {props.bannerData.offer||''}
             </span>
           </div>
 
           <h1 className="text-5xl md:text-8xl font-bold mb-8 leading-tight bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 text-transparent bg-clip-text">
-            {bannerData.heading}
+            {props.bannerData.heading||''}
           </h1>
 
           <p className="text-xl md:text-2xl mb-12 text-gray-300 max-w-3xl mx-auto leading-relaxed">
-            {bannerData.tag}
+            {props.bannerData.tag||''}
           </p>
 
           <div className="flex flex-col sm:flex-row justify-center gap-6 mb-16">
@@ -292,10 +245,10 @@ const Home = () => {
               </button>
             </div>
             <div className="space-y-3">
-              {bootcamps.map((bootcamp) => (
+              {props.bootcamps||[].map((bootcamp) => (
                 <Link
-                  key={bootcamp.id}
-                  to={`/free-class/${bootcamp.id}`}
+                  key={bootcamp._id}
+                  to={`/free-class/${bootcamp._id}`}
                   onClick={() => setIsModalOpen(false)}
                   className="block px-4 py-3 text-white bg-gradient-to-r from-[#2a2a2a] to-[#1a1a1a] 
                     rounded-lg transition-all duration-300 ease-in-out 
@@ -393,7 +346,7 @@ const Home = () => {
           </div>
         </div>
       </div>
-      <Footer />
+      <Footer {...props.bannerData} />
     </div>
   );
 };

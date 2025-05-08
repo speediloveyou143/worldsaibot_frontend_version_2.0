@@ -89,13 +89,13 @@ function ProtectedRoute({ element: Element, allowedRole }) {
 }
 
 // Separate component for routes
-function AppRoutes() {
+function AppRoutes(props) {
   return (
     <Routes>
-      <Route path="/" element={<Body />}>
-        <Route index element={<Home />} />
+      <Route path="/" element={<Body data={props.bootcamps} />}>
+        <Route index element={<Home {...props}/>} />
         <Route path="/courses" element={<Courses />} />
-        <Route path="/contact" element={<Contact />} />
+        <Route path="/contact" element={<Contact {...props.bannerData}/>} />
         <Route path="/about-us" element={<About />} />
         <Route path="/carrers" element={<Carrers />} />
         <Route path="/products" element={<Products />} />
@@ -178,11 +178,12 @@ function AppRoutes() {
   );
 }
 
-function App() {
+function App(props) {
+  
   return (
     <Provider store={appStore}>
       <BrowserRouter>
-        <AppRoutes />
+        <AppRoutes {...props}/>
       </BrowserRouter>
     </Provider>
   );

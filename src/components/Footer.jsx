@@ -3,54 +3,9 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { BACKEND_URL } from '../../config/constant';
 
-function Footer() {
+function Footer(props) {
   const currentYear = new Date().getFullYear();
-  const [contactData, setContactData] = useState({
-    insta: '#',
-    linkedin: '#',
-    youtube: '#',
-    channel: '#',
-    email: 'support@worldsaibot.com',
-    number: '+91 1234567890',
-  });
-  const [bootcamps, setBootcamps] = useState([]); // State for bootcamps
   const [isModalOpen, setIsModalOpen] = useState(false); // State for modal
-
-  useEffect(() => {
-    // Fetch contact data
-    const fetchContactData = async () => {
-      try {
-        const response = await axios.get(`${BACKEND_URL}/all-contacts`,{withCredentials:true});
-        const data = response.data[0];
-        if (data) {
-          setContactData({
-            insta: data.insta || '#',
-            linkedin: data.linkedin || '#',
-            youtube: data.youtube || '#',
-            channel: data.channel || '#',
-            email: data.email || 'support@worldsaibot.com',
-            number: data.number || '+91 1234567890',
-          });
-        }
-      } catch (error) {
-        console.log('Error fetching contact data:', error);
-      }
-    };
-
-    // Fetch bootcamps
-    const fetchBootcamps = async () => {
-      try {
-        const response = await axios.get(`${BACKEND_URL}/show-roadmap-topic`,{withCredentials:true});
-        setBootcamps(response.data);
-      } catch (error) {
-        console.log('Failed to fetch bootcamps:', error);
-      }
-    };
-
-    fetchContactData();
-    fetchBootcamps();
-  }, []);
-
   return (
     <div className="z-index-[-10]">
       <footer className="bg-black relative overflow-hidden">
@@ -69,25 +24,25 @@ function Footer() {
                   {
                     icon: 'bi-instagram',
                     name: 'Instagram',
-                    href: contactData.insta,
+                    href: props.insta,
                     color: 'text-[#E1306C]',
                   },
                   {
                     icon: 'bi-youtube',
                     name: 'YouTube',
-                    href: contactData.channel,
+                    href: props.channel,
                     color: 'text-[#FF0000]',
                   },
                   {
                     icon: 'bi-linkedin',
                     name: 'LinkedIn',
-                    href: contactData.linkedin,
+                    href: props.linkedin,
                     color: 'text-[#0A66C2]',
                   },
                   {
                     icon: 'bi-twitter-x',
                     name: 'X',
-                    href: contactData.channel,
+                    href: props.channel,
                     color: 'text-white',
                   },
                 ].map((social) => (
@@ -158,8 +113,8 @@ function Footer() {
                 Contact Us
               </h3>
               <ul className="space-y-2 text-gray-400">
-                <li>{contactData.email}</li>
-                <li>{contactData.number}</li>
+                <li>{props.email}</li>
+                <li>{props.number}</li>
                 <li>Mon - Fri: 9AM - 6PM</li>
               </ul>
             </div>
@@ -220,7 +175,7 @@ function Footer() {
                 </button>
               </div>
               <div className="space-y-3">
-                {bootcamps.map((bootcamp) => (
+                {props.bootcamps.map((bootcamp) => (
                   <Link
                     key={bootcamp.id}
                     to={`/free-class/${bootcamp.id}`}

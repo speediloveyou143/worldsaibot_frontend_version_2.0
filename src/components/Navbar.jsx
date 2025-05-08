@@ -6,7 +6,8 @@ import { clearUser } from "../redux/userSlice";
 import { useNavigate } from "react-router-dom";
 import { BACKEND_URL } from "../../config/constant";
 
-function Navbar() {
+function Navbar(props) {
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
@@ -15,19 +16,7 @@ function Navbar() {
   const role = user?.role;
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [bootcamps, setBootcamps] = useState([]);
 
-  useEffect(() => {
-    const fetchBootcamps = async () => {
-      try {
-        const response = await axios.get(`${BACKEND_URL}/show-roadmap-topic`, { withCredentials: true });
-        setBootcamps(response.data);
-      } catch (error) {
-        console.error("Failed to fetch bootcamps:", error);
-      }
-    };
-    fetchBootcamps();
-  }, []);
 
   const handleSignOut = async () => {
     try {
@@ -257,7 +246,7 @@ function Navbar() {
               </button>
             </div>
             <div className="space-y-2">
-              {bootcamps.map((bootcamp) => (
+              {props.bootcamps||[].map((bootcamp) => (
                 <Link
                   key={bootcamp.id}
                   to={`/free-class/${bootcamp.id}`}

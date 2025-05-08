@@ -463,7 +463,7 @@ const App = () => {
                     if (window.innerWidth < 768) setShowSidebar(false);
                   }}
                 >
-                  <h3 className="font-semibold text-white line-clamp-2">
+                  <h3 className="font-semibold text-white ">
                     {question.question}
                   </h3>
                   <div className="mt-3 space-y-2">

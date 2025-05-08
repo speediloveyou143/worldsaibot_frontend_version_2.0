@@ -9,7 +9,7 @@ import { useNavigate } from "react-router-dom";
 import { BACKEND_URL } from "../../config/constant";
 
 
-function Body() {
+function Body(props) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -33,7 +33,7 @@ function Body() {
 
   return (
     <div>
-      <Navbar />
+      <Navbar bootcamps={props.data}/>
       <Outlet />
     </div>
   );

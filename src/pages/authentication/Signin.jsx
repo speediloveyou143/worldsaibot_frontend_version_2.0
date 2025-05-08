@@ -6,8 +6,8 @@ import { setUser } from "../../redux/userSlice";
 import { Link } from "react-router-dom";
 import { BACKEND_URL } from "../../../config/constant";
 function Signin() {
-  const [email, setEmail] = useState("rakeshabc@gmail.com");
-  const [password, setPassword] = useState("rakeshabc@gmail.com");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [formError, setFormError] = useState("");
   const [loading, setLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false); // Added for success animation
