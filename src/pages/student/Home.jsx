@@ -297,13 +297,30 @@ const Home = (props) => {
             </span>
           </div>
 
-          {/* Main Heading */}
+          {/* Main Heading with Wave Animation & Shining Effect */}
           <div className="relative mb-8 animate-fadeInUp">
             <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-black leading-tight">
               <span className="relative inline-block">
-                <span className="bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 text-transparent bg-clip-text drop-shadow-2xl">
-                  {props.bannerData?.heading || 'Transform Your Future in AI'}
-                </span>
+                {(props.bannerData?.heading || 'Transform Your Future in AI').split('').map((char, index) => (
+                  <span
+                    key={index}
+                    className="relative inline-block animate-wave"
+                    style={{
+                      animationDelay: `${index * 0.05}s`
+                    }}
+                  >
+                    <span className="relative z-10 bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 text-transparent bg-clip-text drop-shadow-2xl">
+                      {char === ' ' ? '\u00A0' : char}
+                    </span>
+                    {/* Individual spreading rays for each letter */}
+                    <span
+                      className="absolute inset-0 letter-rays pointer-events-none"
+                      style={{
+                        animationDelay: `${index * 0.05}s`
+                      }}
+                    ></span>
+                  </span>
+                ))}
                 {/* Gentle overall glow */}
                 <span className="absolute inset-0 bg-gradient-to-r from-purple-600/20 to-pink-600/20 blur-3xl opacity-50 animate-pulse -z-10"></span>
               </span>
