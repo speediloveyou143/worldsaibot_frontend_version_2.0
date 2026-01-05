@@ -298,27 +298,31 @@ const Home = (props) => {
           </div>
 
           {/* Main Heading with Wave Animation & Shining Effect */}
-          <div className="relative mb-8 animate-fadeInUp">
-            <h1 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-black leading-tight">
-              <span className="relative inline-block">
-                {(props.bannerData?.heading || 'Transform Your Future in AI').split('').map((char, index) => (
-                  <span
-                    key={index}
-                    className="relative inline-block animate-wave"
-                    style={{
-                      animationDelay: `${index * 0.05}s`
-                    }}
-                  >
-                    <span className="relative z-10 bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 text-transparent bg-clip-text drop-shadow-2xl">
-                      {char === ' ' ? '\u00A0' : char}
-                    </span>
-                    {/* Individual spreading rays for each letter */}
-                    <span
-                      className="absolute inset-0 letter-rays pointer-events-none"
-                      style={{
-                        animationDelay: `${index * 0.05}s`
-                      }}
-                    ></span>
+          <div className="relative mb-8 animate-fadeInUp px-2">
+            <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black leading-tight text-center">
+              <span className="relative inline">
+                {(props.bannerData?.heading || 'Transform Your Future in AI').split(' ').map((word, wordIndex) => (
+                  <span key={wordIndex} className="inline-block mr-2 sm:mr-4">
+                    {word.split('').map((char, charIndex) => (
+                      <span
+                        key={charIndex}
+                        className="relative inline-block animate-wave"
+                        style={{
+                          animationDelay: `${(wordIndex * 5 + charIndex) * 0.05}s`
+                        }}
+                      >
+                        <span className="relative z-10 bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 text-transparent bg-clip-text drop-shadow-2xl">
+                          {char}
+                        </span>
+                        {/* Individual spreading rays for each letter */}
+                        <span
+                          className="absolute inset-0 letter-rays pointer-events-none"
+                          style={{
+                            animationDelay: `${(wordIndex * 5 + charIndex) * 0.05}s`
+                          }}
+                        ></span>
+                      </span>
+                    ))}
                   </span>
                 ))}
                 {/* Gentle overall glow */}
