@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
-import { useParams } from "react-router-dom";
-import { BACKEND_URL } from "../../../config/constant";
+import { useParams, useNavigate } from "react-router-dom";
+import APIService from "../../services/api";
 
 function UpdateJob() {
   const { id } = useParams();
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
   const [experience, setExperience] = useState("");
   const [jobRole, setJobRole] = useState("");
   const [workType, setWorkType] = useState("");
@@ -44,16 +45,23 @@ function UpdateJob() {
   }, [alert]);
 
   useEffect(() => {
-    axios
-      .get(`${BACKEND_URL}/show-job/${id}`, { withCredentials: true })
-      .then((response) => {
-        setExperience(response.data.experience);
-        setJobRole(response.data.jobRole);
-        setWorkType(response.data.workType);
-      })
-      .catch(() => {
+    const fetchJob = async () => {
+      try {
+        setLoading(true);
+        const response = await APIService.jobs.getById(id);
+        if (response.status === 200) {
+          setExperience(response.data.experience || "");
+          setJobRole(response.data.jobRole || "");
+          setWorkType(response.data.workType || "");
+        }
+      } catch (error) {
         showAlert("Failed to fetch job details.", "error");
-      });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchJob();
   }, [id]);
 
   const validateForm = () => {
@@ -74,18 +82,28 @@ function UpdateJob() {
     if (!validateForm()) return;
 
     try {
-      const response = await axios.patch(
-        `${BACKEND_URL}/update-job/${id}`,
-        { experience, jobRole, workType },
-        { withCredentials: true }
-      );
+      const response = await APIService.jobs.update(id, { experience, jobRole, workType });
       if (response.status === 200) {
         showAlert("Job updated successfully!", "success");
+        setTimeout(() => {
+          navigate("/admin-dashboard/profile/all-jobs");
+        }, 2000);
       }
     } catch (err) {
       showAlert(err.response?.data?.message || "Failed to update job.", "error");
     }
   };
+
+  if (loading) {
+    return (
+      <div className="h-full w-full flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-slate-400">Loading job data...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="h-full bg-gray-950 flex items-start justify-center m-3">
@@ -146,9 +164,8 @@ function UpdateJob() {
 
         {alert && (
           <div
-            className={`fixed bottom-4 right-4 px-4 py-3 rounded-lg text-white shadow-lg transition-all duration-300 z-[50] ${
-              alert.type === 'success' ? 'bg-green-600' : 'bg-red-600'
-            } flex flex-col w-80`}
+            className={`fixed bottom-4 right-4 px-4 py-3 rounded-lg text-white shadow-lg transition-all duration-300 z-[50] ${alert.type === 'success' ? 'bg-green-600' : 'bg-red-600'
+              } flex flex-col w-80`}
           >
             <div className="flex items-center space-x-2">
               <span className="flex-1">{alert.message}</span>

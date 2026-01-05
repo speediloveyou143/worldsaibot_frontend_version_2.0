@@ -1,7 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { BACKEND_URL } from '../../../config/constant';
-
+import APIService from '../../services/api';
 
 const Terms = () => {
   const [privacyData, setPrivacyData] = useState([]);
@@ -10,17 +9,13 @@ const Terms = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`${BACKEND_URL}/show-privacies`,{withCredentials:true});
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        const data = await response.json();
-        console.log(data)
-
-        setPrivacyData(Array.isArray(data) ? data : []);
+        const response = await APIService.privacy.getAll();
+        // Backend returns {data: [...]} so access response.data.data
+        const privacyItems = response.data?.data || [];
+        setPrivacyData(Array.isArray(privacyItems) ? privacyItems : []);
         setLoading(false);
       } catch (error) {
-        console.error('Fetch error:', error);
+        console.error('Error fetching privacy data:', error);
         setPrivacyData([]);
         setLoading(false);
       }
@@ -70,7 +65,13 @@ const Terms = () => {
                 </div>
                 <div className="mt-6 pt-4 border-t border-zinc-800 ml-16">
                   <p className="text-sm text-zinc-500">
-                    Last Updated: {new Date(item.lastUpdated).toLocaleDateString()}
+                    Last Updated: {item.lastUpdated || item.updatedAt || item.createdAt
+                      ? new Date(item.lastUpdated || item.updatedAt || item.createdAt).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                      })
+                      : 'Recently'}
                   </p>
                 </div>
               </div>

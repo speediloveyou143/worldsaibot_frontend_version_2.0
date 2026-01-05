@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import { useParams } from 'react-router-dom';
-import { BACKEND_URL } from "../../../config/constant";
+import { useParams, useNavigate } from 'react-router-dom';
+import APIService from '../../services/api';
 
 function UpdateBootcamp() {
   const { id } = useParams();
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({
     days: '',
     courseName: '',
@@ -53,9 +54,8 @@ function UpdateBootcamp() {
   useEffect(() => {
     const fetchCourse = async () => {
       try {
-        const response = await axios.get(`${BACKEND_URL}/show-bootcamp/${id}`, {
-          withCredentials: true,
-        });
+        setLoading(true);
+        const response = await APIService.bootcamps.getById(id);
         const data = response.data;
 
         // Convert dates to YYYY-MM-DD format
@@ -68,6 +68,8 @@ function UpdateBootcamp() {
         setFormData(formattedData);
       } catch (error) {
         showAlert('Error fetching course data.', 'error');
+      } finally {
+        setLoading(false);
       }
     };
     fetchCourse();
@@ -135,11 +137,12 @@ function UpdateBootcamp() {
     if (!validateForm()) return;
 
     try {
-      const response = await axios.put(`${BACKEND_URL}/update-bootcamp/${id}`, formData, {
-        withCredentials: true,
-      });
+      const response = await APIService.bootcamps.update(id, formData);
       if (response.status === 200) {
         showAlert('Course updated successfully!', 'success');
+        setTimeout(() => {
+          navigate('/admin-dashboard/profile/all-bootcamps');
+        }, 2000);
       } else {
         showAlert('Failed to update course.', 'error');
       }
@@ -147,6 +150,17 @@ function UpdateBootcamp() {
       showAlert(error.response?.data?.message || 'Error updating course.', 'error');
     }
   };
+
+  if (loading) {
+    return (
+      <div className="h-full w-full flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-slate-400">Loading bootcamp data...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-gray-950 h-full overflow-y-auto sm:p-6 p-2 text-white">
@@ -299,9 +313,8 @@ function UpdateBootcamp() {
 
         {alert && (
           <div
-            className={`fixed bottom-4 right-4 px-4 py-3 rounded-lg text-white shadow-lg transition-all duration-300 z-[50] ${
-              alert.type === 'success' ? 'bg-green-600' : 'bg-red-600'
-            } flex flex-col w-80`}
+            className={`fixed bottom-4 right-4 px-4 py-3 rounded-lg text-white shadow-lg transition-all duration-300 z-[50] ${alert.type === 'success' ? 'bg-green-600' : 'bg-red-600'
+              } flex flex-col w-80`}
           >
             <div className="flex items-center space-x-2">
               <span className="flex-1">{alert.message}</span>

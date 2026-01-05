@@ -4,131 +4,189 @@ import { Outlet, Link, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 import { clearUser } from "../../redux/userSlice";
-import axios from "axios";
+import APIService from "../../services/api";
 import { useNavigate } from "react-router-dom";
-import { BACKEND_URL } from '../../../config/constant';
 
 
 function StudentDashboard() {
   const { user } = useSelector((state) => state.user);
   const name = user?.name || "Guest";
+  const email = user?.email || "";
   const one = name.length > 1 ? name[0] + name[1] : name[0] || "G";
   const [isMoreOpen, setIsMoreOpen] = useState(false);
   const location = useLocation();
-  const dispatch =useDispatch();
-  const navigate=useNavigate()
-
-
-
-  
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const sidebarOptions = [
-    { to: "/student-dashboard/profile", icon: "bi bi-person-circle", label: "Profile" },
-    { to: "/student-dashboard/profile/lectures", icon: "bi bi-play-circle-fill", label: "Lectures" },
-    { to: "/student-dashboard/profile/awards", icon: "bi bi-award-fill", label: "Certificates" },
-    { to: "/student-dashboard/profile/resume-templates", icon: "bi bi-journal-code", label: "Resume" },
-    { to: "/student-dashboard/profile/interview-preparation", icon: "bi bi-journal-text", label: "Interview" },
-    { to: "/student-dashboard/profile/editor", icon: "bi bi-code-slash", label: "Editor" },
+    { to: "/student-dashboard/profile", icon: "bi-person-circle", label: "Profile", gradient: "from-blue-500 to-cyan-500" },
+    { to: "/student-dashboard/profile/lectures", icon: "bi-collection-play-fill", label: "My Courses", gradient: "from-purple-500 to-pink-500" },
+    { to: "/student-dashboard/profile/awards", icon: "bi-award-fill", label: "Certificates", gradient: "from-green-500 to-emerald-500" },
+    { to: "/student-dashboard/profile/resume-templates", icon: "bi-journal-code", label: "Resume", gradient: "from-orange-500 to-red-500" },
+    { to: "/student-dashboard/profile/interview-preparation", icon: "bi-journal-text", label: "Interview", gradient: "from-indigo-500 to-blue-500" },
+    { to: "/student-dashboard/profile/editor", icon: "bi-code-slash", label: "Editor", gradient: "from-teal-500 to-cyan-500" },
   ];
 
   const visibleOptions = sidebarOptions.slice(0, 4);
   const hiddenOptions = sidebarOptions.slice(4);
 
   const isActive = (path) => location.pathname === path;
+
   const handleSignOut = async () => {
     try {
-      await axios.post(`${BACKEND_URL}/signout`, {}, { withCredentials: true });
+      await APIService.auth.signout();
+      localStorage.removeItem('token');
       dispatch(clearUser());
-      navigate("/signin");
+      navigate("/");
     } catch (error) {
-      alert("Failed to sign out. Please try again.");
+      localStorage.removeItem('token');
+      dispatch(clearUser());
+      navigate("/");
     }
   };
 
   return (
-    <div className="flex flex-col md:flex-row h-screen overflow-hidden bg-gradient-to-br from-gray-900 via-black to-blue-950 text-white">
-      {/* Left Sidebar */}
-      <div className="hidden md:flex flex-col w-[300px] bg-gray-900/50 p-4 h-[calc(100vh-64px)] fixed left-0 top-16 overflow-y-auto border-r border-blue-800/30">
+    <div className="flex flex-col md:flex-row h-screen overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+      {/* Left Sidebar - Desktop */}
+      <div className="hidden md:flex flex-col w-[280px] bg-slate-900/50 backdrop-blur-xl border-r border-slate-700/50 h-[calc(100vh-64px)] fixed left-0 top-16 overflow-y-auto">
         {/* Profile Section */}
-        <div className="ls-p-con mb-6 gap-1 flex items-center">
-          <h1 className="w-12 bg-black text-white h-12 flex items-center justify-center font-bold text-xl rounded-full">{one.toUpperCase()}</h1>
-          <h1 className="text-xl truncate ml-1 w-40">{name}</h1>
+        <div className="p-6 border-b border-slate-700/50">
+          <div className="flex items-center gap-4">
+            <div className="relative">
+              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center font-bold text-2xl text-white shadow-lg">
+                {one.toUpperCase()}
+              </div>
+              <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-slate-900"></div>
+            </div>
+            <div className="flex-1 min-w-0">
+              <h2 className="text-white font-semibold text-base truncate">{name}</h2>
+              <p className="text-slate-400 text-xs truncate">{email}</p>
+            </div>
+          </div>
         </div>
 
-        {/* Sidebar Options */}
-        <div className="flex flex-col flex-grow">
-          {sidebarOptions.map((option, index) => (
-            <Link key={index} to={option.to}>
-              <button
-                className={`w-full text-left p-3 rounded-lg hover:bg-blue-900/30 transition-all duration-200 ${
-                  isActive(option.to) ? "bg-blue-900/50 border-l-4 border-blue-500" : ""
-                }`}
-              >
-                <i className={option.icon}></i>  {option.label}
-              </button>
-            </Link>
-          ))}
-        </div>
+        {/* Navigation Links */}
+        <nav className="flex-1 p-4 space-y-2">
+          {sidebarOptions.map((option, index) => {
+            const active = isActive(option.to);
+            return (
+              <Link key={index} to={option.to}>
+                <div
+                  className={`group relative p-3 rounded-lg transition-all duration-300 ${active
+                    ? 'bg-gradient-to-r ' + option.gradient + ' shadow-md'
+                    : 'hover:bg-slate-800/50'
+                    }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center transition-transform group-hover:scale-110 ${active ? 'bg-white/20' : 'bg-slate-800/50'
+                      }`}>
+                      <i className={`bi ${option.icon} text-base ${active ? 'text-white' : 'text-slate-300'}`}></i>
+                    </div>
+                    <span className={`text-sm font-medium ${active ? 'text-white' : 'text-slate-300 group-hover:text-white'}`}>
+                      {option.label}
+                    </span>
+                  </div>
+                  {active && (
+                    <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-white rounded-r-full"></div>
+                  )}
+                </div>
+              </Link>
+            );
+          })}
+        </nav>
 
         {/* Sign Out Button */}
-        <button
-          className="w-full text-left p-3 rounded-lg hover:bg-blue-900/30 transition-all duration-200 mt-auto"
-          onClick={handleSignOut}
-        >
-          <i className="bi bi-box-arrow-right"></i>  Sign Out
-        </button>
+        <div className="p-4 border-t border-slate-700/50">
+          <button
+            onClick={handleSignOut}
+            className="w-full p-4 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 hover:border-red-500/50 transition-all duration-300 group"
+          >
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg bg-red-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <i className="bi bi-box-arrow-right text-xl text-red-400"></i>
+              </div>
+              <span className="text-sm font-medium text-red-400 group-hover:text-red-300">Sign Out</span>
+            </div>
+          </button>
+        </div>
       </div>
 
       {/* Main Content */}
-      <div className="bg-gray-950 mt-1 md:pb-10 md:ml-[300px] h-[calc(100vh-64px)] fixed top-16 w-full md:w-[calc(100vw-300px)] overflow-y-auto">
-  <Outlet />
-</div>
-
+      <div className="flex-1 md:ml-[280px] mb-16 md:mb-0 overflow-y-auto bg-slate-950/50">
+        <Outlet />
+      </div>
 
       {/* Mobile Bottom Navigation */}
-      <div className="md:hidden fixed bottom-0 left-0 w-full bg-gray-900/50 backdrop-blur-sm p-2 flex justify-around items-center border-t border-blue-800/30 rounded-t-lg">
-        {visibleOptions.map((option, index) => (
-          <Link key={index} to={option.to}>
+      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-slate-900/95 backdrop-blur-xl border-t border-slate-700/50 z-50">
+        <div className="flex justify-around items-center p-2">
+          {visibleOptions.map((option, index) => {
+            const active = isActive(option.to);
+            return (
+              <Link key={index} to={option.to} className="flex-1">
+                <div className={`flex flex-col items-center p-2 rounded-lg transition-all ${active ? 'bg-gradient-to-br ' + option.gradient : ''
+                  }`}>
+                  <i className={`bi ${option.icon} text-xl ${active ? 'text-white' : 'text-slate-400'}`}></i>
+                  <span className={`text-xs mt-1 ${active ? 'text-white font-medium' : 'text-slate-400'}`}>
+                    {option.label}
+                  </span>
+                </div>
+              </Link>
+            );
+          })}
+
+          {/* More Menu */}
+          <div className="flex-1 relative">
             <button
-              className={`flex flex-col items-center space-y-1 p-2 hover:bg-blue-900/30 rounded-lg transition-all duration-200 ${
-                isActive(option.to) ? "bg-blue-900/50" : ""
-              }`}
+              onClick={() => setIsMoreOpen(!isMoreOpen)}
+              className="w-full flex flex-col items-center p-2 rounded-lg hover:bg-slate-800/50 transition-all"
             >
-              <i className={option.icon}></i>
-              <span className="text-xs">{option.label}</span>
+              <i className="bi bi-three-dots-vertical text-xl text-slate-400"></i>
+              <span className="text-xs mt-1 text-slate-400">More</span>
             </button>
-          </Link>
-        ))}
 
-        <div className="relative">
-          <button
-            className="flex flex-col items-center space-y-1 p-2 hover:bg-blue-900/30 rounded-lg transition-all duration-200"
-            onClick={() => setIsMoreOpen(!isMoreOpen)}
-          >
-            <i className="bi bi-three-dots-vertical"></i>
-            <span className="text-xs">More</span>
-          </button>
-
-          {isMoreOpen && (
-            <div className="absolute bottom-14 right-0 bg-gray-900/70 backdrop-blur-md p-2 rounded-lg border border-blue-800/30">
-              {hiddenOptions.map((option, index) => (
-                <Link
-                  key={index}
-                  to={option.to}
+            {isMoreOpen && (
+              <>
+                <div
+                  className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40"
                   onClick={() => setIsMoreOpen(false)}
-                >
-                  <button
-                    className={`flex items-center space-x-2 w-full p-2 hover:bg-blue-900/30 rounded-lg transition-all duration-200 ${
-                      isActive(option.to) ? "bg-blue-900/50" : ""
-                    }`}
-                  >
-                    <i className={option.icon}></i>
-                    <span>{option.label}</span>
-                  </button>
-                </Link>
-              ))}
-            </div>
-          )}
+                ></div>
+                <div className="absolute bottom-full right-0 mb-2 bg-slate-900/95 backdrop-blur-xl border border-slate-700/50 rounded-xl p-2 shadow-2xl z-50 min-w-[200px]">
+                  {hiddenOptions.map((option, index) => {
+                    const active = isActive(option.to);
+                    return (
+                      <Link
+                        key={index}
+                        to={option.to}
+                        onClick={() => setIsMoreOpen(false)}
+                      >
+                        <div className={`flex items-center gap-3 p-3 rounded-lg transition-all ${active ? 'bg-gradient-to-r ' + option.gradient : 'hover:bg-slate-800/50'
+                          }`}>
+                          <i className={`bi ${option.icon} text-lg ${active ? 'text-white' : 'text-slate-300'}`}></i>
+                          <span className={`font-medium ${active ? 'text-white' : 'text-slate-300'}`}>
+                            {option.label}
+                          </span>
+                        </div>
+                      </Link>
+                    );
+                  })}
+
+                  {/* Sign Out in More Menu */}
+                  <div className="border-t border-slate-700/50 mt-2 pt-2">
+                    <button
+                      onClick={() => {
+                        setIsMoreOpen(false);
+                        handleSignOut();
+                      }}
+                      className="w-full flex items-center gap-3 p-3 rounded-lg bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 transition-all"
+                    >
+                      <i className="bi bi-box-arrow-right text-lg text-red-400"></i>
+                      <span className="font-medium text-red-400">Sign Out</span>
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
         </div>
       </div>
     </div>

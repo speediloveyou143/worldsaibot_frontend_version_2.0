@@ -1,29 +1,33 @@
-
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { Outlet, Link, useLocation } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { clearUser } from "../../redux/userSlice";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { BACKEND_URL } from "../../../config/constant";
+import APIService from "../../services/api";
 
 function AdminDashboard() {
   const { user } = useSelector((state) => state.user);
   const name = user?.name || "Guest";
-  const one = name.length > 1 ? name[0] + name[1] : name[0] || "G";
+  const initials = useMemo(() =>
+    name.length > 1 ? name[0] + name[1] : name[0] || "G",
+    [name]
+  );
+
   const [isMoreOpen, setIsMoreOpen] = useState(false);
-  const [alert, setAlert] = useState(null); // State for managing alerts
-  const [progress, setProgress] = useState(100); // Progress bar state
+  const [alert, setAlert] = useState(null);
+  const [progress, setProgress] = useState(100);
   const location = useLocation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const sidebarOptions = [
-    { to: "/admin-dashboard", icon: "bi bi-person-circle", label: "Profile" },
+  const sidebarOptions = useMemo(() => [
+    { to: "/admin-dashboard", icon: "bi bi-speedometer2", label: "Dashboard" },
     { to: "/admin-dashboard/profile/all-users", icon: "bi bi-people-fill", label: "All Users" },
+    { to: "/admin-dashboard/profile/create-data", icon: "bi bi-database-fill-add", label: "Create Data" },
+    { to: "/admin-dashboard/profile/all-create-data", icon: "bi bi-database-fill", label: "All Data" },
     { to: "/admin-dashboard/profile/all-registers", icon: "bi bi-person-check-fill", label: "All Registers" },
-    { to: "/admin-dashboard/profile/create-course", icon: "bi bi-plus-square-fill", label: "Create Course" },
-    { to: "/admin-dashboard/profile/all-courses", icon: "bi bi-book-fill", label: "All Courses" },
+    { to: "/admin-dashboard/profile/create-course", icon: "bi bi-plus-circle-fill", label: "Create Course" },
+    { to: "/admin-dashboard/profile/all-courses", icon: "bi bi-journal-code", label: "All Courses" },
     { to: "/admin-dashboard/profile/create-road-map", icon: "bi bi-signpost-split-fill", label: "Create Roadmap" },
     { to: "/admin-dashboard/profile/all-roadmaps", icon: "bi bi-map-fill", label: "All Roadmaps" },
     { to: "/admin-dashboard/profile/create-recordings", icon: "bi bi-mic-mute-fill", label: "Create Recordings" },
@@ -32,45 +36,37 @@ function AdminDashboard() {
     { to: "/admin-dashboard/profile/all-company-logos", icon: "bi bi-building", label: "All Company Logos" },
     { to: "/admin-dashboard/profile/create-video", icon: "bi bi-play-btn-fill", label: "Create Video" },
     { to: "/admin-dashboard/profile/all-videos", icon: "bi bi-camera-video-fill", label: "All Videos" },
-    { to: "/admin-dashboard/profile/create-privacy", icon: "bi bi-shield-lock-fill", label: "Create Privacy Policy" },
-    { to: "/admin-dashboard/profile/all-privacy", icon: "bi bi-lock-fill", label: "All Privacy Policies" },
+    { to: "/admin-dashboard/profile/create-privacy", icon: "bi bi-shield-lock-fill", label: "Create Privacy" },
+    { to: "/admin-dashboard/profile/all-privacy", icon: "bi bi-lock-fill", label: "All Privacy" },
     { to: "/admin-dashboard/profile/create-bootcamp", icon: "bi bi-code-square", label: "Create Bootcamp" },
     { to: "/admin-dashboard/profile/all-bootcamps", icon: "bi bi-laptop-fill", label: "All Bootcamps" },
-    { to: "/admin-dashboard/profile/create-road-map-topics", icon: "bi bi-list-task", label: "Create Roadmap Topics" },
-    { to: "/admin-dashboard/profile/all-road-map-topics", icon: "bi bi-list-check", label: "All Roadmap Topics" },
+    { to: "/admin-dashboard/profile/create-road-map-topics", icon: "bi bi-list-task", label: "Create Topics" },
+    { to: "/admin-dashboard/profile/all-road-map-topics", icon: "bi bi-list-check", label: "All Topics" },
     { to: "/admin-dashboard/profile/create-job", icon: "bi bi-briefcase-fill", label: "Create Job" },
     { to: "/admin-dashboard/profile/all-jobs", icon: "bi bi-briefcase", label: "All Jobs" },
-    { to: "/admin-dashboard/profile/create-data", icon: "bi bi-database-fill", label: "Create Data" },
-    { to: "/admin-dashboard/profile/all-create-data", icon: "bi bi-database", label: "All Data" },
     { to: "/admin-dashboard/profile/create-test", icon: "bi bi-clipboard-check-fill", label: "Create Test" },
     { to: "/admin-dashboard/profile/all-tests", icon: "bi bi-clipboard-data", label: "All Tests" },
-    { to: "/admin-dashboard/profile/create-interview", icon: "bi bi-clipboard-data", label: "Create Interview" },
-    { to: "/admin-dashboard/profile/all-interview", icon: "bi bi-clipboard-data", label: "All Interview Questions" },
-  ];
+    { to: "/admin-dashboard/profile/create-interview", icon: "bi bi-chat-dots-fill", label: "Create Interview" },
+    { to: "/admin-dashboard/profile/all-interview", icon: "bi bi-chat-left-text-fill", label: "All Interviews" },
+  ], []);
 
-  const visibleOptions = sidebarOptions.slice(0, 4);
-  const hiddenOptions = sidebarOptions.slice(4);
+  const isActive = useCallback((path) => location.pathname === path, [location.pathname]);
 
-  const isActive = (path) => location.pathname === path;
-
-  // Function to show alerts
-  const showAlert = (message, type) => {
+  const showAlert = useCallback((message, type) => {
     setAlert({ message, type });
-    setProgress(100); // Reset progress when new alert is shown
-  };
+    setProgress(100);
+  }, []);
 
-  // Handle alert dismissal
-  const dismissAlert = () => {
+  const dismissAlert = useCallback(() => {
     setAlert(null);
     setProgress(100);
-  };
+  }, []);
 
-  // Progress bar and auto-dismiss logic
   useEffect(() => {
     if (alert) {
-      const duration = 3000; // 3 seconds
-      const interval = 50; // Update every 50ms
-      const decrement = (interval / duration) * 100; // Progress reduction per interval
+      const duration = 3000;
+      const interval = 50;
+      const decrement = (interval / duration) * 100;
 
       const timer = setInterval(() => {
         setProgress((prev) => {
@@ -86,126 +82,181 @@ function AdminDashboard() {
 
       return () => clearInterval(timer);
     }
-  }, [alert]);
+  }, [alert, dismissAlert]);
 
-  const handleSignOut = async () => {
+  const handleSignOut = useCallback(async () => {
     try {
-      await axios.post(`${BACKEND_URL}/signout`, {}, { withCredentials: true });
+      await APIService.auth.signout();
+      localStorage.removeItem('token');
       dispatch(clearUser());
-      showAlert("Successfully signed out", "success");
-      setTimeout(() => navigate("/signin"), 1000); // Navigate after showing success
-    } catch (error) {
-      showAlert("Failed to sign out. Please try again.", "error");
+      navigate("/");
+    } catch {
+      localStorage.removeItem('token');
+      dispatch(clearUser());
+      navigate("/");
     }
-  };
+  }, [dispatch, navigate]);
 
   return (
-    <div className="flex flex-col md:flex-row h-screen overflow-hidden bg-gradient-to-br from-gray-900 via-black to-blue-950 text-white">
-      {/* Left Sidebar */}
-      <div className="hidden md:flex flex-col w-[300px] bg-gray-900/50 p-4 h-[calc(100vh-64px)] fixed left-0 top-16 overflow-y-auto border-r border-blue-800/30">
-        <div className="ls-p-con mb-6 gap-1 flex items-center space-x-3">
-          <h1 className="w-12 bg-black text-white h-12 flex items-center justify-center font-bold text-xl rounded-full">
-            {one.toUpperCase()}
-          </h1>
-          <h1 className="text-xl truncate w-40">{name}</h1>
-        </div>
-        <div className="flex flex-col flex-grow">
-          {sidebarOptions.map((option, index) => (
-            <div key={index}>
-              <Link to={option.to}>
-                <button
-                  className={`w-full text-left p-3 rounded-lg hover:bg-blue-900/30 transition-all duration-200 ${
-                    isActive(option.to) ? "bg-blue-900/50 border-l-4 border-blue-500" : ""
-                  }`}
-                >
-                  <i className={option.icon}></i> {option.label}
-                </button>
-              </Link>
-              {option.label.startsWith("All") && index < sidebarOptions.length - 1 && index > 1 && (
-                <hr className="my-2 border-blue-800/20" />
-              )}
+    <div className="flex h-screen w-full overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+      {/* Desktop Sidebar */}
+      <aside className="hidden md:flex flex-col w-64 bg-slate-900/50 backdrop-blur-xl border-r border-slate-700/50">
+        {/* User Profile */}
+        <div className="p-6 border-b border-slate-700/50">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center font-bold text-lg shadow-lg">
+              {initials.toUpperCase()}
             </div>
+            <div className="flex-1 min-w-0">
+              <h2 className="text-sm font-semibold text-white truncate">{name}</h2>
+              <p className="text-xs text-slate-400">Administrator</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Navigation */}
+        <nav className="flex-1 overflow-y-auto p-4 space-y-1 scrollbar-thin scrollbar-thumb-slate-700 scrollbar-track-transparent">
+          {sidebarOptions.map((option) => (
+            <Link
+              key={option.to}
+              to={option.to}
+              className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 group ${isActive(option.to)
+                ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg"
+                : "text-slate-300 hover:bg-slate-800/50 hover:text-white"
+                }`}
+            >
+              <i className={`${option.icon} text-lg`}></i>
+              <span className="text-sm font-medium truncate">{option.label}</span>
+            </Link>
           ))}
-        </div>
-        <button
-          className="w-full text-left p-3 rounded-lg hover:bg-blue-900/30 transition-all duration-200 mt-auto"
-          onClick={handleSignOut}
-        >
-          <i className="bi bi-box-arrow-right"></i> Sign Out
-        </button>
-      </div>
+        </nav>
 
-      {/* Main Content */}
-      <div className="bg-gray-950 mt-1 md:pb-10 md:ml-[300px] h-[calc(100vh-64px)] fixed top-16 w-full md:w-[calc(100vw-300px)]">
-        <Outlet />
-      </div>
-
-      {/* Mobile Bottom Navigation */}
-      <div className="md:hidden fixed bottom-0 left-0 w-full bg-gray-900/50 backdrop-blur-sm p-2 flex justify-around items-center border-t border-blue-800/30 rounded-t-lg">
-        {visibleOptions.map((option, index) => (
-          <Link key={index} to={option.to}>
-            <button
-              className={`flex flex-col items-center space-y-1 p-2 hover:bg-blue-900/30 rounded-lg transition-all duration-200 ${
-                isActive(option.to) ? "bg-blue-900/50" : ""
-              }`}
-            >
-              <i className={option.icon}></i>
-              <span className="text-xs">{option.label}</span>
-            </button>
-          </Link>
-        ))}
-        <div className="relative">
+        {/* Sign Out Button */}
+        <div className="p-4 border-t border-slate-700/50">
           <button
-            className="flex flex-col items-center space-y-1 p-2 hover:bg-blue-900/30 rounded-lg transition-all duration-200"
-            onClick={() => setIsMoreOpen(!isMoreOpen)}
+            onClick={handleSignOut}
+            className="flex items-center gap-3 w-full px-4 py-3 rounded-lg text-slate-300 hover:bg-red-500/10 hover:text-red-400 transition-all duration-200"
           >
-            <i className="bi bi-three-dots-vertical"></i>
-            <span className="text-xs">More</span>
+            <i className="bi bi-box-arrow-right text-lg"></i>
+            <span className="text-sm font-medium">Sign Out</span>
           </button>
-          {isMoreOpen && (
-            <div className="absolute bottom-14 right-0 w-64 max-h-64 overflow-y-auto bg-gray-900/90 backdrop-blur-md p-4 rounded-lg border border-blue-800/30 shadow-lg">
-              {hiddenOptions.map((option, index) => (
-                <Link
-                  key={index}
-                  to={option.to}
-                  onClick={() => setIsMoreOpen(false)}
-                >
-                  <button
-                    className={`flex items-center space-x-2 w-full p-2 hover:bg-blue-900/30 rounded-lg transition-all duration-200 ${
-                      isActive(option.to) ? "bg-blue-900/50" : ""
-                    }`}
-                  >
-                    <i className={option.icon}></i>
-                    <span>{option.label}</span>
-                  </button>
-                </Link>
-              ))}
-            </div>
-          )}
         </div>
-      </div>
+      </aside>
 
-      {/* Alert Component */}
-      {alert && (
-        <div
-          className={`fixed bottom-4 right-4 px-4 py-3 rounded-lg text-white shadow-lg transition-all duration-300 ${
-            alert.type === "success" ? "bg-green-600" : "bg-red-600"
-          } flex flex-col w-80`}
-        >
-          <div className="flex items-center space-x-2">
-            <span className="flex-1">{alert.message}</span>
+      {/* Main Content Area */}
+      <main className="flex-1 flex flex-col overflow-hidden">
+        {/* Top Bar for Mobile */}
+        <header className="md:hidden bg-slate-900/50 backdrop-blur-xl border-b border-slate-700/50 p-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center font-bold">
+                {initials.toUpperCase()}
+              </div>
+              <div>
+                <h2 className="text-sm font-semibold text-white">{name}</h2>
+                <p className="text-xs text-slate-400">Admin</p>
+              </div>
+            </div>
             <button
-              onClick={dismissAlert}
-              className="text-white hover:text-gray-200 focus:outline-none"
+              onClick={handleSignOut}
+              className="p-2 text-slate-400 hover:text-red-400"
             >
-              <i className="bi bi-x-lg"></i>
+              <i className="bi bi-box-arrow-right text-xl"></i>
             </button>
           </div>
-          <div className="w-full h-1 mt-2 bg-white/30 rounded-full overflow-hidden">
-            <div
-              className="h-full bg-white transition-all ease-linear"
-              style={{ width: `${progress}%` }}
-            ></div>
+        </header>
+
+        {/* Content */}
+        <div className="flex-1 overflow-y-auto pb-20 md:pb-0">
+          <Outlet />
+        </div>
+
+        {/* Mobile Bottom Navigation */}
+        <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-slate-900/95 backdrop-blur-xl border-t border-slate-700/50 safe-area-inset-bottom">
+          <div className="flex justify-around items-center px-2 py-2">
+            {sidebarOptions.slice(0, 4).map((option) => (
+              <Link
+                key={option.to}
+                to={option.to}
+                className={`flex flex-col items-center gap-1 px-3 py-2 rounded-lg transition-all ${isActive(option.to)
+                  ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white"
+                  : "text-slate-400 hover:text-white"
+                  }`}
+              >
+                <i className={`${option.icon} text-xl`}></i>
+                <span className="text-xs font-medium">{option.label.split(" ")[0]}</span>
+              </Link>
+            ))}
+            <div className="relative">
+              <button
+                onClick={() => setIsMoreOpen(!isMoreOpen)}
+                className="flex flex-col items-center gap-1 px-3 py-2 text-slate-400 hover:text-white"
+              >
+                <i className="bi bi-grid-fill text-xl"></i>
+                <span className="text-xs font-medium">More</span>
+              </button>
+
+              {isMoreOpen && (
+                <>
+                  <div
+                    className="fixed inset-0 bg-black/50 z-40"
+                    onClick={() => setIsMoreOpen(false)}
+                  ></div>
+                  <div className="absolute bottom-full right-0 mb-2 w-64 max-h-96 overflow-y-auto bg-slate-900/95 backdrop-blur-xl rounded-xl border border-slate-700/50 shadow-2xl z-50">
+                    <div className="p-2 space-y-1">
+                      {sidebarOptions.map((option) => (
+                        <Link
+                          key={option.to}
+                          to={option.to}
+                          onClick={() => setIsMoreOpen(false)}
+                          className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${isActive(option.to)
+                            ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white"
+                            : "text-slate-300 hover:bg-slate-800/50"
+                            }`}
+                        >
+                          <i className={`${option.icon} text-lg`}></i>
+                          <span className="text-sm font-medium">{option.label}</span>
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        </nav>
+      </main>
+
+      {/* Toast Alert */}
+      {alert && (
+        <div className="fixed bottom-24 md:bottom-6 right-6 z-50 animate-slide-up">
+          <div
+            className={`${alert.type === "success"
+              ? "bg-gradient-to-r from-green-600 to-emerald-600"
+              : "bg-gradient-to-r from-red-600 to-rose-600"
+              } text-white px-6 py-4 rounded-xl shadow-2xl min-w-[320px] max-w-md`}
+          >
+            <div className="flex items-start gap-3">
+              <i
+                className={`${alert.type === "success" ? "bi bi-check-circle-fill" : "bi bi-exclamation-circle-fill"
+                  } text-2xl flex-shrink-0`}
+              ></i>
+              <div className="flex-1">
+                <p className="font-medium">{alert.message}</p>
+                <div className="mt-2 h-1 bg-white/30 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-white transition-all duration-75 ease-linear"
+                    style={{ width: `${progress}%` }}
+                  ></div>
+                </div>
+              </div>
+              <button
+                onClick={dismissAlert}
+                className="text-white/80 hover:text-white transition-colors"
+              >
+                <i className="bi bi-x-lg"></i>
+              </button>
+            </div>
           </div>
         </div>
       )}

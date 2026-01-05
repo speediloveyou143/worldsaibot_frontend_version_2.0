@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { BACKEND_URL } from '../../../config/constant';
+import APIService from '../../services/api';
 
 
 const Thanks = () => {
@@ -14,8 +13,12 @@ const Thanks = () => {
     // Fetch group, email, and number data
     const fetchContactData = async () => {
       try {
-        const response = await axios.get(`${BACKEND_URL}/all-contacts`);
-        const data = response.data[0]; // Take the first item
+        const response = await APIService.contacts.getAll();
+
+        // Backend returns {message, data: [...]} so we need response.data.data
+        const contactsArray = response.data.data || response.data || [];
+        const data = contactsArray[0]; // Take the first item
+
         if (data) {
           setContactData({
             group: data.group || 'https://chat.whatsapp.com/YOUR_WHATSAPP_GROUP_LINK',
@@ -24,7 +27,6 @@ const Thanks = () => {
           });
         }
       } catch (error) {
-        console.error('Error fetching contact data:', error);
         // Keep default values if API fails
       }
     };

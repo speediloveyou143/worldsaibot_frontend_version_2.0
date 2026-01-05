@@ -1,19 +1,18 @@
-import axios from "axios";
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { BACKEND_URL } from "../../../config/constant";
+import APIService from "../../services/api";
 
 function Row(props) {
-  const { number, data, showAlert } = props;
+  const { number, data, showAlert, onRefresh } = props;
 
   async function handleDelete() {
+    if (!window.confirm('Are you sure you want to delete this roadmap topic?')) return;
+
     try {
-      const response = await axios.delete(
-        `${BACKEND_URL}/delete-roadmap-topic/${data._id}`,
-        { withCredentials: true }
-      );
+      const response = await APIService.roadmapTopics.delete(data._id);
       if (response.status === 200) {
         showAlert("Roadmap topic deleted successfully!", "success");
+        onRefresh(); // Refresh the list
       } else {
         showAlert("Failed to delete the roadmap topic.", "error");
       }
@@ -76,10 +75,9 @@ function AllRoadMapTopics() {
 
   async function fetchRoadMapTopics() {
     try {
-      const response = await axios.get(`${BACKEND_URL}/show-roadmap-topic`, {
-        withCredentials: true,
-      });
-      setRoadMapData(response?.data || []);
+      const response = await APIService.roadmapTopics.getAll();
+      const topics = response?.data?.data || response?.data || [];
+      setRoadMapData(Array.isArray(topics) ? topics : []);
     } catch (err) {
       setRoadMapData([]);
       showAlert("Error fetching roadmap topics. Please try again.", "error");
@@ -106,7 +104,7 @@ function AllRoadMapTopics() {
         <tbody>
           {roadMapData.length > 0 ? (
             roadMapData.map((x, index) => (
-              <Row key={index} number={index + 1} data={x} showAlert={showAlert} />
+              <Row key={x._id || index} number={index + 1} data={x} showAlert={showAlert} onRefresh={fetchRoadMapTopics} />
             ))
           ) : (
             <tr>
@@ -130,9 +128,8 @@ function AllRoadMapTopics() {
 
       {alert && (
         <div
-          className={`fixed bottom-4 right-4 px-4 py-3 rounded-lg text-white shadow-lg transition-all duration-300 z-[50] ${
-            alert.type === "success" ? "bg-green-600" : "bg-red-600"
-          } flex flex-col w-80`}
+          className={`fixed bottom-4 right-4 px-4 py-3 rounded-lg text-white shadow-lg transition-all duration-300 z-[50] ${alert.type === "success" ? "bg-green-600" : "bg-red-600"
+            } flex flex-col w-80`}
         >
           <div className="flex items-center space-x-2">
             <span className="flex-1">{alert.message}</span>

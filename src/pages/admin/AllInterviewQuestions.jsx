@@ -1,22 +1,23 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { Link } from "react-router-dom";
-import { BACKEND_URL } from "../../../config/constant";
+import APIService from "../../services/api";
 
 function AllInterviewQuestions() {
   const [questionSets, setQuestionSets] = useState([]);
   const [alert, setAlert] = useState(null);
   const [progress, setProgress] = useState(100);
 
+  const fetchQuestionSets = async () => {
+    try {
+      const response = await APIService.interviews.getAll();
+      const questions = response?.data?.data || response?.data || [];
+      setQuestionSets(Array.isArray(questions) ? questions : []);
+    } catch (error) {
+      showAlert("Error fetching questions. Please try again.", "error");
+    }
+  };
+
   useEffect(() => {
-    const fetchQuestionSets = async () => {
-      try {
-        const response = await axios.get(`${BACKEND_URL}/all-questions`);
-        setQuestionSets(response.data);
-      } catch (error) {
-        showAlert("Error fetching questions. Please try again.", "error");
-      }
-    };
     fetchQuestionSets();
   }, []);
 
@@ -53,12 +54,12 @@ function AllInterviewQuestions() {
   }, [alert]);
 
   const handleDelete = async (id) => {
+    if (!window.confirm('Are you sure you want to delete these interview questions?')) return;
+
     try {
-      await axios.delete(`${BACKEND_URL}/delete-questions/${id}`, {
-        withCredentials: true,
-      });
-      setQuestionSets(questionSets.filter((set) => set._id !== id));
+      await APIService.interviews.delete(id);
       showAlert("Questions deleted successfully!", "success");
+      fetchQuestionSets(); // Refresh the list
     } catch (error) {
       showAlert("Error deleting questions. Please try again.", "error");
     }
@@ -99,9 +100,8 @@ function AllInterviewQuestions() {
 
       {alert && (
         <div
-          className={`fixed bottom-4 right-4 px-4 py-3 rounded-lg text-white shadow-lg transition-all duration-300 ${
-            alert.type === "success" ? "bg-green-600" : "bg-red-600"
-          } flex flex-col w-80`}
+          className={`fixed bottom-4 right-4 px-4 py-3 rounded-lg text-white shadow-lg transition-all duration-300 ${alert.type === "success" ? "bg-green-600" : "bg-red-600"
+            } flex flex-col w-80`}
         >
           <div className="flex items-center space-x-2">
             <span className="flex-1">{alert.message}</span>

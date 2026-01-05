@@ -3,9 +3,7 @@ import { createRoot } from 'react-dom/client';
 import './index.css';
 import App from './App.jsx';
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-
-import { BACKEND_URL } from '../config/constant'; // Update this path as needed
+import APIService from './services/api';
 
 const Index = () => {
   const [loading, setLoading] = useState(true);
@@ -35,11 +33,14 @@ const Index = () => {
     const fetchData = async () => {
       try {
         const [bannerRes, bootcampsRes] = await Promise.all([
-          axios.get(`${BACKEND_URL}/all-contacts`, { withCredentials: true }),
-          axios.get(`${BACKEND_URL}/show-roadmap-topic`)
+          APIService.contacts.getAll(),
+          APIService.bootcamps.getAll()
         ]);
 
-        const contact = bannerRes.data[0] || {};
+        // Backend returns {message, data: [...]} so we need bannerRes.data.data
+        const contactsArray = bannerRes.data.data || bannerRes.data || [];
+        const contact = contactsArray[0] || {};
+
         setBannerData({
           offer: contact.offer || defaultBannerData.offer,
           heading: contact.heading || defaultBannerData.heading,
@@ -56,10 +57,13 @@ const Index = () => {
           logo: contact.logo || ''
         });
 
-        setBootcamps(bootcampsRes.data);
-      } catch (error) {
-        console.error('API fetch error:', error);
+        // Extract bootcamps data properly
+        const bootcampsData = bootcampsRes?.data?.data || bootcampsRes?.data || [];
+        setBootcamps(Array.isArray(bootcampsData) ? bootcampsData : []);
+      } catch {
+        // API fetch failed, use default banner data
         setBannerData(defaultBannerData);
+        setBootcamps([]);
       } finally {
         setTimeout(() => setLoading(false), 500); // optional delay for smoother transition
       }

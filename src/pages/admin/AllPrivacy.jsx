@@ -1,19 +1,18 @@
-import axios from "axios";
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { BACKEND_URL } from "../../../config/constant";
+import APIService from "../../services/api";
 
 function Row(props) {
-  const { number, data, showAlert } = props;
+  const { number, data, showAlert, onRefresh } = props;
 
   async function handleDelete() {
+    if (!window.confirm('Are you sure you want to delete this privacy entry?')) return;
+
     try {
-      const response = await axios.delete(
-        `${BACKEND_URL}/delete-privacy/${data._id}`,
-        { withCredentials: true }
-      );
+      const response = await APIService.privacy.delete(data._id);
       if (response.status === 200) {
         showAlert("Privacy entry deleted successfully!", "success");
+        onRefresh(); // Refresh the list
       } else {
         showAlert("Failed to delete the privacy entry.", "error");
       }
@@ -76,10 +75,9 @@ function AllPrivacy() {
 
   async function fetchPrivacies() {
     try {
-      const response = await axios.get(`${BACKEND_URL}/show-privacies`, {
-        withCredentials: true,
-      });
-      setPrivacyData(response?.data || []);
+      const response = await APIService.privacy.getAll();
+      const privacies = response?.data?.data || response?.data || [];
+      setPrivacyData(Array.isArray(privacies) ? privacies : []);
     } catch (err) {
       setPrivacyData([]);
       showAlert("Error fetching privacy entries. Please try again.", "error");
@@ -106,7 +104,7 @@ function AllPrivacy() {
         <tbody>
           {privacyData.length > 0 ? (
             privacyData.map((x, index) => (
-              <Row key={index} number={index + 1} data={x} showAlert={showAlert} />
+              <Row key={x._id || index} number={index + 1} data={x} showAlert={showAlert} onRefresh={fetchPrivacies} />
             ))
           ) : (
             <tr>
@@ -130,9 +128,8 @@ function AllPrivacy() {
 
       {alert && (
         <div
-          className={`fixed bottom-4 right-4 px-4 py-3 rounded-lg text-white shadow-lg transition-all duration-300 z-[50] ${
-            alert.type === "success" ? "bg-green-600" : "bg-red-600"
-          } flex flex-col w-80`}
+          className={`fixed bottom-4 right-4 px-4 py-3 rounded-lg text-white shadow-lg transition-all duration-300 z-[50] ${alert.type === "success" ? "bg-green-600" : "bg-red-600"
+            } flex flex-col w-80`}
         >
           <div className="flex items-center space-x-2">
             <span className="flex-1">{alert.message}</span>

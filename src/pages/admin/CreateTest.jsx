@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
-import { BACKEND_URL } from "../../../config/constant";
+import APIService from "../../services/api";
 
 function CreateTest() {
   const [formData, setFormData] = useState({
@@ -83,19 +82,15 @@ function CreateTest() {
         return;
       }
 
-      const response = await axios.post(
-        `${BACKEND_URL}/create-test`,
-        formData,
-        { withCredentials: true }
-      );
-      if (response.status === 200) {
+      const response = await APIService.tests.create(formData);
+      if (response.status === 200 || response.status === 201) {
         showAlert("Test created successfully!", "success");
         setFormData({ question: "", test: [{ input: "", output: "" }] });
       } else {
         showAlert("Test not created.", "error");
       }
     } catch (err) {
-      showAlert("Something went wrong while creating the test.", "error");
+      showAlert(err.response?.data?.message || "Something went wrong while creating the test.", "error");
     }
   };
 
@@ -157,9 +152,8 @@ function CreateTest() {
 
         {alert && (
           <div
-            className={`fixed bottom-4 right-4 px-4 py-3 rounded-lg text-white shadow-lg transition-all duration-300 z-[50] ${
-              alert.type === 'success' ? 'bg-green-600' : 'bg-red-600'
-            } flex flex-col w-80`}
+            className={`fixed bottom-4 right-4 px-4 py-3 rounded-lg text-white shadow-lg transition-all duration-300 z-[50] ${alert.type === 'success' ? 'bg-green-600' : 'bg-red-600'
+              } flex flex-col w-80`}
           >
             <div className="flex items-center space-x-2">
               <span className="flex-1">{alert.message}</span>

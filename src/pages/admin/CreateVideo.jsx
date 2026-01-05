@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { BACKEND_URL } from "../../../config/constant";
+import APIService from '../../services/api';
 
 function CreateVideo() {
   const [videoUrl, setVideoUrl] = useState('');
@@ -47,6 +46,10 @@ function CreateVideo() {
   const validateForm = () => {
     const newErrors = {};
     if (!videoUrl.trim()) newErrors.videoUrl = 'Video URL is required';
+    else if (!/^https?:\/\/.+/.test(videoUrl.trim())) {
+      newErrors.videoUrl = 'Video URL must be a valid URL starting with http:// or https://';
+    }
+
     if (!jobRole.trim()) newErrors.jobRole = 'Job Role is required';
     if (!name.trim()) newErrors.name = 'Name is required';
     if (!packageAmount.trim()) newErrors.packageAmount = 'Package is required';
@@ -66,18 +69,15 @@ function CreateVideo() {
     if (!validateForm()) return;
 
     try {
-      const response = await axios.post(
-        `${BACKEND_URL}/create-video`,
-        {
-          videoUrl,
-          jobRole,
-          name,
-          package: packageAmount,
-          companyName,
-        },
-        { withCredentials: true }
-      );
-      if (response.status === 200) {
+      const response = await APIService.videos.create({
+        videoUrl,
+        jobRole,
+        name,
+        package: packageAmount,
+        companyName,
+      });
+
+      if (response.status === 200 || response.status === 201) {
         showAlert('Success video created successfully!', 'success');
         setVideoUrl('');
         setJobRole('');
@@ -106,11 +106,10 @@ function CreateVideo() {
               id="videoUrl"
               value={videoUrl}
               onChange={(e) => setVideoUrl(e.target.value)}
-              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
-                errors.videoUrl
-                  ? 'border-red-500 focus:ring-red-500 bg-gray-700 text-white'
-                  : 'border-gray-600 focus:ring-blue-500 bg-gray-700 text-white'
-              }`}
+              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 ${errors.videoUrl
+                ? 'border-red-500 focus:ring-red-500 bg-gray-700 text-white'
+                : 'border-gray-600 focus:ring-blue-500 bg-gray-700 text-white'
+                }`}
               placeholder="Enter video URL"
             />
           </div>
@@ -124,11 +123,10 @@ function CreateVideo() {
               id="jobRole"
               value={jobRole}
               onChange={(e) => setJobRole(e.target.value)}
-              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
-                errors.jobRole
-                  ? 'border-red-500 focus:ring-red-500 bg-gray-700 text-white'
-                  : 'border-gray-600 focus:ring-blue-500 bg-gray-700 text-white'
-              }`}
+              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 ${errors.jobRole
+                ? 'border-red-500 focus:ring-red-500 bg-gray-700 text-white'
+                : 'border-gray-600 focus:ring-blue-500 bg-gray-700 text-white'
+                }`}
               placeholder="Enter job role"
             />
           </div>
@@ -142,11 +140,10 @@ function CreateVideo() {
               id="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
-                errors.name
-                  ? 'border-red-500 focus:ring-red-500 bg-gray-700 text-white'
-                  : 'border-gray-600 focus:ring-blue-500 bg-gray-700 text-white'
-              }`}
+              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 ${errors.name
+                ? 'border-red-500 focus:ring-red-500 bg-gray-700 text-white'
+                : 'border-gray-600 focus:ring-blue-500 bg-gray-700 text-white'
+                }`}
               placeholder="Enter name"
             />
           </div>
@@ -160,11 +157,10 @@ function CreateVideo() {
               id="package"
               value={packageAmount}
               onChange={(e) => setPackageAmount(e.target.value)}
-              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
-                errors.packageAmount
-                  ? 'border-red-500 focus:ring-red-500 bg-gray-700 text-white'
-                  : 'border-gray-600 focus:ring-blue-500 bg-gray-700 text-white'
-              }`}
+              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 ${errors.packageAmount
+                ? 'border-red-500 focus:ring-red-500 bg-gray-700 text-white'
+                : 'border-gray-600 focus:ring-blue-500 bg-gray-700 text-white'
+                }`}
               placeholder="Enter package"
             />
           </div>
@@ -178,11 +174,10 @@ function CreateVideo() {
               id="companyName"
               value={companyName}
               onChange={(e) => setCompanyName(e.target.value)}
-              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
-                errors.companyName
-                  ? 'border-red-500 focus:ring-red-500 bg-gray-700 text-white'
-                  : 'border-gray-600 focus:ring-blue-500 bg-gray-700 text-white'
-              }`}
+              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 ${errors.companyName
+                ? 'border-red-500 focus:ring-red-500 bg-gray-700 text-white'
+                : 'border-gray-600 focus:ring-blue-500 bg-gray-700 text-white'
+                }`}
               placeholder="Enter company name"
             />
           </div>
@@ -197,9 +192,8 @@ function CreateVideo() {
 
         {alert && (
           <div
-            className={`fixed bottom-4 right-4 px-4 py-3 rounded-lg text-white shadow-lg transition-all duration-300 z-[50] ${
-              alert.type === 'success' ? 'bg-green-600' : 'bg-red-600'
-            } flex flex-col w-80`}
+            className={`fixed bottom-4 right-4 px-4 py-3 rounded-lg text-white shadow-lg transition-all duration-300 z-[50] ${alert.type === 'success' ? 'bg-green-600' : 'bg-red-600'
+              } flex flex-col w-80`}
           >
             <div className="flex items-center space-x-2">
               <span className="flex-1">{alert.message}</span>

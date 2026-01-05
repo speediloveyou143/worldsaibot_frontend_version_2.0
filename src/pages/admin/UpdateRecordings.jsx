@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
-import { useParams } from "react-router-dom";
-import { BACKEND_URL } from "../../../config/constant";
+import { useParams, useNavigate } from "react-router-dom";
+import APIService from "../../services/api";
 
 function UpdateRecordings() {
   const { id } = useParams(); // Batch ID from URL params
@@ -47,10 +46,7 @@ function UpdateRecordings() {
   useEffect(() => {
     const fetchBatchData = async () => {
       try {
-        const response = await axios.get(
-          `${BACKEND_URL}/show-recordings/${id}`,
-          { withCredentials: true }
-        );
+        const response = await APIService.recordings.getById(id);
 
         if (response.status === 200) {
           const { batchNumber, recordings } = response.data;
@@ -134,11 +130,10 @@ function UpdateRecordings() {
     e.preventDefault();
     if (validate()) {
       try {
-        const response = await axios.put(
-          `${BACKEND_URL}/update-recordings/${id}`,
-          { batchNumber: batch.batchNumber, recordings: batch.videos },
-          { withCredentials: true }
-        );
+        const response = await APIService.recordings.update(id, {
+          batchNumber: batch.batchNumber,
+          recordings: batch.videos
+        });
         if (response.status === 200) {
           showAlert("Recordings updated successfully!", "success");
         }
@@ -225,9 +220,8 @@ function UpdateRecordings() {
 
       {alert && (
         <div
-          className={`fixed bottom-4 right-4 px-4 py-3 rounded-lg text-white shadow-lg transition-all duration-300 z-[50] ${
-            alert.type === 'success' ? 'bg-green-600' : 'bg-red-600'
-          } flex flex-col w-80`}
+          className={`fixed bottom-4 right-4 px-4 py-3 rounded-lg text-white shadow-lg transition-all duration-300 z-[50] ${alert.type === 'success' ? 'bg-green-600' : 'bg-red-600'
+            } flex flex-col w-80`}
         >
           <div className="flex items-center space-x-2">
             <span className="flex-1">{alert.message}</span>

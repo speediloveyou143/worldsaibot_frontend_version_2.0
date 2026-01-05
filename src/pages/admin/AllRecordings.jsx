@@ -1,19 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
-import { BACKEND_URL } from "../../../config/constant";
+import APIService from '../../services/api';
 
 function RecordingCard(props) {
-  const { data, showAlert } = props;
+  const { data, showAlert, onRefresh } = props;
 
   async function handleDelete() {
+    if (!window.confirm('Are you sure you want to delete this recording batch?')) return;
+
     try {
-      const response = await axios.delete(
-        `${BACKEND_URL}/delete-recordings/${data._id}`,
-        { withCredentials: true }
-      );
+      const response = await APIService.recordings.delete(data._id);
       if (response.status === 200) {
         showAlert("Recordings deleted successfully!", "success");
+        onRefresh(); // Refresh the list
       } else {
         showAlert("Failed to delete the recordings.", "error");
       }
@@ -79,10 +78,9 @@ function AllRecordings() {
 
   async function fetchRecordings() {
     try {
-      const response = await axios.get(`${BACKEND_URL}/show-recordings`, {
-        withCredentials: true,
-      });
-      setRecordings(response?.data?.data || []);
+      const response = await APIService.recordings.getAll();
+      const data = response?.data?.data || response?.data || [];
+      setRecordings(Array.isArray(data) ? data : []);
     } catch (error) {
       setRecordings([]);
       showAlert("Error fetching recordings. Please try again.", "error");
@@ -100,13 +98,12 @@ function AllRecordings() {
   return (
     <div className="flex flex-wrap align-center justify-evenly">
       {recordings.map((x, index) => (
-        <RecordingCard key={index} data={x} showAlert={showAlert} />
+        <RecordingCard key={x._id || index} data={x} showAlert={showAlert} onRefresh={fetchRecordings} />
       ))}
       {alert && (
         <div
-          className={`fixed bottom-4 right-4 px-4 py-3 rounded-lg text-white shadow-lg transition-all duration-300 z-[50] ${
-            alert.type === "success" ? "bg-green-600" : "bg-red-600"
-          } flex flex-col w-80`}
+          className={`fixed bottom-4 right-4 px-4 py-3 rounded-lg text-white shadow-lg transition-all duration-300 z-[50] ${alert.type === "success" ? "bg-green-600" : "bg-red-600"
+            } flex flex-col w-80`}
         >
           <div className="flex items-center space-x-2">
             <span className="flex-1">{alert.message}</span>

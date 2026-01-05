@@ -40,7 +40,7 @@ const ResetPassword = () => {
     try {
       await axios.post(`${BACKEND_URL}/reset-password`, {
         token,
-        newPassword,
+        new_password: newPassword,
       });
       setMessage("Your password has been reset! Redirecting to sign in...");
       // Navigate to /signin after 2 seconds to allow user to read the message
@@ -92,11 +92,10 @@ const ResetPassword = () => {
           <button
             type="submit"
             disabled={!token || isLoading}
-            className={`w-full py-3 rounded-lg font-semibold text-white transition duration-300 flex items-center justify-center ${
-              token && !isLoading
+            className={`w-full py-3 rounded-lg font-semibold text-white transition duration-300 flex items-center justify-center ${token && !isLoading
                 ? "bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800"
                 : "bg-gray-600 cursor-not-allowed opacity-75"
-            }`}
+              }`}
           >
             {isLoading ? (
               <svg

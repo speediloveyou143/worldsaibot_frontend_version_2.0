@@ -1,20 +1,19 @@
 
-import axios from "axios";
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { BACKEND_URL } from "../../../config/constant";
+import APIService from "../../services/api";
 
 function Row(props) {
-  const { showAlert, data, number } = props;
+  const { showAlert, data, number, onRefresh } = props;
 
   async function handleDelete() {
+    if (!window.confirm('Are you sure you want to delete this company logo?')) return;
+
     try {
-      const response = await axios.delete(
-        `${BACKEND_URL}/delete-company/${data._id}`,
-        { withCredentials: true }
-      );
+      const response = await APIService.companies.delete(data._id);
       if (response.status === 200) {
         showAlert("Company deleted successfully!", "success");
+        onRefresh(); // Refresh the list
       } else {
         showAlert("Failed to delete the company.", "error");
       }
@@ -28,7 +27,7 @@ function Row(props) {
       <th>{number}</th>
       <td>{data.companyName}</td>
       <td>
-        <img src={data.logo} alt={data.companyName} className="w-16 h-16 object-contain" />
+        <img src={data.logoUrl || data.logo} alt={data.companyName} className="w-16 h-16 object-contain" />
       </td>
       <td className="text-success cursor-pointer">
         <Link to={`/admin-dashboard/profile/update-company/${data._id}`}>update</Link>
@@ -82,10 +81,10 @@ function AllCompanyLogos() {
 
   async function fetchCompanies() {
     try {
-      const response = await axios.get(`${BACKEND_URL}/show-companies`, {
-        withCredentials: true,
-      });
-      setCompanyData(response?.data);
+      const response = await APIService.companies.getAll();
+      // Extract data from nested structure
+      const companies = response?.data?.data || response?.data || [];
+      setCompanyData(Array.isArray(companies) ? companies : []);
     } catch (err) {
       setCompanyData([]);
       showAlert("Error fetching companies. Please try again.", "error");
@@ -112,7 +111,7 @@ function AllCompanyLogos() {
         <tbody>
           {companyData.length > 0 ? (
             companyData.map((x, index) => (
-              <Row key={index} number={index + 1} data={x} showAlert={showAlert} />
+              <Row key={x._id || index} number={index + 1} data={x} showAlert={showAlert} onRefresh={fetchCompanies} />
             ))
           ) : (
             <tr>
@@ -137,9 +136,8 @@ function AllCompanyLogos() {
       {/* Alert Component */}
       {alert && (
         <div
-          className={`fixed bottom-4 right-4 px-4 py-3 rounded-lg text-white shadow-lg transition-all duration-300 ${
-            alert.type === "success" ? "bg-green-600" : "bg-red-600"
-          } flex flex-col w-80 z-[50]`}
+          className={`fixed bottom-4 right-4 px-4 py-3 rounded-lg text-white shadow-lg transition-all duration-300 ${alert.type === "success" ? "bg-green-600" : "bg-red-600"
+            } flex flex-col w-80 z-[50]`}
         >
           <div className="flex items-center space-x-2">
             <span className="flex-1">{alert.message}</span>

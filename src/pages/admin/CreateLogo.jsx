@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { BACKEND_URL } from "../../../config/constant";
+import { useNavigate } from 'react-router-dom';
+import APIService from '../../services/api';
 
 function CreateLogo() {
-  const [companyName, setCompanyName] = useState('');
-  const [logo, setLogo] = useState('');
-  const [errors, setErrors] = useState({});
+  const navigate = useNavigate();
+  const [submitting, setSubmitting] = useState(false);
+  const [formData, setFormData] = useState({
+    companyName: '',
+    logo: ''
+  });
   const [alert, setAlert] = useState(null);
   const [progress, setProgress] = useState(100);
 
@@ -41,15 +44,25 @@ function CreateLogo() {
     }
   }, [alert]);
 
-  const validateForm = () => {
-    const newErrors = {};
-    if (!companyName.trim()) newErrors.companyName = 'Company Name is required';
-    if (!logo.trim()) newErrors.logo = 'Logo URL is required';
-    setErrors(newErrors);
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
 
-    if (Object.keys(newErrors).length > 0) {
-      const errorMessages = Object.values(newErrors).join(', ');
-      showAlert(errorMessages, 'error');
+  const validateForm = () => {
+    if (!formData.companyName.trim()) {
+      showAlert('Company Name is required', 'error');
+      return false;
+    }
+    if (!formData.logo.trim()) {
+      showAlert('Logo URL is required', 'error');
+      return false;
+    }
+    if (!/^https?:\/\/.+/.test(formData.logo)) {
+      showAlert('Please enter a valid URL starting with http:// or https://', 'error');
       return false;
     }
     return true;
@@ -59,95 +72,155 @@ function CreateLogo() {
     e.preventDefault();
     if (!validateForm()) return;
 
+    setSubmitting(true);
     try {
-      const response = await axios.post(
-        `${BACKEND_URL}/create-logo`,
-        { companyName, logo },
-        { withCredentials: true }
-      );
-      if (response.status === 200) {
+      const response = await APIService.companies.create({
+        companyName: formData.companyName,
+        logoUrl: formData.logo  // Backend expects logoUrl
+      });
+      if (response.status === 200 || response.status === 201) {
         showAlert('Company logo created successfully!', 'success');
-        setCompanyName('');
-        setLogo('');
-        setErrors({});
+        setFormData({
+          companyName: '',
+          logo: ''
+        });
       }
     } catch (error) {
       showAlert(error.response?.data?.message || 'An error occurred while creating the logo.', 'error');
+    } finally {
+      setSubmitting(false);
     }
   };
 
   return (
-    <div className="bg-gray-950 sm:flex sm:items-center sm:justify-center p-4">
-      <div className="bg-gray-800 p-6 rounded-lg shadow-lg w-full sm:max-w-md">
-        <h2 className="text-2xl font-bold mb-6 text-center text-white">Create Company Logo</h2>
+    <div className="h-full w-full overflow-auto p-6">
+      <div className="mb-6">
+        <button
+          onClick={() => navigate("/admin-dashboard/profile/all-company-logos")}
+          className="mb-4 text-slate-400 hover:text-white transition-colors flex items-center gap-2"
+        >
+          <i className="bi bi-arrow-left"></i>
+          Back to Company Logos
+        </button>
+        <h1 className="text-3xl font-bold text-white mb-2">Create Company Logo</h1>
+        <p className="text-slate-400">Add a new company logo to your collection</p>
+      </div>
 
-        <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label className="block text-gray-300 text-sm font-bold mb-2" htmlFor="companyName">
-              Company Name
-            </label>
-            <input
-              type="text"
-              id="companyName"
-              value={companyName}
-              onChange={(e) => setCompanyName(e.target.value)}
-              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
-                errors.companyName
-                  ? 'border-red-500 focus:ring-red-500 bg-gray-700 text-white'
-                  : 'border-gray-600 focus:ring-blue-500 bg-gray-700 text-white'
-              }`}
-              placeholder="Enter company name"
-            />
+      <form onSubmit={handleSubmit} className="max-w-2xl">
+        <div className="bg-slate-800/30 backdrop-blur-sm rounded-xl border border-slate-700/50 p-8">
+          <div className="space-y-6">
+            {/* Company Name */}
+            <div>
+              <label className="block text-sm font-medium text-slate-300 mb-2">
+                Company Name <span className="text-red-400">*</span>
+              </label>
+              <div className="relative">
+                <i className="bi bi-building absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                <input
+                  type="text"
+                  name="companyName"
+                  value={formData.companyName}
+                  onChange={handleChange}
+                  placeholder="e.g., Google, Microsoft, Apple"
+                  className="w-full pl-12 pr-4 py-3 bg-slate-900/50 border border-slate-700/50 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20"
+                  required
+                />
+              </div>
+              <p className="mt-1 text-xs text-slate-500">Enter the official company name</p>
+            </div>
+
+            {/* Logo URL */}
+            <div>
+              <label className="block text-sm font-medium text-slate-300 mb-2">
+                Logo URL <span className="text-red-400">*</span>
+              </label>
+              <div className="relative">
+                <i className="bi bi-image absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                <input
+                  type="url"
+                  name="logo"
+                  value={formData.logo}
+                  onChange={handleChange}
+                  placeholder="https://example.com/logo.png"
+                  className="w-full pl-12 pr-4 py-3 bg-slate-900/50 border border-slate-700/50 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20"
+                  required
+                />
+              </div>
+              <p className="mt-1 text-xs text-slate-500">Provide a direct URL to the company logo image</p>
+            </div>
+
+            {/* Logo Preview */}
+            {formData.logo && /^https?:\/\/.+/.test(formData.logo) && (
+              <div>
+                <label className="block text-sm font-medium text-slate-300 mb-2">
+                  Logo Preview
+                </label>
+                <div className="bg-slate-900/50 border border-slate-700/50 rounded-lg p-6 flex items-center justify-center">
+                  <img
+                    src={formData.logo}
+                    alt="Logo preview"
+                    className="max-w-full max-h-32 object-contain"
+                    onError={(e) => {
+                      e.target.style.display = 'none';
+                      e.target.nextElementSibling.style.display = 'flex';
+                    }}
+                  />
+                  <div className="hidden flex-col items-center gap-2 text-slate-500">
+                    <i className="bi bi-image-fill text-3xl"></i>
+                    <p className="text-sm">Failed to load image</p>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
-          <div className="mb-6">
-            <label className="block text-gray-300 text-sm font-bold mb-2" htmlFor="logo">
-              Logo URL
-            </label>
-            <input
-              type="text"
-              id="logo"
-              value={logo}
-              onChange={(e) => setLogo(e.target.value)}
-              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
-                errors.logo
-                  ? 'border-red-500 focus:ring-red-500 bg-gray-700 text-white'
-                  : 'border-gray-600 focus:ring-blue-500 bg-gray-700 text-white'
-              }`}
-              placeholder="Enter logo URL"
-            />
-          </div>
+        </div>
+
+        <div className="flex gap-3 mt-6">
           <button
             type="submit"
-            className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition duration-300"
+            disabled={submitting}
+            className="flex-1 px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-medium hover:from-blue-700 hover:to-purple-700 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
           >
-            Create Logo
+            {submitting ? (
+              <>
+                <i className="bi bi-arrow-repeat animate-spin"></i>
+                Creating...
+              </>
+            ) : (
+              <>
+                <i className="bi bi-plus-circle"></i>
+                Create Company Logo
+              </>
+            )}
           </button>
-        </form>
-
-        {alert && (
-          <div
-            className={`fixed bottom-4 right-4 px-4 py-3 rounded-lg text-white shadow-lg transition-all duration-300 z-[50] ${
-              alert.type === 'success' ? 'bg-green-600' : 'bg-red-600'
-            } flex flex-col w-80`}
+          <button
+            type="button"
+            onClick={() => navigate("/admin-dashboard/profile/all-company-logos")}
+            className="px-6 py-3 bg-slate-700/50 text-slate-300 rounded-lg font-medium hover:bg-slate-700 transition-all"
           >
-            <div className="flex items-center space-x-2">
-              <span className="flex-1">{alert.message}</span>
-              <button
-                onClick={dismissAlert}
-                className="text-white hover:text-gray-200 focus:outline-none"
-              >
+            Cancel
+          </button>
+        </div>
+      </form>
+
+      {alert && (
+        <div className="fixed bottom-6 right-6 z-[9999]">
+          <div className={`${alert.type === "success" ? "bg-gradient-to-r from-green-600 to-emerald-600" : "bg-gradient-to-r from-red-600 to-rose-600"} text-white px-6 py-4 rounded-xl shadow-2xl min-w-[320px]`}>
+            <div className="flex items-center gap-3">
+              <i className={`${alert.type === "success" ? "bi bi-check-circle-fill" : "bi bi-exclamation-circle-fill"} text-2xl`}></i>
+              <div className="flex-1">
+                <p className="font-medium">{alert.message}</p>
+                <div className="mt-2 h-1 bg-white/30 rounded-full overflow-hidden">
+                  <div className="h-full bg-white transition-all duration-75 ease-linear" style={{ width: `${progress}%` }}></div>
+                </div>
+              </div>
+              <button onClick={dismissAlert} className="text-white/80 hover:text-white">
                 <i className="bi bi-x-lg"></i>
               </button>
             </div>
-            <div className="w-full h-1 mt-2 bg-white/30 rounded-full overflow-hidden">
-              <div
-                className="h-full bg-white transition-all ease-linear"
-                style={{ width: `${progress}%` }}
-              ></div>
-            </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,19 +1,18 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import { Link } from "react-router-dom";
-import { BACKEND_URL } from "../../../config/constant";
+import APIService from "../../services/api";
 
 function Row(props) {
-  const { number, data, showAlert } = props;
+  const { number, data, showAlert, onRefresh } = props;
 
   async function handleDelete() {
+    if (!window.confirm('Are you sure you want to delete this contact?')) return;
+
     try {
-      const response = await axios.delete(
-        `${BACKEND_URL}/delete-contact/${data._id}`,
-        { withCredentials: true }
-      );
+      const response = await APIService.contacts.delete(data._id);
       if (response.status === 200) {
         showAlert("Contact deleted successfully!", "success");
+        onRefresh(); // Refresh the list
       } else {
         showAlert("Failed to delete the contact.", "error");
       }
@@ -115,10 +114,10 @@ function AllData() {
 
   async function fetchContacts() {
     try {
-      const response = await axios.get(`${BACKEND_URL}/all-contacts`, {
-        withCredentials: true,
-      });
-      setContactData(response?.data || []);
+      const response = await APIService.contacts.getAll();
+      // Extract data from nested structure
+      const contacts = response?.data?.data || response?.data || [];
+      setContactData(Array.isArray(contacts) ? contacts : []);
     } catch (err) {
       setContactData([]);
       showAlert("Error fetching contacts. Please try again.", "error");
@@ -156,7 +155,7 @@ function AllData() {
         <tbody>
           {contactData.length > 0 ? (
             contactData.map((x, index) => (
-              <Row key={index} number={index + 1} data={x} showAlert={showAlert} />
+              <Row key={x._id || index} number={index + 1} data={x} showAlert={showAlert} onRefresh={fetchContacts} />
             ))
           ) : (
             <tr>
@@ -191,9 +190,8 @@ function AllData() {
 
       {alert && (
         <div
-          className={`fixed bottom-4 right-4 px-4 py-3 rounded-lg text-white shadow-lg transition-all duration-300 z-[50] ${
-            alert.type === "success" ? "bg-green-600" : "bg-red-600"
-          } flex flex-col w-80`}
+          className={`fixed bottom-4 right-4 px-4 py-3 rounded-lg text-white shadow-lg transition-all duration-300 z-[50] ${alert.type === "success" ? "bg-green-600" : "bg-red-600"
+            } flex flex-col w-80`}
         >
           <div className="flex items-center space-x-2">
             <span className="flex-1">{alert.message}</span>
@@ -210,7 +208,7 @@ function AllData() {
               style={{ width: `${progress}%` }}
             ></div>
           </div>
- POSIX:644
+          POSIX:644
         </div>
       )}
     </div>

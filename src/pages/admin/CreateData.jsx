@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
-import { BACKEND_URL } from "../../../config/constant";
+import { useNavigate } from "react-router-dom";
+import APIService from "../../services/api";
 
 function CreateData() {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     offer: "",
     heading: "",
@@ -19,6 +20,7 @@ function CreateData() {
     logo: "",
   });
 
+  const [submitting, setSubmitting] = useState(false);
   const [alert, setAlert] = useState(null);
   const [progress, setProgress] = useState(100);
 
@@ -60,229 +62,199 @@ function CreateData() {
       ...formData,
       [name]: value,
     });
-
-    // Real-time validation for number field
-    if (name === "number") {
-      if (!/^\d{0,10}$/.test(value)) {
-        showAlert("Phone number must contain exactly 10 digits.", "error");
-      } else if (value.length === 10) {
-        showAlert(null, null);
-      }
-    }
   };
 
-  const handleSubmit = async () => {
+  const validateForm = () => {
+    // Email validation
+    if (formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      showAlert("Please enter a valid email address.", "error");
+      return false;
+    }
+
+    // Phone number validation
+    if (formData.number && !/^\d{10}$/.test(formData.number)) {
+      showAlert("Phone number must contain exactly 10 digits.", "error");
+      return false;
+    }
+
+    // URL validations
+    const urlFields = ['insta', 'linkedin', 'youtube', 'maps', 'group', 'logo'];
+    for (const field of urlFields) {
+      if (formData[field] && !/^https?:\/\/.+/.test(formData[field])) {
+        showAlert(`${field.charAt(0).toUpperCase() + field.slice(1)} must be a valid URL.`, "error");
+        return false;
+      }
+    }
+
+    return true;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!validateForm()) return;
+
+    setSubmitting(true);
     try {
-      // Basic validation for all fields
-      const requiredFields = Object.keys(formData);
-      const missingFields = requiredFields.filter((field) => !formData[field]);
-      if (missingFields.length > 0) {
-        showAlert(`Please fill in all fields: ${missingFields.join(", ")}`, "error");
-        return;
-      }
+      const response = await APIService.contacts.create(formData);
 
-      // Specific validation for number (10 digits)
-      if (!/^\d{10}$/.test(formData.number)) {
-        showAlert("Phone number must contain exactly 10 digits.", "error");
-        return;
-      }
-
-      const contact = { ...formData };
-      const response = await axios.post(
-        `${BACKEND_URL}/create-contact`,
-        contact,
-        { withCredentials: true }
-      );
       if (response.status === 200) {
-        showAlert("Data stored successfully", "success");
-        setFormData({
-          offer: "",
-          heading: "",
-          tag: "",
-          insta: "",
-          linkedin: "",
-          youtube: "",
-          channel: "",
-          maps: "",
-          group: "",
-          email: "",
-          number: "",
-          address: "",
-          logo: "",
-        });
-      } else {
-        showAlert("Contact not created.", "error");
+        showAlert("Contact data created successfully!", "success");
+        setTimeout(() => {
+          setFormData({
+            offer: "",
+            heading: "",
+            tag: "",
+            insta: "",
+            linkedin: "",
+            youtube: "",
+            channel: "",
+            maps: "",
+            group: "",
+            email: "",
+            number: "",
+            address: "",
+            logo: "",
+          });
+          navigate("/admin-dashboard/profile/all-create-data");
+        }, 2000);
       }
     } catch (err) {
-      showAlert("Something went wrong while creating the contact.", "error");
+      const message = err.response?.data?.message || "Failed to create contact data.";
+      showAlert(message, "error");
+    } finally {
+      setSubmitting(false);
     }
   };
 
-  return (
-    <div className="h-full overflow-y-auto bg-gray-950 p-4 flex flex-col items-start pb-[60px]">
-      {/* Create Contact Form */}
-      <div className="sm:w-2/3 w-full bg-base-300 p-2 sm:p-7 rounded-2xl border-2 border-sky-500 s-form text-center mb-8 mx-auto">
-        <h1 className="text-4xl">Create Data</h1>
-        <label className="input input-bordered flex items-center gap-2 mt-3">
-          Offer:
-          <input
-            type="text"
-            name="offer"
-            value={formData.offer}
-            onChange={handleChange}
-            className="grow"
-          />
-        </label>
-        <label className="input input-bordered flex items-center gap-2 mt-3">
-          Heading:
-          <input
-            type="text"
-            name="heading"
-            value={formData.heading}
-            onChange={handleChange}
-            className="grow"
-          />
-        </label>
-        <label className="input input-bordered flex items-center gap-2 mt-3">
-          Tag:
-          <input
-            type="text"
-            name="tag"
-            value={formData.tag}
-            onChange={handleChange}
-            className="grow"
-          />
-        </label>
-        <label className="input input-bordered flex items-center gap-2 mt-3">
-          Instagram URL:
-          <input
-            type="url"
-            name="insta"
-            value={formData.insta}
-            onChange={handleChange}
-            className="grow"
-          />
-        </label>
-        <label className="input input-bordered flex items-center gap-2 mt-3">
-          LinkedIn URL:
-          <input
-            type="url"
-            name="linkedin"
-            value={formData.linkedin}
-            onChange={handleChange}
-            className="grow"
-          />
-        </label>
-        <label className="input input-bordered flex items-center gap-2 mt-3">
-          YouTube URL:
-          <input
-            type="url"
-            name="youtube"
-            value={formData.youtube}
-            onChange={handleChange}
-            className="grow"
-          />
-        </label>
-        <label className="input input-bordered flex items-center gap-2 mt-3">
-          Channel:
-          <input
-            type="text"
-            name="channel"
-            value={formData.channel}
-            onChange={handleChange}
-            className="grow"
-          />
-        </label>
-        <label className="input input-bordered flex items-center gap-2 mt-3">
-          Google Maps URL:
-          <input
-            type="url"
-            name="maps"
-            value={formData.maps}
-            onChange={handleChange}
-            className="grow"
-          />
-        </label>
-        <label className="input input-bordered flex items-center gap-2 mt-3">
-          Group URL:
-          <input
-            type="url"
-            name="group"
-            value={formData.group}
-            onChange={handleChange}
-            className="grow"
-          />
-        </label>
-        <label className="input input-bordered flex items-center gap-2 mt-3">
-          Email:
-          <input
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            className="grow"
-          />
-        </label>
-        <label className="input input-bordered flex items-center gap-2 mt-3">
-          Phone Number:
-          <input
-            type="text"
-            name="number"
-            value={formData.number}
-            onChange={handleChange}
-            className="grow"
-            maxLength="10"
-          />
-        </label>
-        <label className="input input-bordered flex items-center gap-2 mt-3">
-          Address:
-          <input
-            type="text"
-            name="address"
-            value={formData.address}
-            onChange={handleChange}
-            className="grow"
-          />
-        </label>
-        <label className="input input-bordered flex items-center gap-2 mt-3">
-          Logo URL:
-          <input
-            type="url"
-            name="logo"
-            value={formData.logo}
-            onChange={handleChange}
-            className="grow"
-          />
-        </label>
+  const inputGroups = [
+    {
+      title: "Banner & Branding",
+      fields: [
+        { name: "offer", label: "Offer Banner", type: "text", placeholder: "🎉 Special Launch Offer - Enroll Now!", required: true },
+        { name: "heading", label: "Main Heading", type: "text", placeholder: "Transform Your Future", required: true },
+        { name: "tag", label: "Tagline", type: "text", placeholder: "Join 10,000+ learners...", required: true },
+        { name: "logo", label: "Logo URL", type: "url", placeholder: "https://example.com/logo.png" },
+      ]
+    },
+    {
+      title: "Social Media Links",
+      fields: [
+        { name: "insta", label: "Instagram", type: "url", placeholder: "https://instagram.com/yourpage", icon: "bi-instagram" },
+        { name: "linkedin", label: "LinkedIn", type: "url", placeholder: "https://linkedin.com/company/yourcompany", icon: "bi-linkedin" },
+        { name: "youtube", label: "YouTube", type: "url", placeholder: "https://youtube.com/@yourchannel", icon: "bi-youtube" },
+        { name: "channel", label: "Channel/Twitter", type: "url", placeholder: "https://twitter.com/yourhandle", icon: "bi-twitter-x" },
+        { name: "group", label: "Community Group", type: "url", placeholder: "https://t.me/yourgroup", icon: "bi-telegram" },
+      ]
+    },
+    {
+      title: "Contact Information",
+      fields: [
+        { name: "email", label: "Email Address", type: "email", placeholder: "contact@example.com", required: true, icon: "bi-envelope" },
+        { name: "number", label: "Phone Number", type: "tel", placeholder: "9876543210", required: true, maxLength: 10, icon: "bi-telephone" },
+        { name: "address", label: "Office Address", type: "text", placeholder: "123 Main St, City, Country", required: true, icon: "bi-geo-alt" },
+        { name: "maps", label: "Google Maps Embed URL", type: "url", placeholder: "https://maps.google.com/...", icon: "bi-map" },
+      ]
+    },
+  ];
 
-        {alert && (
-          <div
-            className={`fixed bottom-4 right-4 px-4 py-3 rounded-lg text-white shadow-lg transition-all duration-300 z-[50] ${
-              alert.type === "success" ? "bg-green-600" : "bg-red-600"
-            } flex flex-col w-80`}
+  return (
+    <div className="h-full w-full overflow-auto p-6">
+      <div className="mb-6">
+        <button
+          onClick={() => navigate("/admin-dashboard/profile/all-create-data")}
+          className="mb-4 text-slate-400 hover:text-white transition-colors flex items-center gap-2"
+        >
+          <i className="bi bi-arrow-left"></i>
+          Back to Contact Data
+        </button>
+        <h1 className="text-3xl font-bold text-white mb-2">Create Contact Data</h1>
+        <p className="text-slate-400">Configure your website's contact information and branding</p>
+      </div>
+
+      <form onSubmit={handleSubmit} className="max-w-4xl">
+        {inputGroups.map((group, groupIndex) => (
+          <div key={groupIndex} className="bg-slate-800/30 backdrop-blur-sm rounded-xl border border-slate-700/50 p-8 mb-6">
+            <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
+              <span className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center text-sm">
+                {groupIndex + 1}
+              </span>
+              {group.title}
+            </h2>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {group.fields.map((field) => (
+                <div key={field.name} className={field.name === 'tag' || field.name === 'address' ? 'md:col-span-2' : ''}>
+                  <label className="block text-sm font-medium text-slate-300 mb-2">
+                    {field.label} {field.required && <span className="text-red-400">*</span>}
+                  </label>
+                  <div className="relative">
+                    {field.icon && (
+                      <i className={`${field.icon} absolute left-4 top-1/2 -translate-y-1/2 text-slate-400`}></i>
+                    )}
+                    <input
+                      type={field.type}
+                      name={field.name}
+                      value={formData[field.name]}
+                      onChange={handleChange}
+                      placeholder={field.placeholder}
+                      maxLength={field.maxLength}
+                      required={field.required}
+                      className={`w-full ${field.icon ? 'pl-12' : 'pl-4'} pr-4 py-3 bg-slate-900/50 border border-slate-700/50 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20`}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
+
+        <div className="flex gap-3 pt-4">
+          <button
+            type="submit"
+            disabled={submitting}
+            className="flex-1 px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg font-medium hover:from-blue-700 hover:to-purple-700 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
           >
-            <div className="flex items-center space-x-2">
-              <span className="flex-1">{alert.message}</span>
-              <button
-                onClick={dismissAlert}
-                className="text-white hover:text-gray-200 focus:outline-none"
-              >
+            {submitting ? (
+              <>
+                <i className="bi bi-arrow-repeat animate-spin"></i>
+                Creating...
+              </>
+            ) : (
+              <>
+                <i className="bi bi-plus-circle"></i>
+                Create Contact Data
+              </>
+            )}
+          </button>
+          <button
+            type="button"
+            onClick={() => navigate("/admin-dashboard/profile/all-create-data")}
+            className="px-6 py-3 bg-slate-700/50 text-slate-300 rounded-lg font-medium hover:bg-slate-700"
+          >
+            Cancel
+          </button>
+        </div>
+      </form>
+
+      {alert && (
+        <div className="fixed bottom-6 right-6 z-50">
+          <div className={`${alert.type === "success" ? "bg-gradient-to-r from-green-600 to-emerald-600" : "bg-gradient-to-r from-red-600 to-rose-600"} text-white px-6 py-4 rounded-xl shadow-2xl min-w-[320px]`}>
+            <div className="flex items-center gap-3">
+              <i className={`${alert.type === "success" ? "bi bi-check-circle-fill" : "bi bi-exclamation-circle-fill"} text-2xl`}></i>
+              <div className="flex-1">
+                <p className="font-medium">{alert.message}</p>
+                <div className="mt-2 h-1 bg-white/30 rounded-full overflow-hidden">
+                  <div className="h-full bg-white transition-all duration-75 ease-linear" style={{ width: `${progress}%` }}></div>
+                </div>
+              </div>
+              <button onClick={dismissAlert} className="text-white/80 hover:text-white">
                 <i className="bi bi-x-lg"></i>
               </button>
             </div>
-            <div className="w-full h-1 mt-2 bg-white/30 rounded-full overflow-hidden">
-              <div
-                className="h-full bg-white transition-all ease-linear"
-                style={{ width: `${progress}%` }}
-              ></div>
-            </div>
           </div>
-        )}
-
-        <button onClick={handleSubmit} className="btn w-full mt-3 btn-info">
-          Create Data
-        </button>
-      </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -1,22 +1,25 @@
 import React, { useState } from 'react';
 import Footer from '../../components/Footer';
+import axios from 'axios';
+import { BACKEND_URL } from '../../../config/constant';
 
 const Contact = (props) => {
-  console.log(props)
   const [formData, setFormData] = useState({ name: '', email: '', mobile: '', message: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState({ name: '', email: '', mobile: '', message: '' });
+  const [successMessage, setSuccessMessage] = useState('');
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
     // Clear error when user starts typing
     setErrors({ ...errors, [name]: '' });
+    setSuccessMessage('');
   };
 
   const validateForm = () => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const mobileRegex = /^\+?[\d\s-]{10,}$/;
+    const mobileRegex = /^[+]?[\d\s-]{10,}$/;
     const newErrors = { name: '', email: '', mobile: '', message: '' };
     let isValid = true;
 
@@ -41,26 +44,32 @@ const Contact = (props) => {
     return isValid;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
 
-    if (!props?.email) {
-      setErrors({ ...errors, form: 'Contact email not available. Please try again later.' });
-      return;
-    }
-
     setIsSubmitting(true);
-    const emailRecipient = props.email;
-    const emailSubject = encodeURIComponent('User Report');
-    const emailBody = encodeURIComponent(
-      `Name: ${formData.name}\nEmail: ${formData.email}\nMobile: ${formData.mobile}\n\nMessage:\n${formData.message}`
-    );
-    const mailtoLink = `mailto:${emailRecipient}?subject=${emailSubject}&body=${emailBody}`;
+    setSuccessMessage('');
 
-    window.location.href = mailtoLink;
-    setFormData({ name: '', email: '', mobile: '', message: '' });
-    setIsSubmitting(false);
+    try {
+      // Save feedback to database
+      const response = await axios.post(`${BACKEND_URL}/create-feedback`, {
+        name: formData.name,
+        email: formData.email,
+        mobile: formData.mobile,
+        message: formData.message
+      });
+
+      if (response.data) {
+        setSuccessMessage('Thank you for your message! We will get back to you soon.');
+        setFormData({ name: '', email: '', mobile: '', message: '' });
+      }
+    } catch (error) {
+      console.error('Error submitting feedback:', error);
+      setErrors({ ...errors, form: 'Failed to send message. Please try again.' });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -78,12 +87,23 @@ const Contact = (props) => {
                 Get in Touch
               </h3>
               <p className="text-base sm:text-lg text-gray-300 mb-4 sm:mb-8">
-                Have questions or need assistance? We're here to help! Fill out the form below, and it will open your email client to send us a message.
+                Have questions or need assistance? We're here to help! Fill out the form below and we'll get back to you soon.
               </p>
 
               <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+                {successMessage && (
+                  <div className="p-4 rounded-lg bg-green-500/20 border border-green-500/50 text-green-400" role="alert">
+                    <div className="flex items-center gap-2">
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                      </svg>
+                      {successMessage}
+                    </div>
+                  </div>
+                )}
+
                 {errors.form && (
-                  <p className="text-red-400 text-sm" role="alert">
+                  <p className="text-red-400 text-sm p-3 rounded-lg bg-red-500/10 border border-red-500/30" role="alert">
                     {errors.form}
                   </p>
                 )}
@@ -183,7 +203,7 @@ const Contact = (props) => {
                 <div>
                   <button
                     type="submit"
-                    disabled={isSubmitting || !props?.email}
+                    disabled={isSubmitting}
                     className="w-full px-4 py-2 sm:px-6 sm:py-3 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 hover: мою from-blue-700 hover:to-purple-700 text-white font-semibold transition-all transform hover:scale-105 disabled:opacity-50"
                     aria-label="Send message"
                   >
@@ -234,7 +254,7 @@ const Contact = (props) => {
                       </h4>
                       <div className="flex space-x-3 sm:space-x-4">
                         <a
-                          href={props.insta||''}
+                          href={props.insta || ''}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center bg-blue-900/30 rounded-lg border border-blue-800/50 hover:bg-blue-900/50 transition-all"
@@ -243,7 +263,7 @@ const Contact = (props) => {
                           <i className="bi bi-instagram text-[#E1306C] text-xl"></i>
                         </a>
                         <a
-                          href={props.youtube||''}
+                          href={props.youtube || ''}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center bg-blue-900/30 rounded-lg border border-blue-800/50 hover:bg-blue-900/50 transition-all"
@@ -252,7 +272,7 @@ const Contact = (props) => {
                           <i className="bi bi-youtube text-[#FF0000] text-xl"></i>
                         </a>
                         <a
-                          href={props.linkedin||''}
+                          href={props.linkedin || ''}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center bg-blue-900/30 rounded-lg border border-blue-800/50 hover:bg-blue-900/50 transition-all"
@@ -261,7 +281,7 @@ const Contact = (props) => {
                           <i className="bi bi-linkedin text-[#0A66C2] text-xl"></i>
                         </a>
                         <a
-                          href={props.channel||''}
+                          href={props.channel || ''}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center bg-blue-900/30 rounded-lg border border-blue-800/50 hover:bg-blue-900/50 transition-all"
@@ -278,7 +298,7 @@ const Contact = (props) => {
                       </h4>
                       <div className="w-full h-40 sm:h-48 rounded-lg overflow-hidden">
                         <iframe
-                          src={props.maps||''}
+                          src={props.maps || ''}
                           width="100%"
                           height="100%"
                           style={{ border: 0 }}
@@ -297,7 +317,7 @@ const Contact = (props) => {
           </div>
         </div>
       </div>
-      <Footer  {...props}/>
+      <Footer  {...props} />
     </div>
   );
 };

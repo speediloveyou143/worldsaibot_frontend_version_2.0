@@ -67,11 +67,12 @@ const FreeClass = (props) => {
     const fetchBootcamp = async () => {
       try {
         showAlert("Loading bootcamp data...", "info");
-        const response = await axios.get(`${BACKEND_URL}/show-bootcamp/${id}`,{withCredentials:true});
+        // Fetch actual bootcamp data
+        const response = await axios.get(`${BACKEND_URL}/show-bootcamp/${id}`, { withCredentials: true });
         setBootcampData(response.data);
         setFormData((prev) => ({
           ...prev,
-          course: response.data.courseName,
+          course: response.data.courseName || response.data.roadMapName,
         }));
         setLoading(false);
         showAlert("Bootcamp data loaded successfully!", "success");
@@ -244,55 +245,54 @@ const FreeClass = (props) => {
     return <div className="min-h-screen bg-gray-950 text-white flex items-center justify-center">Bootcamp not found</div>;
   }
 
-  const startDate = new Date(bootcampData.startDate).toLocaleDateString("en-US", {
+  const startDate = bootcampData.startDate ? new Date(bootcampData.startDate).toLocaleDateString("en-US", {
     day: "numeric",
     month: "long",
-  });
-  const endDate = new Date(bootcampData.endDate).toLocaleDateString("en-US", {
+  }) : "TBD";
+  const endDate = bootcampData.endDate ? new Date(bootcampData.endDate).toLocaleDateString("en-US", {
     day: "numeric",
     month: "long",
-  });
+  }) : "TBD";
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-950 text-white pb-24">
       {/* Alert Component */}
       {alert && (
-  <div
-    className={`fixed top-[85px] left-1/2 -translate-x-1/2 px-4 py-3 rounded-lg text-white shadow-lg transition-all duration-300 z-[100] ${
-      alert.type === 'success'
-        ? 'bg-green-600'
-        : alert.type === 'info'
-        ? 'bg-blue-600'
-        : 'bg-red-600'
-    } flex flex-col w-80 sm:bottom-4 sm:right-4 sm:top-auto sm:left-auto sm:translate-x-0 opacity-0 ${alert.visible ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
-  >
-    <div className="flex items-center space-x-2">
-      <span className="flex-1">{alert.message}</span>
-      <button
-        onClick={dismissAlert}
-        className="text-white hover:text-gray-200 focus:outline-none"
-      >
-        <i className="bi bi-x-lg"></i>
-      </button>
-    </div>
-    <div className="w-full h-1 mt-2 bg-white/30 rounded-full overflow-hidden">
-      <div
-        className="h-full bg-white transition-all ease-linear"
-        style={{ width: `${progress}%` }}
-      ></div>
-    </div>
-  </div>
-)}
+        <div
+          className={`fixed top-[85px] left-1/2 -translate-x-1/2 px-4 py-3 rounded-lg text-white shadow-lg transition-all duration-300 z-[100] ${alert.type === 'success'
+            ? 'bg-green-600'
+            : alert.type === 'info'
+              ? 'bg-blue-600'
+              : 'bg-red-600'
+            } flex flex-col w-80 sm:bottom-4 sm:right-4 sm:top-auto sm:left-auto sm:translate-x-0 opacity-0 ${alert.visible ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+        >
+          <div className="flex items-center space-x-2">
+            <span className="flex-1">{alert.message}</span>
+            <button
+              onClick={dismissAlert}
+              className="text-white hover:text-gray-200 focus:outline-none"
+            >
+              <i className="bi bi-x-lg"></i>
+            </button>
+          </div>
+          <div className="w-full h-1 mt-2 bg-white/30 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-white transition-all ease-linear"
+              style={{ width: `${progress}%` }}
+            ></div>
+          </div>
+        </div>
+      )}
 
       <header className="container mx-auto px-4 py-16 text-center">
         <h1 className="text-5xl font-bold mb-4 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-          Get Started with {bootcampData.days} Days {bootcampData.courseName} Bootcamp for Free
+          Get Started with {bootcampData.days || 'Free'} Days {bootcampData.roadMapName || bootcampData.courseName} Bootcamp for Free
         </h1>
         <p className="text-xl text-gray-300 mb-4 max-w-2xl mx-auto">
-          Dive into {bootcampData.courseName} and kickstart your journey with hands-on learning!
+          Dive into {bootcampData.roadMapName || bootcampData.courseName} and kickstart your journey with hands-on learning!
         </p>
         <p className="text-lg text-blue-400 mb-8">
-          {startDate} to {endDate} | {bootcampData.startTime} PM IST
+          {startDate} to {endDate} | {bootcampData.startTime || '7:00'} PM IST
         </p>
         <div className="flex flex-col md:flex-row items-center justify-center gap-4">
           <button
@@ -310,7 +310,7 @@ const FreeClass = (props) => {
           Bootcamp Schedule
         </h2>
         <div className="grid md:grid-cols-2 gap-6">
-          {bootcampData.courseRoadmap.map((dayContent, index) => (
+          {bootcampData.courseRoadmap && Array.isArray(bootcampData.courseRoadmap) ? bootcampData.courseRoadmap.map((dayContent, index) => (
             <div
               key={index}
               className="bg-blue-900/20 p-6 rounded-xl border border-blue-800/30 hover:border-blue-600/50 transition-all"
@@ -319,47 +319,55 @@ const FreeClass = (props) => {
               <h3 className="text-xl font-bold mb-2">{dayContent[0]}</h3>
               <p className="text-gray-400">{dayContent[1]}</p>
             </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="container mx-auto px-4 py-12">
-        <h2 className="text-3xl font-bold mb-8 text-center">
-          Bootcamp Overview Video
-        </h2>
-        <div className="w-full max-w-4xl mx-auto">
-          <div className="aspect-w-16 aspect-h-9">
-            <iframe
-              className="w-full h-[250px] md:h-[500px] rounded-xl"
-              src={bootcampData.videoUrl}
-              title={`${bootcampData.courseName} Overview Video`}
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-            ></iframe>
-          </div>
-        </div>
-      </section>
-
-      <section className="container mx-auto px-4 py-12">
-        <h2 className="text-3xl font-bold mb-8 text-center">
-          Meet Your Instructors
-        </h2>
-        <div className="grid md:grid-cols-3 gap-6">
-          {bootcampData.instructors.map((instructor, index) => (
-            <div
-              key={index}
-              className="bg-gray-900/50 p-6 rounded-xl border border-gray-800/30"
-            >
-              <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center font-bold text-2xl mb-4">
-                {instructor.name.charAt(0)}
-              </div>
-              <h3 className="text-xl font-bold">{instructor.name}</h3>
-              <p className="text-gray-400 text-sm mb-2">{instructor.role}</p>
-              <p className="text-gray-300">{instructor.description}</p>
+          )) : (
+            <div className="col-span-2 text-center text-gray-400 py-8">
+              <p>Course roadmap coming soon!</p>
             </div>
-          ))}
+          )}
         </div>
       </section>
+
+      {bootcampData.videoUrl && (
+        <section className="container mx-auto px-4 py-12">
+          <h2 className="text-3xl font-bold mb-8 text-center">
+            Bootcamp Overview Video
+          </h2>
+          <div className="w-full max-w-4xl mx-auto">
+            <div className="aspect-w-16 aspect-h-9">
+              <iframe
+                className="w-full h-[250px] md:h-[500px] rounded-xl"
+                src={bootcampData.videoUrl}
+                title={`${bootcampData.roadMapName || bootcampData.courseName} Overview Video`}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              ></iframe>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {bootcampData.instructors && Array.isArray(bootcampData.instructors) && bootcampData.instructors.length > 0 && (
+        <section className="container mx-auto px-4 py-12">
+          <h2 className="text-3xl font-bold mb-8 text-center">
+            Meet Your Instructors
+          </h2>
+          <div className="grid md:grid-cols-3 gap-6">
+            {bootcampData.instructors.map((instructor, index) => (
+              <div
+                key={index}
+                className="bg-gray-900/50 p-6 rounded-xl border border-gray-800/30"
+              >
+                <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center font-bold text-2xl mb-4">
+                  {instructor.name.charAt(0)}
+                </div>
+                <h3 className="text-xl font-bold">{instructor.name}</h3>
+                <p className="text-gray-400 text-sm mb-2">{instructor.role}</p>
+                <p className="text-gray-300">{instructor.description}</p>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       <section className="container mx-auto px-4 py-12 mb-24 md:mb-12">
         <h2 className="text-3xl font-bold mb-8 text-center">Student Reviews</h2>
@@ -406,7 +414,7 @@ const FreeClass = (props) => {
         </div>
       </section>
 
-      <Footer {...props}/>
+      <Footer {...props} />
 
       <div className="fixed bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black to-transparent backdrop-blur-sm border-t border-blue-900/30">
         <div className="container mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
@@ -439,7 +447,7 @@ const FreeClass = (props) => {
         <div className="fixed inset-0 bg-black/90 backdrop-blur-sm flex items-center justify-center p-4 z-50">
           <div className="bg-gradient-to-br from-gray-900 to-blue-900 rounded-xl p-8 max-w-md w-full border border-blue-800/50">
             <h2 className="text-2xl font-bold mb-6 text-center">
-              Register for {bootcampData.courseName} Bootcamp
+              Register for {bootcampData.roadMapName || bootcampData.courseName} Bootcamp
             </h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>

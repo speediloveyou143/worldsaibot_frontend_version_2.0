@@ -1,11 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
-import { BACKEND_URL } from '../../config/constant';
+import APIService from '../services/api';
 
 function Footer(props) {
   const currentYear = new Date().getFullYear();
-  const [isModalOpen, setIsModalOpen] = useState(false); // State for modal
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [bootcamps, setBootcamps] = useState([]);
+
+  // Fetch bootcamps (actual bootcamps, not roadmap topics)
+  useEffect(() => {
+    const fetchBootcamps = async () => {
+      try {
+        const response = await APIService.bootcamps.getAll();
+        const bootcampsData = response?.data?.data || response?.data || [];
+        setBootcamps(Array.isArray(bootcampsData) ? bootcampsData : []);
+      } catch (error) {
+        console.error('Error fetching bootcamps:', error);
+        setBootcamps([]);
+      }
+    };
+
+    fetchBootcamps();
+  }, []);
+
   return (
     <div className="z-index-[-10]">
       <footer className="bg-black relative overflow-hidden">
@@ -175,10 +192,10 @@ function Footer(props) {
                 </button>
               </div>
               <div className="space-y-3">
-                {(props.bootcamps||[]).map((bootcamp) => (
+                {bootcamps.length > 0 ? bootcamps.map((bootcamp) => (
                   <Link
-                    key={bootcamp.id}
-                    to={`/free-class/${bootcamp.id}`}
+                    key={bootcamp._id}
+                    to={`/free-class/${bootcamp._id}`}
                     onClick={() => setIsModalOpen(false)}
                     className="block px-4 py-3 text-white bg-gradient-to-r from-[#2a2a2a] to-[#1a1a1a] 
                       rounded-lg transition-all duration-300 ease-in-out 
@@ -186,9 +203,13 @@ function Footer(props) {
                       hover:shadow-[0_0_15px_rgba(138,43,226,0.6)] 
                       active:scale-95 active:shadow-inner text-center font-medium"
                   >
-                    {bootcamp.roadMapName}
+                    {bootcamp.courseName || bootcamp.roadMapName}
                   </Link>
-                ))}
+                )) : (
+                  <div className="text-center text-gray-400 py-6">
+                    <p>No bootcamps available</p>
+                  </div>
+                )}
               </div>
             </div>
           </div>

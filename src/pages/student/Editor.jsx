@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import Editor from "@monaco-editor/react";
 import axios from "axios";
 import { BACKEND_URL } from '../../../config/constant';
+import APIService from '../../services/api';
 
 const App = () => {
   const [code, setCode] = useState("# Write your Python code here");
@@ -104,14 +105,22 @@ const App = () => {
 
   const fetchQuestions = async () => {
     try {
-      const response = await axios.get(`${BACKEND_URL}/all-tests`, {
-        withCredentials: true,
-      });
-      const data = response.data;
+      // Use APIService for authenticated requests
+      const response = await APIService.tests.getAll();
+      // Backend returns { message, data } format
+      const data = response.data?.data || response.data || [];
+
+      if (!Array.isArray(data)) {
+        setQuestions([]);
+        setSelectedQuestion(null);
+        showAlert("No questions available.", "info");
+        return;
+      }
+
       const formattedQuestions = data.map((item, index) => ({
         id: item._id || index + 1,
         question: `${index + 1}. ${item.question}`,
-        testCases: item.test.map((testCase) => ({
+        testCases: (item.test || []).map((testCase) => ({
           input: testCase.input,
           output: testCase.output,
         })),
@@ -119,7 +128,7 @@ const App = () => {
       setQuestions(formattedQuestions);
       if (formattedQuestions.length > 0) {
         setSelectedQuestion(formattedQuestions[0]);
-        showAlert("Questions loaded successfully!", "success");
+        showAlert(`${formattedQuestions.length} questions loaded!`, "success");
       } else {
         showAlert("No questions available.", "info");
       }
@@ -157,11 +166,10 @@ const App = () => {
     try {
       switch (language) {
         case "javascript":
-          const originalConsoleLog = console.log;
-          const originalConsoleError = console.error;
           let consoleOutput = "";
 
-          console.log = (...args) => {
+          // Mock console.log
+          const mockConsoleLog = (...args) => {
             const formattedArgs = args.map((arg) => {
               if (typeof arg === "object" && arg !== null) {
                 return JSON.stringify(arg, null, 2);
@@ -170,7 +178,9 @@ const App = () => {
             });
             consoleOutput += formattedArgs.join(" ") + "\n";
           };
-          console.error = (...args) => {
+
+          // Mock console.error
+          const mockConsoleError = (...args) => {
             consoleOutput += "Error: " + args.join(" ") + "\n";
           };
 
@@ -181,22 +191,16 @@ const App = () => {
             );
             const asyncCode = `
               return new Promise((resolve) => {
-                const log = console.log;
-                const error = console.error;
                 ${code}
                 setTimeout(resolve, 1000);
               });
             `;
             const executionFunction = new Function(asyncCode);
             await executionFunction();
-            console.log = originalConsoleLog;
-            console.error = originalConsoleError;
             setOutput(
               consoleOutput || "Code executed successfully (no console output)"
             );
           } catch (error) {
-            console.log = originalConsoleLog;
-            console.error = originalConsoleError;
             setOutput(consoleOutput || `Error: ${error.message}`);
             showAlert(`JavaScript Error: ${error.message}`, "error");
           }
@@ -279,8 +283,7 @@ const App = () => {
             const testResults = selectedQuestion.testCases
               .map(
                 (testCase, index) =>
-                  `Test Case ${index + 1}:\nInput: ${
-                    testCase.input
+                  `Test Case ${index + 1}:\nInput: ${testCase.input
                   }\nExpected Output: ${testCase.output}`
               )
               .join("\n\n");
@@ -304,22 +307,22 @@ const App = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white overflow-hidden sm:pb-[0px] pb-[100px]">
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white overflow-hidden sm:pb-[0px] pb-[100px]">
       {/* Alert Component */}
       {alert && (
         <div
-          className={`fixed top-24 left-1/2 transform -translate-x-1/2 z-50 transition-all duration-300 ${
-            alert.visible ? 'opacity-100' : 'opacity-0 pointer-events-none'
-          }`}
+          className={`fixed top-24 left-1/2 transform -translate-x-1/2 z-50 transition-all duration-300 ${alert.visible ? 'opacity-100' : 'opacity-0 pointer-events-none'
+            }`}
         >
           <div
-            className={`px-6 py-4 rounded-xl shadow-xl backdrop-blur-sm flex flex-col w-80 ${
-              alert.type === 'success'
-                ? 'bg-green-600/90'
-                : alert.type === 'info'
-                ? 'bg-blue-600/90'
-                : 'bg-red-600/90'
-            }`}
+            className={`px-6 py-4 rounded-xl shadow-2xl backdrop-blur-md flex flex-col w-80 border ${alert.type === 'success'
+              ? 'bg-emerald-600/90 border-emerald-400/30'
+              : alert.type === 'info'
+                ? 'bg-blue-600/90 border-blue-400/30'
+                : alert.type === 'warning'
+                  ? 'bg-amber-600/90 border-amber-400/30'
+                  : 'bg-red-600/90 border-red-400/30'
+              }`}
           >
             <div className="flex items-center justify-between">
               <span className="font-medium">{alert.message}</span>
@@ -341,44 +344,56 @@ const App = () => {
           </div>
         </div>
       )}
-  
+
       {/* Header */}
-      <header className="bg-gradient-to-r from-blue-600 to-purple-600 p-4 shadow-xl">
+      <header className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 p-4 shadow-2xl border-b border-white/10">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
-          <h1 className="text-2xl font-bold flex items-center gap-2">
-            <span>Code Editor</span>
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-white/10 rounded-xl">
+              <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
+              </svg>
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold">Code Editor</h1>
+              <p className="text-white/70 text-sm">Write, run & test your code</p>
+            </div>
             {!pyodideReady && (
-              <span className="text-sm font-normal bg-white/10 px-2 py-1 rounded-full flex items-center gap-1">
-                <span className="animate-pulse">Loading Python</span>
+              <span className="text-sm font-normal bg-white/10 px-3 py-1.5 rounded-full flex items-center gap-2 ml-2">
                 <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24">
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
+                <span className="animate-pulse">Loading Python...</span>
               </span>
             )}
-          </h1>
-          
+          </div>
+
           <div className="flex items-center gap-3">
-            <select
-              value={language}
-              onChange={(e) => setLanguage(e.target.value)}
-              className="bg-gray-800/80 text-white px-4 py-2 rounded-lg border border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400 appearance-none"
-            >
-              {languages.map((lang) => (
-                <option key={lang.value} value={lang.value}>
-                  {lang.label}
-                </option>
-              ))}
-            </select>
-            
+            <div className="relative">
+              <select
+                value={language}
+                onChange={(e) => setLanguage(e.target.value)}
+                className="bg-white/10 backdrop-blur-sm text-white px-4 py-2.5 pr-10 rounded-xl border border-white/20 focus:outline-none focus:ring-2 focus:ring-white/30 appearance-none cursor-pointer hover:bg-white/20 transition-colors"
+              >
+                {languages.map((lang) => (
+                  <option key={lang.value} value={lang.value} className="bg-slate-800 text-white">
+                    {lang.label.replace(' 🔽', '')}
+                  </option>
+                ))}
+              </select>
+              <svg className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </div>
+
             <button
               onClick={executeCode}
               disabled={loading || (language === "python" && !pyodideReady)}
-              className={`px-5 py-2.5 rounded-lg font-medium flex items-center gap-2 transition-all ${
-                loading
-                  ? 'bg-gray-500 cursor-not-allowed'
-                  : 'bg-white text-blue-600 hover:bg-gray-100 hover:scale-[1.02] active:scale-95 shadow-md'
-              }`}
+              className={`px-6 py-2.5 rounded-xl font-semibold flex items-center gap-2 transition-all ${loading
+                ? 'bg-gray-500 cursor-not-allowed'
+                : 'bg-white text-gray-900 hover:bg-gray-100 hover:scale-[1.02] active:scale-95 shadow-lg'
+                }`}
             >
               {loading ? (
                 <>
@@ -390,9 +405,8 @@ const App = () => {
                 </>
               ) : (
                 <>
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path>
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                  <svg className="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M8 5v14l11-7z" />
                   </svg>
                   Run Code
                 </>
@@ -401,7 +415,7 @@ const App = () => {
           </div>
         </div>
       </header>
-  
+
       {/* Mobile Sidebar Toggle */}
       <div className="p-4 md:hidden">
         <button
@@ -425,74 +439,92 @@ const App = () => {
           )}
         </button>
       </div>
-  
+
       {/* Main Content */}
       <main className="flex flex-col md:flex-row h-[calc(100vh-112px)] max-w-7xl mx-auto">
         {/* Sidebar */}
         <div
-          className={`fixed md:relative inset-y-0 left-0 w-72 bg-gray-800/80 backdrop-blur-sm rounded-r-xl md:rounded-none overflow-y-auto p-4 transform transition-transform duration-300 ease-in-out z-20 ${
-            showSidebar ? "translate-x-0" : "-translate-x-full"
-          } md:translate-x-0 md:border-r md:border-gray-700 shadow-xl`}
+          className={`fixed md:relative inset-y-0 left-0 w-80 bg-slate-900/95 backdrop-blur-xl rounded-r-2xl md:rounded-none overflow-y-auto p-4 transform transition-transform duration-300 ease-in-out z-50 ${showSidebar ? "translate-x-0" : "-translate-x-full"}
+            } md:translate-x-0 md:border-r md:border-slate-700/50 shadow-2xl`}
         >
-          <div className="flex justify-between items-center mb-4 p-2">
-            <h2 className="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-              Coding Questions
-            </h2>
+          <div className="flex justify-between items-center mb-6 p-3 bg-gradient-to-r from-blue-600/20 to-purple-600/20 rounded-xl border border-white/5">
+            <div className="flex items-center gap-2">
+              <div className="p-1.5 bg-blue-500/20 rounded-lg">
+                <svg className="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+              </div>
+              <h2 className="text-lg font-bold text-white">
+                Coding Challenges
+              </h2>
+            </div>
             <button
               onClick={() => setShowSidebar(false)}
-              className="md:hidden text-gray-400 hover:text-white p-1 rounded-full hover:bg-gray-700/50"
+              className="md:hidden text-gray-400 hover:text-white p-2 rounded-lg hover:bg-white/10 transition-colors"
             >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
               </svg>
             </button>
           </div>
-          
+
           {questions.length > 0 ? (
             <div className="space-y-3">
-              {questions.map((question) => (
+              {questions.map((question, idx) => (
                 <div
                   key={question.id}
-                  className={`p-4 rounded-xl cursor-pointer transition-all ${
-                    selectedQuestion?.id === question.id
-                      ? "bg-gradient-to-r from-blue-600/30 to-purple-600/30 border border-blue-500/30"
-                      : "bg-gray-700/50 hover:bg-gray-700 border border-gray-700"
-                  }`}
+                  className={`p-4 rounded-xl cursor-pointer transition-all duration-200 ${selectedQuestion?.id === question.id
+                    ? "bg-gradient-to-r from-blue-600/30 to-purple-600/30 border-l-4 border-blue-500 shadow-lg"
+                    : "bg-slate-800/50 hover:bg-slate-800 border-l-4 border-transparent hover:border-slate-600"
+                    }`}
                   onClick={() => {
                     setSelectedQuestion(question);
                     if (window.innerWidth < 768) setShowSidebar(false);
                   }}
                 >
-                  <h3 className="font-semibold text-white ">
-                    {question.question}
-                  </h3>
-                  <div className="mt-3 space-y-2">
-                    {question.testCases.slice(0, 2).map((testCase, index) => (
-                      <div
-                        key={index}
-                        className="text-xs bg-gray-800/70 p-2 rounded-lg"
-                      >
-                        <p className="text-gray-300 font-medium">Input: <span className="text-white">{testCase.input}</span></p>
-                        <p className="text-gray-300 font-medium">Output: <span className="text-white">{testCase.output}</span></p>
+                  <div className="flex items-start gap-3">
+                    <span className={`flex-shrink-0 w-7 h-7 rounded-lg flex items-center justify-center text-sm font-bold ${selectedQuestion?.id === question.id
+                      ? 'bg-blue-500 text-white'
+                      : 'bg-slate-700 text-gray-400'
+                      }`}>
+                      {idx + 1}
+                    </span>
+                    <div className="flex-1">
+                      <h3 className="font-medium text-white text-sm leading-snug">
+                        {question.question.replace(/^\d+\.\s*/, '')}
+                      </h3>
+                      <div className="mt-3 space-y-1.5">
+                        {question.testCases.slice(0, 1).map((testCase, index) => (
+                          <div
+                            key={index}
+                            className="text-xs bg-slate-900/70 p-2 rounded-lg font-mono"
+                          >
+                            <p className="text-gray-400">Input: <span className="text-emerald-400">{testCase.input}</span></p>
+                            <p className="text-gray-400">Output: <span className="text-amber-400">{testCase.output}</span></p>
+                          </div>
+                        ))}
+                        {question.testCases.length > 1 && (
+                          <p className="text-xs text-gray-500">+{question.testCases.length - 1} more test cases</p>
+                        )}
                       </div>
-                    ))}
-                    {question.testCases.length > 2 && (
-                      <p className="text-xs text-gray-400 mt-1">+{question.testCases.length - 2} more test cases</p>
-                    )}
+                    </div>
                   </div>
                 </div>
               ))}
             </div>
           ) : (
-            <div className="text-center py-8">
-              <svg className="mx-auto h-10 w-10 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-              </svg>
-              <p className="mt-2 text-gray-400">No questions available</p>
+            <div className="text-center py-12">
+              <div className="w-16 h-16 mx-auto bg-slate-800 rounded-2xl flex items-center justify-center mb-4">
+                <svg className="h-8 w-8 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+              </div>
+              <p className="text-gray-400 font-medium">No questions available</p>
+              <p className="text-gray-500 text-sm mt-1">Check back later for new challenges</p>
             </div>
           )}
         </div>
-  
+
         {/* Editor and Output */}
         <div className="flex-1 flex flex-col p-4 overflow-hidden">
           {/* Editor */}
@@ -514,7 +546,7 @@ const App = () => {
               }}
             />
           </div>
-  
+
           {/* Output */}
           <div className="mt-4 bg-gray-800 rounded-xl overflow-hidden shadow-xl border border-gray-700 flex flex-col h-[40vh]">
             <div className="bg-gray-700/50 p-3 flex justify-between items-center border-b border-gray-700">
@@ -534,7 +566,7 @@ const App = () => {
                 Clear
               </button>
             </div>
-            
+
             <div className="flex-1 overflow-auto p-4 bg-gray-900/50">
               {loading ? (
                 <div className="flex justify-center items-center h-full">

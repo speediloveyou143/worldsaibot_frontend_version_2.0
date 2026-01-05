@@ -1,7 +1,6 @@
-import axios from "axios";
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { BACKEND_URL } from "../../../config/constant";
+import APIService from "../../services/api";
 
 const RoadMapForm = () => {
   const navigate = useNavigate();
@@ -149,21 +148,17 @@ const RoadMapForm = () => {
     e.preventDefault();
     if (validate()) {
       try {
-        const response = await axios.post(
-          `${BACKEND_URL}/create-roadmap`,
-          roadmap,
-          { withCredentials: true }
-        );
-        if (response.status === 200) {
+        const response = await APIService.roadmaps.create(roadmap);
+        if (response.status === 200 || response.status === 201) {
           showAlert("Roadmap stored successfully!", "success");
           setTimeout(() => {
             navigate("/admin-dashboard/profile/all-roadmaps");
-          }, 1000); // Delay navigation to allow alert visibility
+          }, 2000);
         } else {
           showAlert("Failed to store roadmap.", "error");
         }
       } catch (err) {
-        showAlert("Something went wrong while storing the roadmap.", "error");
+        showAlert(err.response?.data?.message || "Something went wrong while storing the roadmap.", "error");
       }
     }
   };
@@ -295,9 +290,8 @@ const RoadMapForm = () => {
 
       {alert && (
         <div
-          className={`fixed bottom-4 right-4 px-4 py-3 rounded-lg text-white shadow-lg transition-all duration-300 z-[50] ${
-            alert.type === 'success' ? 'bg-green-600' : 'bg-red-600'
-          } flex flex-col w-80`}
+          className={`fixed bottom-4 right-4 px-4 py-3 rounded-lg text-white shadow-lg transition-all duration-300 z-[50] ${alert.type === 'success' ? 'bg-green-600' : 'bg-red-600'
+            } flex flex-col w-80`}
         >
           <div className="flex items-center space-x-2">
             <span className="flex-1">{alert.message}</span>

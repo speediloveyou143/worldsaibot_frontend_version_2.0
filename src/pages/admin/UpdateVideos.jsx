@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
-import { useParams } from "react-router-dom";
-import { BACKEND_URL } from "../../../config/constant";
+import { useParams, useNavigate } from "react-router-dom";
+import APIService from "../../services/api";
 
 function UpdateVideos() {
   const { id } = useParams();
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
   const [videoUrl, setVideoUrl] = useState("");
   const [jobRole, setJobRole] = useState("");
   const [name, setName] = useState("");
@@ -46,26 +47,35 @@ function UpdateVideos() {
   }, [alert]);
 
   useEffect(() => {
-    axios
-      .get(`${BACKEND_URL}/show-video/${id}`, { withCredentials: true })
-      .then((response) => {
-        setVideoUrl(response.data.videoUrl);
-        setJobRole(response.data.jobRole);
-        setName(response.data.name);
-        setPackageAmount(response.data.package);
-        setCompanyName(response.data.companyName);
-      })
-      .catch(() => {
+    const fetchVideo = async () => {
+      try {
+        setLoading(true);
+        const response = await APIService.videos.getById(id);
+        if (response.status === 200) {
+          setVideoUrl(response.data.videoUrl || "");
+          setJobRole(response.data.jobRole || "");
+          setName(response.data.name || "");
+          setPackageAmount(response.data.package || "");
+          setCompanyName(response.data.companyName || "");
+        }
+      } catch (error) {
         showAlert("Failed to fetch video details.", "error");
-      });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchVideo();
   }, [id]);
 
   const validateForm = () => {
     const errors = [];
-    if (!videoUrl.trim()) errors.push("Video URL is required.");
-    else if (!/^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})([/\w .-]*)*\/?$/.test(videoUrl)) {
-      errors.push("Video URL format is invalid.");
+    if (!videoUrl.trim()) {
+      errors.push("Video URL is required.");
+    } else if (!/^https?:\/\/.+/.test(videoUrl.trim())) {
+      errors.push("Video URL must start with http:// or https://");
     }
+
     if (!jobRole.trim()) errors.push("Job Role is required.");
     if (!name.trim()) errors.push("Name is required.");
     if (!packageAmount.trim()) errors.push("Package is required.");
@@ -83,18 +93,35 @@ function UpdateVideos() {
     if (!validateForm()) return;
 
     try {
-      const response = await axios.patch(
-        `${BACKEND_URL}/update-video/${id}`,
-        { videoUrl, jobRole, name, package: packageAmount, companyName },
-        { withCredentials: true }
-      );
+      const response = await APIService.videos.update(id, {
+        videoUrl,
+        jobRole,
+        name,
+        package: packageAmount,
+        companyName
+      });
+
       if (response.status === 200) {
         showAlert("Video updated successfully!", "success");
+        setTimeout(() => {
+          navigate("/admin-dashboard/profile/all-videos");
+        }, 2000);
       }
     } catch (err) {
       showAlert(err.response?.data?.message || "Failed to update video.", "error");
     }
   };
+
+  if (loading) {
+    return (
+      <div className="h-full w-full flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-slate-400">Loading video data...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="h-full flex items-start justify-center mt-4 m-3 sm:p-3 p-2 bg-gray-950">
@@ -178,9 +205,8 @@ function UpdateVideos() {
 
         {alert && (
           <div
-            className={`fixed bottom-4 right-4 px-4 py-3 rounded-lg text-white shadow-lg transition-all duration-300 z-[50] ${
-              alert.type === 'success' ? 'bg-green-600' : 'bg-red-600'
-            } flex flex-col w-80`}
+            className={`fixed bottom-4 right-4 px-4 py-3 rounded-lg text-white shadow-lg transition-all duration-300 z-[50] ${alert.type === 'success' ? 'bg-green-600' : 'bg-red-600'
+              } flex flex-col w-80`}
           >
             <div className="flex items-center space-x-2">
               <span className="flex-1">{alert.message}</span>

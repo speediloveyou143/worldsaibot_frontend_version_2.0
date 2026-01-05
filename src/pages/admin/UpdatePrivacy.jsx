@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
-import { useParams } from "react-router-dom";
-import { BACKEND_URL } from "../../../config/constant";
+import { useParams, useNavigate } from "react-router-dom";
+import APIService from "../../services/api";
 
 function UpdatePrivacy() {
   const { id } = useParams();
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
   const [heading, setHeading] = useState("");
   const [paragraph, setParagraph] = useState("");
   const [alert, setAlert] = useState(null);
@@ -43,15 +44,22 @@ function UpdatePrivacy() {
   }, [alert]);
 
   useEffect(() => {
-    axios
-      .get(`${BACKEND_URL}/show-privacy/${id}`, { withCredentials: true })
-      .then((response) => {
-        setHeading(response.data.heading);
-        setParagraph(response.data.paragraph);
-      })
-      .catch(() => {
+    const fetchPrivacy = async () => {
+      try {
+        setLoading(true);
+        const response = await APIService.privacy.getById(id);
+        if (response.status === 200) {
+          setHeading(response.data.heading || "");
+          setParagraph(response.data.paragraph || "");
+        }
+      } catch (error) {
         showAlert("Failed to fetch privacy details.", "error");
-      });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPrivacy();
   }, [id]);
 
   const validateForm = () => {
@@ -71,18 +79,28 @@ function UpdatePrivacy() {
     if (!validateForm()) return;
 
     try {
-      const response = await axios.patch(
-        `${BACKEND_URL}/update-privacy/${id}`,
-        { heading, paragraph },
-        { withCredentials: true }
-      );
+      const response = await APIService.privacy.update(id, { heading, paragraph });
       if (response.status === 200) {
         showAlert("Privacy entry updated successfully!", "success");
+        setTimeout(() => {
+          navigate("/admin-dashboard/profile/all-privacy");
+        }, 2000);
       }
     } catch (err) {
       showAlert(err.response?.data?.message || "Failed to update privacy entry.", "error");
     }
   };
+
+  if (loading) {
+    return (
+      <div className="h-full w-full flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-slate-400">Loading privacy entry...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="h-full mt-4 sm:mt-5 m-3 bg-gray-950 flex items-start justify-center">
@@ -126,9 +144,8 @@ function UpdatePrivacy() {
 
         {alert && (
           <div
-            className={`fixed bottom-4 right-4 px-4 py-3 rounded-lg text-white shadow-lg transition-all duration-300 z-[50] ${
-              alert.type === 'success' ? 'bg-green-600' : 'bg-red-600'
-            } flex flex-col w-80`}
+            className={`fixed bottom-4 right-4 px-4 py-3 rounded-lg text-white shadow-lg transition-all duration-300 z-[50] ${alert.type === 'success' ? 'bg-green-600' : 'bg-red-600'
+              } flex flex-col w-80`}
           >
             <div className="flex items-center space-x-2">
               <span className="flex-1">{alert.message}</span>

@@ -1,41 +1,39 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import { Link } from "react-router-dom";
-import { BACKEND_URL } from "../../../config/constant";
+import APIService from "../../services/api";
 
 function Row(props) {
+  const { data, number, onRefresh } = props;
+
   async function handleDelete() {
     try {
       if (window.confirm("Are you sure you want to delete this test?")) {
-        const response = await axios.delete(
-          `${BACKEND_URL}/delete-test/${props.data._id}`,
-          { withCredentials: true }
-        );
+        const response = await APIService.tests.delete(data._id);
         if (response.status === 200) {
           alert("Test deleted successfully!");
+          onRefresh(); // Refresh the list
         } else {
           alert("Failed to delete the test.");
         }
       }
     } catch (error) {
       alert("An error occurred while deleting the test.");
-      console.error("Error deleting test:", error);
     }
   }
 
   return (
     <tr>
-      <th>{props.number}</th>
-      <td>{props.data.question}</td>
+      <th>{number}</th>
+      <td>{data.question}</td>
       <td>
-        {props.data.test.map((item, index) => (
+        {data.test.map((item, index) => (
           <div key={index}>
             Input: {item.input}, Output: {item.output}
           </div>
         ))}
       </td>
       <td className="text-success cursor-pointer">
-        <Link to={`/admin-dashboard/profile/update-test/${props.data._id}`}>
+        <Link to={`/admin-dashboard/profile/update-test/${data._id}`}>
           update
         </Link>
       </td>
@@ -51,13 +49,11 @@ function AllTests() {
 
   async function fetchTests() {
     try {
-      const response = await axios.get(`${BACKEND_URL}/all-tests`, {
-        withCredentials: true,
-      });
-      setTestData(response?.data);
+      const response = await APIService.tests.getAll();
+      const tests = response?.data?.data || response?.data || [];
+      setTestData(Array.isArray(tests) ? tests : []);
     } catch (err) {
       setTestData([]);
-      console.error("Error fetching tests:", err);
     }
   }
 
@@ -80,8 +76,8 @@ function AllTests() {
         </thead>
         <tbody>
           {testData.length > 0 ? (
-            testData.map((x, index) => (
-              <Row key={index} number={index + 1} data={x} />
+            testData.map((item, index) => (
+              <Row key={item._id || index} data={item} number={index + 1} onRefresh={fetchTests} />
             ))
           ) : (
             <tr>

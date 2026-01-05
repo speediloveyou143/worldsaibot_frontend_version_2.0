@@ -1,39 +1,35 @@
-
 import React, { useEffect } from "react";
 import { Outlet } from "react-router-dom";
 import Navbar from "./Navbar";
 import { useDispatch } from "react-redux";
-import axios from "axios";
+import APIService from "../services/api";
 import { setUser } from "../redux/userSlice";
-import { useNavigate } from "react-router-dom";
-import { BACKEND_URL } from "../../config/constant";
-
 
 function Body(props) {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
-
-  const fetchUser = async () => {
-    try {
-      const res = await axios.get(`${BACKEND_URL}/profile`,{withCredentials:true});
-      if (res.status === 200) {
-        dispatch(setUser(res.data));
-      }
-    } catch (err) {
-      if (err.response?.status === 401) {
-        navigate("/");
-      }
-      // Do nothing (Silently handle the error)
-    }
-  };
 
   useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (token) {
+          const res = await APIService.profile.getMe();
+          if (res.status === 200) {
+            dispatch(setUser(res.data));
+          }
+        }
+      } catch (err) {
+        // Silently handle - user is not logged in or token expired
+        // This is fine for public pages
+      }
+    };
+
     fetchUser();
-  }, []);
+  }, [dispatch]);
 
   return (
     <div>
-      <Navbar {...props}/>
+      <Navbar {...props} />
       <Outlet />
     </div>
   );

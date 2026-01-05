@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { BACKEND_URL } from "../../../config/constant";
+import APIService from '../../services/api';
 
 const CreateBootcamp = () => {
   const [formData, setFormData] = useState({
@@ -103,10 +102,21 @@ const CreateBootcamp = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(`${BACKEND_URL}/create-bootcamp`, formData, {
-        withCredentials: true,
-      });
-      showAlert('Bootcamp created successfully!', 'success');
+      const response = await APIService.bootcamps.create(formData);
+      if (response.status === 200 || response.status === 201) {
+        showAlert('Bootcamp created successfully!', 'success');
+        // Reset form after successful creation
+        setFormData({
+          days: '',
+          courseName: '',
+          startDate: '',
+          endDate: '',
+          startTime: '',
+          courseRoadmap: [['']],
+          videoUrl: '',
+          instructors: [{ name: '', role: '', description: '' }],
+        });
+      }
     } catch (error) {
       showAlert(error.response?.data?.message || 'An error occurred while creating the bootcamp.', 'error');
     }
@@ -116,9 +126,8 @@ const CreateBootcamp = () => {
     <div className="bg-gray-950 h-full overflow-y-auto sm:p-6 p-2 text-white flex items-start justify-center">
       {alert && (
         <div
-          className={`fixed bottom-4 right-4 px-4 py-3 rounded-lg text-white shadow-lg transition-all duration-300 z-[50] ${
-            alert.type === 'success' ? 'bg-green-600' : 'bg-red-600'
-          } flex flex-col w-80`}
+          className={`fixed bottom-4 right-4 px-4 py-3 rounded-lg text-white shadow-lg transition-all duration-300 z-[50] ${alert.type === 'success' ? 'bg-green-600' : 'bg-red-600'
+            } flex flex-col w-80`}
         >
           <div className="flex items-center space-x-2">
             <span className="flex-1">{alert.message}</span>

@@ -1,6 +1,12 @@
-import { Routes, Route, Navigate } from "react-router-dom";
-import { BrowserRouter } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Routes, Route, Navigate, BrowserRouter } from "react-router-dom";
 import { Provider, useSelector } from "react-redux";
+import ErrorBoundary from "./components/ErrorBoundary";
+import appStore from "./redux/appStore";
+import { useDispatch } from "react-redux";
+import { setUser } from "./redux/userSlice";
+import APIService from "./services/api";
+import Loading from "./components/Loading";
 import Home from "./pages/student/Home";
 import Courses from "./pages/student/Courses";
 import Contact from "./pages/student/Contact";
@@ -8,8 +14,9 @@ import Signin from "./pages/authentication/Signin";
 import Signup from "./pages/authentication/Signup";
 import StudentDashboard from "./pages/student/StudentDashboard";
 import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminDashboardHome from "./pages/admin/AdminDashboardHome";
 import Profile from "./pages/student/Profile";
-import appStore from "./redux/appStore";
+import ProfileSettings from "./pages/student/ProfileSettings";
 import Body from "./components/Body";
 import Lectures from "./pages/student/Lectures";
 import Resume from "./pages/student/Resume";
@@ -49,6 +56,7 @@ import UpdatePrivacy from "./pages/admin/UpdatePrivacy";
 import FreeClass from "./pages/student/FreeClass";
 import Thanks from "./pages/student/Thanks";
 import AllRegisters from "./pages/admin/AllRegisters";
+import AllFeedbacks from "./pages/admin/AllFeedbacks";
 import CreateBootcamp from "./pages/admin/CreateBootcamp";
 import AllBootcamps from "./pages/admin/AllBootcamps";
 import UpdateBootcamp from "./pages/admin/UpdateBootcamp";
@@ -70,6 +78,7 @@ import ResetPasswordRequest from "./pages/student/ResetPasswordRequest";
 import CreateInterviewQuestions from "./pages/admin/CreateInterviewQuestions";
 import AllInterviewQuestions from "./pages/admin/AllInterviewQuestions";
 import UpdateInterviewQuestions from "./pages/admin/UpdateInterviewQuestions";
+
 // Protected Route Wrapper
 function ProtectedRoute({ element: Element, allowedRole }) {
   const { user } = useSelector((state) => state.user);
@@ -77,7 +86,7 @@ function ProtectedRoute({ element: Element, allowedRole }) {
 
   if (!user) {
     // Redirect to signin if no user is logged in
-    return null
+    return null;
   }
 
   if (role !== allowedRole) {
@@ -90,21 +99,45 @@ function ProtectedRoute({ element: Element, allowedRole }) {
 
 // Separate component for routes
 function AppRoutes(props) {
-  console.log(props)
+  const dispatch = useDispatch();
+  const [isAuthChecking, setIsAuthChecking] = useState(true);
+
+  useEffect(() => {
+    const verifySession = async () => {
+      const token = localStorage.getItem('token');
+      if (token) {
+        try {
+          const response = await APIService.profile.getMe();
+          dispatch(setUser(response.data));
+        } catch (error) {
+          // Session verification failed, clear token
+          localStorage.removeItem('token');
+        }
+      }
+      setIsAuthChecking(false);
+    };
+
+    verifySession();
+  }, [dispatch]);
+
+  if (isAuthChecking) {
+    return <Loading message="Verifying session..." />;
+  }
+
   return (
     <Routes>
-      <Route path="/" element={<Body data={props.bootcamps} />}>
-        <Route index element={<Home {...props}/>} />
-        <Route path="/courses" element={<Courses {...props.bannerData}/>} />
-        <Route path="/contact" element={<Contact {...props.bannerData}/>} />
-        <Route path="/about-us" element={<About {...props.bannerData}/>} />
-        <Route path="/carrers" element={<Carrers {...props.bannerData}/>} />
-        <Route path="/products" element={<Products {...props.bannerData}/>} />
+      <Route path="/" element={<Body {...props} />}>
+        <Route index element={<Home {...props} />} />
+        <Route path="/courses" element={<Courses {...props.bannerData} />} />
+        <Route path="/contact" element={<Contact {...props.bannerData} />} />
+        <Route path="/about-us" element={<About {...props.bannerData} />} />
+        <Route path="/carrers" element={<Carrers {...props.bannerData} />} />
+        <Route path="/products" element={<Products {...props.bannerData} />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/signin" element={<Signin />} />
         <Route path="/buy-now/:id/:courseId" element={<BuyNow />} />
-        <Route path="/privacy-policy" element={<Terms/>} />
-        <Route path="/free-class/:id" element={<FreeClass {...props.bannerData}/>} />
+        <Route path="/privacy-policy" element={<Terms />} />
+        <Route path="/free-class/:id" element={<FreeClass {...props.bannerData} />} />
         <Route path="/register-successful" element={<Thanks />} />
         <Route path="/reset-password-request" element={<ResetPasswordRequest />} />
 
@@ -119,6 +152,7 @@ function AppRoutes(props) {
           <Route path="resume-templates" element={<Resume />} />
           <Route path="interview-preparation" element={<Interview />} />
           <Route path="editor" element={<Editor />} />
+          <Route path="settings" element={<ProfileSettings />} />
           <Route path="recordings/:id" element={<Recordings />} />
         </Route>
 
@@ -127,7 +161,7 @@ function AppRoutes(props) {
           path="/admin-dashboard"
           element={<ProtectedRoute element={AdminDashboard} allowedRole="admin" />}
         >
-          <Route index element={<Profile />} />
+          <Route index element={<AdminDashboardHome />} />
           <Route path="profile/all-users" element={<AllUsers />} />
           <Route path="profile/update-user/:id" element={<UpdateUser />} />
           <Route path="profile/update-pc/:id" element={<UpdatePc />} />
@@ -153,6 +187,7 @@ function AppRoutes(props) {
           <Route path="profile/all-privacy" element={<AllPrivacy />} />
           <Route path="profile/update-privacy/:id" element={<UpdatePrivacy />} />
           <Route path="profile/all-registers" element={<AllRegisters />} />
+          <Route path="profile/all-feedbacks" element={<AllFeedbacks />} />
           <Route path="profile/create-bootcamp" element={<CreateBootcamp />} />
           <Route path="profile/all-bootcamps" element={<AllBootcamps />} />
           <Route path="profile/update-bootcamp/:id" element={<UpdateBootcamp />} />
@@ -168,9 +203,9 @@ function AppRoutes(props) {
           <Route path="profile/create-test" element={<CreateTest />} />
           <Route path="profile/all-tests" element={<AllTests />} />
           <Route path="profile/update-test/:id" element={<UpdateTest />} />
-          <Route path="profile/create-interview" element={<CreateInterviewQuestions/>} />
-          <Route path="profile/all-interview" element={<AllInterviewQuestions/>} />
-          <Route path="profile/update-interview/:id" element={<UpdateInterviewQuestions/>} />
+          <Route path="profile/create-interview" element={<CreateInterviewQuestions />} />
+          <Route path="profile/all-interview" element={<AllInterviewQuestions />} />
+          <Route path="profile/update-interview/:id" element={<UpdateInterviewQuestions />} />
         </Route>
       </Route>
       <Route path="*" element={<NotFoundPage />} />
@@ -180,11 +215,11 @@ function AppRoutes(props) {
 }
 
 function App(props) {
-  
+
   return (
     <Provider store={appStore}>
       <BrowserRouter>
-        <AppRoutes {...props}/>
+        <AppRoutes {...props} />
       </BrowserRouter>
     </Provider>
   );

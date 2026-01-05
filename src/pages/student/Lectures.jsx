@@ -1,159 +1,181 @@
-
-import React, { useState, useEffect } from 'react';
-import { useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
-import CourseCards from '../../components/CourseCards';
+import React, { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 function Lectures() {
-  const { user } = useSelector((state) => state.user || {});
-  const courses = user?.courses || [];
-  const [alert, setAlert] = useState(null);
-  const [progress, setProgress] = useState(100);
-
-  const showAlert = (message, type) => {
-    setAlert({ message, type });
-    setProgress(100);
-  };
-
-  const dismissAlert = () => {
-    setAlert(null);
-    setProgress(100);
-  };
+  const { user } = useSelector((state) => state.user);
+  const [courses, setCourses] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (alert) {
-      const duration = 3000;
-      const interval = 50;
-      const decrement = (interval / duration) * 100;
+    loadCourses();
+  }, [user]);
 
-      const timer = setInterval(() => {
-        setProgress((prev) => {
-          const newProgress = prev - decrement;
-          if (newProgress <= 0) {
-            dismissAlert();
-            clearInterval(timer);
-            return 0;
-          }
-          return newProgress;
-        });
-      }, interval);
-
-      return () => clearInterval(timer);
+  const loadCourses = () => {
+    try {
+      setLoading(true);
+      // Get courses from user data
+      const userCourses = user?.courses || [];
+      setCourses(userCourses);
+    } catch (error) {
+      console.error("Error loading courses:", error);
+    } finally {
+      setLoading(false);
     }
-  }, [alert]);
-
-  useEffect(() => {
-    if (!user) {
-      showAlert("Loading user data...", "info");
-    } else if (courses.length === 0) {
-      showAlert("No paid courses found. Explore available courses!", "info");
-    } else {
-      showAlert("Your paid courses loaded successfully!", "success");
-    }
-  }, [user, courses]);
-
-  useEffect(() => {
-    if (courses.length > 0) {
-      courses.forEach((course) => {
-        showAlert(
-          `Course "${course.courseName}" is ${course.status ? 'Active' : 'Expired'}`,
-          course.status ? 'success' : 'error'
-        );
-      });
-    }
-  }, [courses]);
-
-  const handleWatchRecordings = (courseName) => {
-    showAlert(`Navigating to recordings for ${courseName}...`, "info");
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-950 to-slate-900 flex items-center justify-center p-4">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-slate-400 text-lg">Loading your courses...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="w-full min-h-screen p-4 bg-gradient-to-br from-gray-950 to-gray-900 text-white overflow-y-auto">
-      {/* Alert Component */}
-      {alert && (
-  <div
-    className={`fixed top-[85px] left-1/2 -translate-x-1/2 px-4 py-3 rounded-lg text-white shadow-lg transition-all duration-300 z-[100] ${
-      alert.type === 'success'
-        ? 'bg-green-600'
-        : alert.type === 'info'
-        ? 'bg-blue-600'
-        : 'bg-red-600'
-    } flex flex-col w-80 ${alert.visible ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
-  >
-    <div className="flex items-center space-x-2">
-      <span className="flex-1">{alert.message}</span>
-      <button
-        onClick={dismissAlert}
-        className="text-white hover:text-gray-200 focus:outline-none"
-      >
-        <i className="bi bi-x-lg"></i>
-      </button>
-    </div>
-    <div className="w-full h-1 mt-2 bg-white/30 rounded-full overflow-hidden">
-      <div
-        className="h-full bg-white transition-all duration-[16ms] ease-linear"
-        style={{ width: `${progress}%` }}
-      ></div>
-    </div>
-  </div>
-)}
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 to-slate-900 px-4 md:px-6 pt-4 pb-6">
+      {/* Header */}
+      <div className="mb-8">
+        <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">
+          My Courses
+        </h1>
+        <p className="text-slate-400 text-base md:text-lg">
+          {courses.length} {courses.length === 1 ? "course" : "courses"} enrolled
+        </p>
+      </div>
 
-      {user ? (
-        courses.length > 0 ? (
-          <div className="w-full">
-            <h2 className="text-xl font-semibold mb-4 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-              Your Paid Courses
-            </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {courses.map((course, index) => (
-                <div
-                  key={index}
-                  className="p-6 rounded-xl bg-gray-900/50 border border-blue-800/30 hover:border-blue-600/50 transition-all min-w-[280px] max-w-[350px]"
-                >
-                  <h3 className="text-lg font-bold mb-2 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-                    {course.courseName}
-                  </h3>
-                  <p className="text-gray-300 text-sm">Amount Paid: ₹{course.amount}</p>
-                  <p className="text-gray-300 text-sm">Transaction ID: {course.transactionId}</p>
-                  <p className="text-gray-300 text-sm">Purchased By: {course.name}</p>
-                  <p className="text-gray-300 text-sm">Gmail: {course.email}</p>
-                  <p
-                    className={`font-medium mt-2 text-sm ${
-                      course.status ? 'text-green-400' : 'text-red-500'
-                    }`}
-                  >
-                    Status: {course.status ? 'Active' : 'Expired'}
-                  </p>
+      {/* Stats Section */}
+      {courses.length > 0 && (
+        <div className="mb-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="bg-slate-800/30 backdrop-blur-sm rounded-xl border border-slate-700/50 p-6">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg flex items-center justify-center">
+                <i className="bi bi-book-fill text-2xl text-white"></i>
+              </div>
+              <div>
+                <p className="text-slate-400 text-sm">Total Courses</p>
+                <h3 className="text-2xl font-bold text-white">{courses.length}</h3>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-slate-800/30 backdrop-blur-sm rounded-xl border border-slate-700/50 p-6">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-500 rounded-lg flex items-center justify-center">
+                <i className="bi bi-check-circle-fill text-2xl text-white"></i>
+              </div>
+              <div>
+                <p className="text-slate-400 text-sm">Active Courses</p>
+                <h3 className="text-2xl font-bold text-white">
+                  {courses.filter(c => c.status).length}
+                </h3>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-slate-800/30 backdrop-blur-sm rounded-xl border border-slate-700/50 p-6">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
+                <i className="bi bi-clock-fill text-2xl text-white"></i>
+              </div>
+              <div>
+                <p className="text-slate-400 text-sm">Learning Hours</p>
+                <h3 className="text-2xl font-bold text-white">{courses.length * 40}+</h3>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Courses Grid */}
+      {courses.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {courses.map((course, index) => (
+            <div
+              key={index}
+              className="group bg-slate-800/30 backdrop-blur-sm rounded-xl border border-slate-700/50 overflow-hidden hover:border-purple-500/50 transition-all duration-300 hover:scale-105"
+            >
+              {/* Course Header */}
+              <div className="bg-gradient-to-br from-purple-500/20 to-pink-500/20 p-6">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
+                    <i className="bi bi-play-circle-fill text-3xl text-white"></i>
+                  </div>
                   {course.status && (
-                    <Link to={`/student-dashboard/profile/recordings/${course.recordingsId}`}>
-                      <button
-                        onClick={() => handleWatchRecordings(course.courseName)}
-                        className="mt-3 px-3 py-1.5 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 transition-all transform hover:scale-105 text-sm"
-                      >
-                        Watch Recordings
-                      </button>
-                    </Link>
+                    <span className="px-3 py-1 bg-green-500/20 text-green-400 text-xs font-medium rounded-full border border-green-500/30">
+                      Active
+                    </span>
                   )}
                 </div>
-              ))}
+                <h3 className="text-white font-bold text-xl mb-2 line-clamp-2">
+                  {course.courseName || "Course"}
+                </h3>
+              </div>
+
+              {/* Course Details */}
+              <div className="p-6">
+                <div className="space-y-3 mb-6">
+                  <div className="flex items-center gap-3 text-slate-400 text-sm">
+                    <i className="bi bi-calendar-check"></i>
+                    <span>
+                      Purchased: {new Date(course.purchaseDate || Date.now()).toLocaleDateString()}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3 text-slate-400 text-sm">
+                    <i className="bi bi-currency-rupee"></i>
+                    <span>₹{course.amount || "N/A"}</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-slate-400 text-sm">
+                    <i className="bi bi-receipt"></i>
+                    <span className="truncate">Transaction: {course.transactionId || "N/A"}</span>
+                  </div>
+                </div>
+
+                {/* Action Button */}
+                {course.recordingsId ? (
+                  <Link
+                    to={`/student-dashboard/profile/recordings/${course.recordingsId}`}
+                    className="block w-full text-center px-4 py-3 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-medium rounded-lg transition-all group-hover:shadow-lg group-hover:shadow-purple-500/50"
+                  >
+                    <span className="flex items-center justify-center gap-2">
+                      <i className="bi bi-play-circle-fill"></i>
+                      Start Learning
+                    </span>
+                  </Link>
+                ) : (
+                  <button
+                    disabled
+                    className="w-full px-4 py-3 bg-slate-700/50 text-slate-500 font-medium rounded-lg cursor-not-allowed"
+                  >
+                    Recordings Unavailable
+                  </button>
+                )}
+              </div>
             </div>
-          </div>
-        ) : (
-          <div className="text-center w-full">
-            <h2 className="text-xl font-semibold mb-4 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-              No Paid Courses
-            </h2>
-            <p className="text-gray-300 mb-4 text-sm">Please purchase a course to access lectures.</p>
-            <div className="w-full">
-              <CourseCards />
-            </div>
-          </div>
-        )
+          ))}
+        </div>
       ) : (
-        <div className="text-center">
-          <h2 className="text-xl font-semibold mb-4 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-            Loading...
-          </h2>
+        // Empty State
+        <div className="max-w-2xl mx-auto">
+          <div className="bg-slate-800/30 backdrop-blur-sm rounded-xl border border-slate-700/50 p-12 text-center">
+            <div className="w-24 h-24 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
+              <i className="bi bi-book-fill text-5xl text-purple-400"></i>
+            </div>
+            <h2 className="text-2xl font-bold text-white mb-3">No Courses Yet</h2>
+            <p className="text-slate-400 text-lg mb-8">
+              Start your learning journey by enrolling in a course
+            </p>
+            <Link
+              to="/courses"
+              className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-medium rounded-lg transition-all shadow-lg hover:shadow-purple-500/50"
+            >
+              <i className="bi bi-search"></i>
+              Browse Courses
+            </Link>
+          </div>
         </div>
       )}
     </div>

@@ -1,19 +1,18 @@
-import axios from "axios";
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { BACKEND_URL } from "../../../config/constant";
+import APIService from "../../services/api";
 
 function VideoRow(props) {
-  const { number, data, showAlert } = props;
+  const { number, data, showAlert, onRefresh } = props;
 
   async function handleDelete() {
+    if (!window.confirm('Are you sure you want to delete this video?')) return;
+
     try {
-      const response = await axios.delete(
-        `${BACKEND_URL}/delete-video/${data._id}`,
-        { withCredentials: true }
-      );
+      const response = await APIService.videos.delete(data._id);
       if (response.status === 200) {
         showAlert("Video deleted successfully!", "success");
+        onRefresh(); // Refresh the list
       } else {
         showAlert("Failed to delete the video.", "error");
       }
@@ -79,10 +78,9 @@ function AllVideos() {
 
   async function fetchVideos() {
     try {
-      const response = await axios.get(`${BACKEND_URL}/show-videos`, {
-        withCredentials: true,
-      });
-      setVideoData(response?.data || []);
+      const response = await APIService.videos.getAll();
+      const videos = response?.data?.data || response?.data || [];
+      setVideoData(Array.isArray(videos) ? videos : []);
     } catch (err) {
       setVideoData([]);
       showAlert("Error fetching videos. Please try again.", "error");
@@ -112,7 +110,7 @@ function AllVideos() {
         <tbody>
           {videoData.length > 0 ? (
             videoData.map((x, index) => (
-              <VideoRow key={index} number={index + 1} data={x} showAlert={showAlert} />
+              <VideoRow key={x._id || index} number={index + 1} data={x} showAlert={showAlert} onRefresh={fetchVideos} />
             ))
           ) : (
             <tr>
@@ -139,9 +137,8 @@ function AllVideos() {
 
       {alert && (
         <div
-          className={`fixed bottom-4 right-4 px-4 py-3 rounded-lg text-white shadow-lg transition-all duration-300 z-[50] ${
-            alert.type === "success" ? "bg-green-600" : "bg-red-600"
-          } flex flex-col w-80`}
+          className={`fixed bottom-4 right-4 px-4 py-3 rounded-lg text-white shadow-lg transition-all duration-300 z-[50] ${alert.type === "success" ? "bg-green-600" : "bg-red-600"
+            } flex flex-col w-80`}
         >
           <div className="flex items-center space-x-2">
             <span className="flex-1">{alert.message}</span>

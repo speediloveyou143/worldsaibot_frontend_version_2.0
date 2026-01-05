@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { BACKEND_URL } from "../../../config/constant";
+import APIService from '../../services/api';
 
 function CreateJob() {
   const [experience, setExperience] = useState('');
@@ -62,12 +61,8 @@ function CreateJob() {
     if (!validateForm()) return;
 
     try {
-      const response = await axios.post(
-        `${BACKEND_URL}/create-job`,
-        { experience, jobRole, workType },
-        { withCredentials: true }
-      );
-      if (response.status === 200) {
+      const response = await APIService.jobs.create({ experience, jobRole, workType });
+      if (response.status === 200 || response.status === 201) {
         showAlert('Job created successfully!', 'success');
         setExperience('');
         setJobRole('');
@@ -94,11 +89,10 @@ function CreateJob() {
               id="experience"
               value={experience}
               onChange={(e) => setExperience(e.target.value)}
-              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
-                errors.experience
+              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 ${errors.experience
                   ? 'border-red-500 focus:ring-red-500 bg-gray-700 text-white'
                   : 'border-gray-600 focus:ring-blue-500 bg-gray-700 text-white'
-              }`}
+                }`}
               placeholder="Enter experience (e.g., 2-5 years)"
             />
           </div>
@@ -111,11 +105,10 @@ function CreateJob() {
               id="jobRole"
               value={jobRole}
               onChange={(e) => setJobRole(e.target.value)}
-              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
-                errors.jobRole
+              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 ${errors.jobRole
                   ? 'border-red-500 focus:ring-red-500 bg-gray-700 text-white'
                   : 'border-gray-600 focus:ring-blue-500 bg-gray-700 text-white'
-              }`}
+                }`}
               placeholder="Enter job role"
             />
           </div>
@@ -127,11 +120,10 @@ function CreateJob() {
               id="workType"
               value={workType}
               onChange={(e) => setWorkType(e.target.value)}
-              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
-                errors.workType
+              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 ${errors.workType
                   ? 'border-red-500 focus:ring-red-500 bg-gray-700 text-white'
                   : 'border-gray-600 focus:ring-blue-500 bg-gray-700 text-white'
-              }`}
+                }`}
             >
               <option value="">Select work type</option>
               <option value="onsite">Onsite</option>
@@ -149,9 +141,8 @@ function CreateJob() {
 
         {alert && (
           <div
-            className={`fixed bottom-4 right-4 px-4 py-3 rounded-lg text-white shadow-lg transition-all duration-300 z-[50] ${
-              alert.type === 'success' ? 'bg-green-600' : 'bg-red-600'
-            } flex flex-col w-80`}
+            className={`fixed bottom-4 right-4 px-4 py-3 rounded-lg text-white shadow-lg transition-all duration-300 z-[50] ${alert.type === 'success' ? 'bg-green-600' : 'bg-red-600'
+              } flex flex-col w-80`}
           >
             <div className="flex items-center space-x-2">
               <span className="flex-1">{alert.message}</span>

@@ -727,7 +727,7 @@ function Resume() {
         pdf.line(margin, yPos, pageWidth - margin, yPos);
         yPos += 20;
 
-秀
+        秀
         const renderSection = (title, contentFn, xPos, width) => {
           if (!contentFn) return yPos;
           pdf.setFontSize(14);
@@ -827,82 +827,112 @@ function Resume() {
   };
 
   const renderTemplateSelection = () => (
-    <div className="bg-gray-900 text-white p-2 flex justify-center items-center h-screen">
-      <div className="rounded-lg shadow-lg w-full max-w-3xl h-full">
-        <h2 className="text-2xl font-bold mb-4 text-center" style={{ fontFamily: 'Poppins, sans-serif' }}>
-          Choose a Resume Template
-        </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-7 h-[calc(100vh-200px)] pb-10 sm:pb-0 sm:h-[600px] overflow-y-auto">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white p-6">
+      <div className="max-w-5xl mx-auto">
+        {/* Header */}
+        <div className="text-center mb-10">
+          <h1 className="text-4xl md:text-5xl font-black mb-3 bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+            Resume Templates
+          </h1>
+          <p className="text-gray-400 text-lg">Choose a professional template to build your resume</p>
+        </div>
+
+        {/* Template Grid */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {Object.entries(templates).map(([key, template]) => (
             <div
               key={key}
               onClick={() => setSelectedTemplate(key)}
-              className="bg-gray-700 p-3 rounded-lg cursor-pointer hover:bg-gray-600 transition-all duration-200 flex flex-col"
+              className="group cursor-pointer"
             >
-              <div className="flex-1">
-                <h3 className="text-lg font-semibold text-blue-300 mb-2">{template.name}</h3>
-                <p className="text-gray-300 mb-2" style={{ minHeight: '2.5em' }}>{template.description}</p>
-              </div>
-              <div
-                style={{
-                  height: '120px',
-                  background: '#fff',
-                  border: '1px solid #e2e8f0',
-                  padding: '8px',
-                  fontFamily: 'Helvetica, sans-serif',
-                  fontSize: '9px',
-                  color: '#000',
-                  position: 'relative'
-                }}
-              >
-                <div style={{ textAlign: template.layout === 'centered' ? 'center' : 'left', width: '100%' }}>
-                  <h4 style={{ fontSize: '12px', color: '#1e3a8a', fontWeight: 'bold', marginBottom: '4px' }}>
-                    John Doe
-                  </h4>
-                  <p style={{ fontSize: '7px', color: '#4b5563', marginBottom: '6px' }}>
-                    +1234567890 | john.doe@example.com
-                  </p>
-                  <hr style={{ border: '1px solid #1e3a8a', marginBottom: '8px' }} />
-                  <h5 style={{ fontSize: '10px', color: '#1e3a8a', fontWeight: template.layout === 'stackedSections' ? 'normal' : 'bold', marginBottom: '4px' }}>
-                    Experience
-                  </h5>
-                  <p style={{ fontSize: '8px' }}>Software Engineer - Tech Corp</p>
-                </div>
-                {(template.layout === 'twoColumn' || template.layout === 'sidebarRight') && (
+              {/* Card */}
+              <div className="relative bg-slate-800/50 backdrop-blur-sm rounded-2xl overflow-hidden border border-slate-700 hover:border-blue-500/50 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/20 hover:-translate-y-1">
+                {/* Preview Area */}
+                <div className="p-4 bg-white rounded-t-xl mx-3 mt-3">
                   <div style={{
-                    position: 'absolute',
-                    top: '8px',
-                    right: template.layout === 'sidebarRight' ? '8px' : 'auto',
-                    left: template.layout === 'twoColumn' ? '8px' : 'auto',
-                    width: '30%',
-                    fontSize: '7px'
+                    height: '140px',
+                    fontFamily: 'Helvetica, sans-serif',
+                    fontSize: '8px',
+                    color: '#000',
+                    position: 'relative',
+                    overflow: 'hidden'
                   }}>
-                    <h5 style={{ fontSize: '9px', color: '#1e3a8a', fontWeight: 'bold', marginBottom: '4px' }}>
-                      Skills
-                    </h5>
-                    <p>• JavaScript</p>
+                    <div style={{ textAlign: template.layout === 'centered' ? 'center' : 'left', width: '100%' }}>
+                      <h4 style={{ fontSize: '13px', color: '#1e3a8a', fontWeight: 'bold', marginBottom: '4px' }}>
+                        John Doe
+                      </h4>
+                      <p style={{ fontSize: '7px', color: '#6b7280', marginBottom: '8px' }}>
+                        +1234567890 | john.doe@example.com
+                      </p>
+                      <hr style={{ border: '0.5px solid #3b82f6', marginBottom: '10px' }} />
+                      <h5 style={{ fontSize: '9px', color: '#1e3a8a', fontWeight: template.layout === 'stackedSections' ? 'normal' : 'bold', marginBottom: '3px' }}>
+                        Experience
+                      </h5>
+                      <p style={{ fontWeight: 'bold', fontSize: '8px' }}>Software Engineer</p>
+                      <p style={{ fontSize: '7px', color: '#6b7280' }}>Tech Corp | 2020-2023</p>
+                    </div>
+                    {(template.layout === 'twoColumn' || template.layout === 'sidebarRight') && (
+                      <div style={{
+                        position: 'absolute',
+                        top: '0',
+                        right: template.layout === 'sidebarRight' ? '0' : 'auto',
+                        left: template.layout === 'twoColumn' ? '0' : 'auto',
+                        width: '30%',
+                        fontSize: '7px',
+                        padding: '4px',
+                        background: '#f8fafc'
+                      }}>
+                        <h5 style={{ fontSize: '8px', color: '#1e3a8a', fontWeight: 'bold', marginBottom: '4px' }}>
+                          Skills
+                        </h5>
+                        <p>• JavaScript</p>
+                        <p>• React</p>
+                      </div>
+                    )}
                   </div>
-                )}
+                </div>
+
+                {/* Info Area */}
+                <div className="p-4">
+                  <h3 className="text-lg font-bold text-white mb-1 group-hover:text-blue-400 transition-colors">
+                    {template.name}
+                  </h3>
+                  <p className="text-gray-400 text-sm">{template.description}</p>
+                </div>
+
+                {/* Select Overlay */}
+                <div className="absolute inset-0 bg-blue-500/0 group-hover:bg-blue-500/5 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
+                  <span className="px-4 py-2 bg-blue-500 text-white rounded-lg font-semibold text-sm shadow-lg transform translate-y-4 group-hover:translate-y-0 transition-transform">
+                    Select Template
+                  </span>
+                </div>
               </div>
             </div>
           ))}
         </div>
+
+        {/* Tips Section */}
+        <div className="mt-10 p-6 bg-slate-800/30 rounded-2xl border border-slate-700">
+          <h3 className="text-lg font-bold text-white mb-3 flex items-center gap-2">
+            <i className="bi bi-lightbulb text-yellow-400"></i>
+            Tips for a Great Resume
+          </h3>
+          <div className="grid sm:grid-cols-3 gap-4 text-sm text-gray-400">
+            <div className="flex items-start gap-2">
+              <span className="text-blue-400">✓</span>
+              <span>Keep it concise and focused on your achievements</span>
+            </div>
+            <div className="flex items-start gap-2">
+              <span className="text-blue-400">✓</span>
+              <span>Use action verbs to describe your experience</span>
+            </div>
+            <div className="flex items-start gap-2">
+              <span className="text-blue-400">✓</span>
+              <span>Tailor your resume for each job application</span>
+            </div>
+          </div>
+        </div>
       </div>
-      <style jsx>{`
-        ::-webkit-scrollbar {
-          width: 6px;
-        }
-        ::-webkit-scrollbar-track {
-          background: #1f2937;
-        }
-        ::-webkit-scrollbar-thumb {
-          background: #4b5563;
-          border-radius: 3px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-          background: #6b7280;
-        }
-      `}</style>
     </div>
   );
 
@@ -1220,103 +1250,103 @@ function Resume() {
                       </p>
                     ), { compact: true, paddingLeft: '10px' })}
                     {renderSectionPreview('Achievements', resumeData.achievements, (ach, i) => (
-                                              <div key={i} style={{ marginBottom: '6px' }}>
-                                              <strong style={{ fontSize: '10pt' }}>{ach.title}</strong>
-                                              <p style={{ fontSize: '9pt' }}>{ach.description}</p>
-                                            </div>
-                                          ), { compact: true })}
-                                        </>
-                                      )}
-                    
-                                      {layout === 'sidebarRight' && (
-                                        <div style={{ display: 'flex', gap: '25px' }}>
-                                          <div style={{ width: '355px' }}>
-                                            {renderSectionPreview('Career Objective', [resumeData.careerObjective], (_, i) => (
-                                              <p key={i} style={{ fontSize: '10pt' }}>{resumeData.careerObjective}</p>
-                                            ))}
-                                            {renderSectionPreview('Experience', resumeData.experience, (exp, i) => (
-                                              <div key={i} style={{ marginBottom: '8px' }}>
-                                                <strong style={{ fontSize: '11pt' }}>{exp.title}</strong>
-                                                <p style={{ fontSize: '10pt', color: '#4b5563' }}>{exp.company} | {exp.duration}</p>
-                                              </div>
-                                            ))}
-                                            {renderSectionPreview('Education', resumeData.education, (edu, i) => (
-                                              <div key={i} style={{ marginBottom: '8px' }}>
-                                                <strong style={{ fontSize: '11pt' }}>{edu.degree}</strong>
-                                                <p style={{ fontSize: '10pt', color: '#4b5563' }}>{edu.institution} | {edu.year}</p>
-                                              </div>
-                                            ))}
-                                            {renderSectionPreview('Projects', resumeData.projects, (proj, i) => (
-                                              <div key={i} style={{ marginBottom: '8px' }}>
-                                                <strong style={{ fontSize: '11pt' }}>{proj.title}</strong>
-                                                <p style={{ fontSize: '10pt' }}>{proj.description}</p>
-                                              </div>
-                                            ))}
-                                            {renderSectionPreview('Achievements', resumeData.achievements, (ach, i) => (
-                                              <div key={i} style={{ marginBottom: '8px' }}>
-                                                <strong style={{ fontSize: '11pt' }}>{ach.title}</strong>
-                                                <p style={{ fontSize: '10pt' }}>{ach.description}</p>
-                                              </div>
-                                            ))}
-                                          </div>
-                                          <div style={{ width: '175px' }}>
-                                            {renderSectionPreview('Skills', resumeData.skills, (skill, i) => (
-                                              <p key={i} style={{ fontSize: '10pt', paddingLeft: '15px', marginBottom: '8px' }}>
-                                                • {skill.name}{skill.description ? `: ${skill.description}` : ''}
-                                              </p>
-                                            ))}
-                                            {renderSectionPreview('Certifications', resumeData.certifications, (cert, i) => (
-                                              <p key={i} style={{ fontSize: '10pt', paddingLeft: '15px', marginBottom: '8px' }}>
-                                                • {cert.title} ({cert.issuer}, {cert.year})
-                                              </p>
-                                            ))}
-                                          </div>
-                                        </div>
-                                      )}
-                    
-                                      {layout === 'stackedSections' && (
-                                        <>
-                                          {renderSectionPreview('Career Objective', [resumeData.careerObjective], (_, i) => (
-                                            <p key={i} style={{ fontSize: '10pt' }}>{resumeData.careerObjective}</p>
-                                          ), { boldHeader: false })}
-                                          {renderSectionPreview('Experience', resumeData.experience, (exp, i) => (
-                                            <div key={i} style={{ marginBottom: '8px' }}>
-                                              <strong style={{ fontSize: '11pt' }}>{exp.title}</strong>
-                                              <p style={{ fontSize: '10pt', color: '#4b5563' }}>{exp.company} | {exp.duration}</p>
-                                            </div>
-                                          ), { boldHeader: false })}
-                                          {renderSectionPreview('Education', resumeData.education, (edu, i) => (
-                                            <div key={i} style={{ marginBottom: '8px' }}>
-                                              <strong style={{ fontSize: '11pt' }}>{edu.degree}</strong>
-                                              <p style={{ fontSize: '10pt', color: '#4b5563' }}>{edu.institution} | {edu.year}</p>
-                                            </div>
-                                          ), { boldHeader: false })}
-                                          {renderSectionPreview('Skills', resumeData.skills, (skill, i) => (
-                                            <p key={i} style={{ fontSize: '10pt', paddingLeft: '15px', marginBottom: '8px' }}>
-                                              • {skill.name}{skill.description ? `: ${skill.description}` : ''}
-                                            </p>
-                                          ), { boldHeader: false, paddingLeft: '15px' })}
-                                          {renderSectionPreview('Projects', resumeData.projects, (proj, i) => (
-                                            <div key={i} style={{ marginBottom: '8px' }}>
-                                              <strong style={{ fontSize: '11pt' }}>{proj.title}</strong>
-                                              <p style={{ fontSize: '10pt' }}>{proj.description}</p>
-                                            </div>
-                                          ), { boldHeader: false })}
-                                          {renderSectionPreview('Certifications', resumeData.certifications, (cert, i) => (
-                                            <p key={i} style={{ fontSize: '10pt', paddingLeft: '15px', marginBottom: '8px' }}>
-                                              • {cert.title} ({cert.issuer}, {cert.year})
-                                            </p>
-                                          ), { boldHeader: false, paddingLeft: '15px' })}
-                                          {renderSectionPreview('Achievements', resumeData.achievements, (ach, i) => (
-                                            <div key={i} style={{ marginBottom: '8px' }}>
-                                              <strong style={{ fontSize: '11pt' }}>{ach.title}</strong>
-                                              <p style={{ fontSize: '10pt' }}>{ach.description}</p>
-                                            </div>
-                                          ), { boldHeader: false })}
-                                        </>
-                                      )}
-                                    </div>
-                                    <style jsx>{`
+                      <div key={i} style={{ marginBottom: '6px' }}>
+                        <strong style={{ fontSize: '10pt' }}>{ach.title}</strong>
+                        <p style={{ fontSize: '9pt' }}>{ach.description}</p>
+                      </div>
+                    ), { compact: true })}
+                  </>
+                )}
+
+                {layout === 'sidebarRight' && (
+                  <div style={{ display: 'flex', gap: '25px' }}>
+                    <div style={{ width: '355px' }}>
+                      {renderSectionPreview('Career Objective', [resumeData.careerObjective], (_, i) => (
+                        <p key={i} style={{ fontSize: '10pt' }}>{resumeData.careerObjective}</p>
+                      ))}
+                      {renderSectionPreview('Experience', resumeData.experience, (exp, i) => (
+                        <div key={i} style={{ marginBottom: '8px' }}>
+                          <strong style={{ fontSize: '11pt' }}>{exp.title}</strong>
+                          <p style={{ fontSize: '10pt', color: '#4b5563' }}>{exp.company} | {exp.duration}</p>
+                        </div>
+                      ))}
+                      {renderSectionPreview('Education', resumeData.education, (edu, i) => (
+                        <div key={i} style={{ marginBottom: '8px' }}>
+                          <strong style={{ fontSize: '11pt' }}>{edu.degree}</strong>
+                          <p style={{ fontSize: '10pt', color: '#4b5563' }}>{edu.institution} | {edu.year}</p>
+                        </div>
+                      ))}
+                      {renderSectionPreview('Projects', resumeData.projects, (proj, i) => (
+                        <div key={i} style={{ marginBottom: '8px' }}>
+                          <strong style={{ fontSize: '11pt' }}>{proj.title}</strong>
+                          <p style={{ fontSize: '10pt' }}>{proj.description}</p>
+                        </div>
+                      ))}
+                      {renderSectionPreview('Achievements', resumeData.achievements, (ach, i) => (
+                        <div key={i} style={{ marginBottom: '8px' }}>
+                          <strong style={{ fontSize: '11pt' }}>{ach.title}</strong>
+                          <p style={{ fontSize: '10pt' }}>{ach.description}</p>
+                        </div>
+                      ))}
+                    </div>
+                    <div style={{ width: '175px' }}>
+                      {renderSectionPreview('Skills', resumeData.skills, (skill, i) => (
+                        <p key={i} style={{ fontSize: '10pt', paddingLeft: '15px', marginBottom: '8px' }}>
+                          • {skill.name}{skill.description ? `: ${skill.description}` : ''}
+                        </p>
+                      ))}
+                      {renderSectionPreview('Certifications', resumeData.certifications, (cert, i) => (
+                        <p key={i} style={{ fontSize: '10pt', paddingLeft: '15px', marginBottom: '8px' }}>
+                          • {cert.title} ({cert.issuer}, {cert.year})
+                        </p>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {layout === 'stackedSections' && (
+                  <>
+                    {renderSectionPreview('Career Objective', [resumeData.careerObjective], (_, i) => (
+                      <p key={i} style={{ fontSize: '10pt' }}>{resumeData.careerObjective}</p>
+                    ), { boldHeader: false })}
+                    {renderSectionPreview('Experience', resumeData.experience, (exp, i) => (
+                      <div key={i} style={{ marginBottom: '8px' }}>
+                        <strong style={{ fontSize: '11pt' }}>{exp.title}</strong>
+                        <p style={{ fontSize: '10pt', color: '#4b5563' }}>{exp.company} | {exp.duration}</p>
+                      </div>
+                    ), { boldHeader: false })}
+                    {renderSectionPreview('Education', resumeData.education, (edu, i) => (
+                      <div key={i} style={{ marginBottom: '8px' }}>
+                        <strong style={{ fontSize: '11pt' }}>{edu.degree}</strong>
+                        <p style={{ fontSize: '10pt', color: '#4b5563' }}>{edu.institution} | {edu.year}</p>
+                      </div>
+                    ), { boldHeader: false })}
+                    {renderSectionPreview('Skills', resumeData.skills, (skill, i) => (
+                      <p key={i} style={{ fontSize: '10pt', paddingLeft: '15px', marginBottom: '8px' }}>
+                        • {skill.name}{skill.description ? `: ${skill.description}` : ''}
+                      </p>
+                    ), { boldHeader: false, paddingLeft: '15px' })}
+                    {renderSectionPreview('Projects', resumeData.projects, (proj, i) => (
+                      <div key={i} style={{ marginBottom: '8px' }}>
+                        <strong style={{ fontSize: '11pt' }}>{proj.title}</strong>
+                        <p style={{ fontSize: '10pt' }}>{proj.description}</p>
+                      </div>
+                    ), { boldHeader: false })}
+                    {renderSectionPreview('Certifications', resumeData.certifications, (cert, i) => (
+                      <p key={i} style={{ fontSize: '10pt', paddingLeft: '15px', marginBottom: '8px' }}>
+                        • {cert.title} ({cert.issuer}, {cert.year})
+                      </p>
+                    ), { boldHeader: false, paddingLeft: '15px' })}
+                    {renderSectionPreview('Achievements', resumeData.achievements, (ach, i) => (
+                      <div key={i} style={{ marginBottom: '8px' }}>
+                        <strong style={{ fontSize: '11pt' }}>{ach.title}</strong>
+                        <p style={{ fontSize: '10pt' }}>{ach.description}</p>
+                      </div>
+                    ), { boldHeader: false })}
+                  </>
+                )}
+              </div>
+              <style jsx>{`
                                       ::-webkit-scrollbar {
                                         width: 6px;
                                       }
@@ -1331,9 +1361,9 @@ function Resume() {
                                         background: #555;
                                       }
                                     `}</style>
-                                  </div>
-                                </div>
-                                <style jsx>{`
+            </div>
+          </div>
+          <style jsx>{`
                                   ::-webkit-scrollbar {
                                     width: 6px;
                                   }
@@ -1348,16 +1378,16 @@ function Resume() {
                                     background: #6b7280;
                                   }
                                 `}</style>
-                              </div>
-                            </div>
-                          );
-                        };
-                    
-                        return (
-                          <div>
-                            {selectedTemplate ? renderResumeBuilder() : renderTemplateSelection()}
-                          </div>
-                        );
-                      }
-                    
-                      export default Resume;
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div>
+      {selectedTemplate ? renderResumeBuilder() : renderTemplateSelection()}
+    </div>
+  );
+}
+
+export default Resume;

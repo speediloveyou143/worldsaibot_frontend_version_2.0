@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
-import { BACKEND_URL } from "../../../config/constant";
+import APIService from "../../services/api";
 
 function CreateRecordings() {
   const [batch, setBatch] = useState({
@@ -115,19 +114,15 @@ function CreateRecordings() {
 
     if (validate()) {
       try {
-        const response = await axios.post(
-          `${BACKEND_URL}/create-recordings`,
-          {
-            batchNumber: batch.batchNumber,
-            recordings: batch.videos.map((video) => ({
-              videoUrl: video.videoUrl,
-              videoTitle: video.videoTitle,
-            })),
-          },
-          { withCredentials: true }
-        );
+        const response = await APIService.recordings.create({
+          batchNumber: batch.batchNumber,
+          recordings: batch.videos.map((video) => ({
+            videoUrl: video.videoUrl,
+            videoTitle: video.videoTitle,
+          })),
+        });
 
-        if (response.status === 200) {
+        if (response.status === 200 || response.status === 201) {
           showAlert("Recordings added successfully!", "success");
           setBatch({
             batchNumber: "",
@@ -219,9 +214,8 @@ function CreateRecordings() {
 
       {alert && (
         <div
-          className={`fixed bottom-4 right-4 px-4 py-3 rounded-lg text-white shadow-lg transition-all duration-300 z-[50] ${
-            alert.type === 'success' ? 'bg-green-600' : 'bg-red-600'
-          } flex flex-col w-80`}
+          className={`fixed bottom-4 right-4 px-4 py-3 rounded-lg text-white shadow-lg transition-all duration-300 z-[50] ${alert.type === 'success' ? 'bg-green-600' : 'bg-red-600'
+            } flex flex-col w-80`}
         >
           <div className="flex items-center space-x-2">
             <span className="flex-1">{alert.message}</span>

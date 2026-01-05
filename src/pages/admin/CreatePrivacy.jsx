@@ -1,7 +1,6 @@
 
 import React, { useState, useEffect } from "react";
-import axios from "axios";
-import { BACKEND_URL } from "../../../config/constant";
+import APIService from "../../services/api";
 
 function CreatePrivacy() {
   const [heading, setHeading] = useState("");
@@ -48,18 +47,14 @@ function CreatePrivacy() {
       return;
     }
     try {
-      const response = await axios.post(
-        `${BACKEND_URL}/create-privacy`,
-        { heading, paragraph },
-        { withCredentials: true }
-      );
-      if (response.status === 200) {
+      const response = await APIService.privacy.create({ heading, paragraph });
+      if (response.status === 200 || response.status === 201) {
         showAlert("Privacy entry created successfully!", "success");
         setHeading("");
         setParagraph("");
       }
     } catch (err) {
-      showAlert("Failed to create privacy entry.", "error");
+      showAlert(err.response?.data?.message || "Failed to create privacy entry.", "error");
     }
   };
 
@@ -105,9 +100,8 @@ function CreatePrivacy() {
 
         {alert && (
           <div
-            className={`fixed bottom-4 right-4 px-4 py-3 rounded-lg text-white shadow-lg transition-all duration-300 z-[50] ${
-              alert.type === 'success' ? 'bg-green-600' : 'bg-red-600'
-            } flex flex-col w-80`}
+            className={`fixed bottom-4 right-4 px-4 py-3 rounded-lg text-white shadow-lg transition-all duration-300 z-[50] ${alert.type === 'success' ? 'bg-green-600' : 'bg-red-600'
+              } flex flex-col w-80`}
           >
             <div className="flex items-center space-x-2">
               <span className="flex-1">{alert.message}</span>

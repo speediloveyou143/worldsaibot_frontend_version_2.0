@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
-import { useParams } from "react-router-dom";
-import { BACKEND_URL } from "../../../config/constant";
+import { useParams, useNavigate } from "react-router-dom";
+import APIService from "../../services/api";
 
 function UpdateTest() {
   const { id } = useParams();
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({
     question: "",
     test: [{ input: "", output: "" }],
@@ -47,16 +48,16 @@ function UpdateTest() {
   useEffect(() => {
     async function fetchTest() {
       try {
-        const response = await axios.get(
-          `${BACKEND_URL}/show-test/${id}`,
-          { withCredentials: true }
-        );
+        setLoading(true);
+        const response = await APIService.tests.getById(id);
         if (response.status === 200) {
           const { _id, __v, ...filteredData } = response.data;
           setFormData(filteredData);
         }
       } catch (err) {
         showAlert("Failed to load test data.", "error");
+      } finally {
+        setLoading(false);
       }
     }
     fetchTest();
@@ -118,18 +119,28 @@ function UpdateTest() {
     if (!validateForm()) return;
 
     try {
-      const response = await axios.put(
-        `${BACKEND_URL}/update-test/${id}`,
-        formData,
-        { withCredentials: true }
-      );
+      const response = await APIService.tests.update(id, formData);
       if (response.status === 200) {
         showAlert("Test updated successfully!", "success");
+        setTimeout(() => {
+          navigate("/admin-dashboard/profile/all-tests");
+        }, 2000);
       }
     } catch (err) {
       showAlert(err.response?.data?.message || "Failed to update test.", "error");
     }
   };
+
+  if (loading) {
+    return (
+      <div className="h-full w-full flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-slate-400">Loading test data...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="h-full bg-gray-950 overflow-y-auto p-4 flex flex-col items-start pb-[100px] sm:pb-[0px]">
@@ -193,9 +204,8 @@ function UpdateTest() {
 
         {alert && (
           <div
-            className={`fixed bottom-4 right-4 px-4 py-3 rounded-lg text-white shadow-lg transition-all duration-300 z-[50] ${
-              alert.type === 'success' ? 'bg-green-600' : 'bg-red-600'
-            } flex flex-col w-80`}
+            className={`fixed bottom-4 right-4 px-4 py-3 rounded-lg text-white shadow-lg transition-all duration-300 z-[50] ${alert.type === 'success' ? 'bg-green-600' : 'bg-red-600'
+              } flex flex-col w-80`}
           >
             <div className="flex items-center space-x-2">
               <span className="flex-1">{alert.message}</span>

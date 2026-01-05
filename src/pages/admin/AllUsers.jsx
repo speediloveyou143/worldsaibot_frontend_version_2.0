@@ -1,265 +1,252 @@
-import axios from "axios";
-import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { BACKEND_URL } from "../../../config/constant";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
+import { Link } from "react-router-dom";
+import APIService from "../../services/api";
+import Loading from "../../components/Loading";
 
-function Row(props) {
-  const { number, data, showAlert } = props;
-  const navigate = useNavigate();
+const UserRow = React.memo(({ number, data, onDelete }) => {
+  const [isDeleting, setIsDeleting] = useState(false);
 
-  async function handleDelete() {
+  const handleDelete = useCallback(async () => {
+    if (!window.confirm(`Delete ${data.name}?`)) return;
+
+    setIsDeleting(true);
     try {
-      const response = await axios.delete(
-        `${BACKEND_URL}/delete-profile/${data._id}`,
-        { withCredentials: true }
-      );
-      if (response.status === 200) {
-        showAlert("User deleted successfully!", "success");
-      } else {
-        showAlert("Failed to delete the user.", "error");
-      }
-    } catch (error) {
-      showAlert("An error occurred while deleting the user.", "error");
+      await APIService.profile.delete(data._id);
+      onDelete(data._id, `${data.name} deleted successfully!`);
+    } catch {
+      setIsDeleting(false);
+      onDelete(null, "Failed to delete user", "error");
     }
-  }
+  }, [data._id, data.name, onDelete]);
 
-  const isPaid = data.courses?.length > 1;
-  const paidStatus = isPaid ? "Paid" : "Not Paid";
-  const statusClass = isPaid ? "text-green-500" : "text-red-500";
+  const isPaid = useMemo(() => data.courses?.length > 0, [data.courses]);
 
   return (
-    <tr>
-      <th>{number}</th>
-      <td>{data.name}</td>
-      <td>{data.email}</td>
-      <td>{data.number}</td>
-      <td>{data.batchNumber}</td>
-      <td className={statusClass}>{paidStatus}</td>
-      <td className="text-success cursor-pointer">
-        <Link to={`/admin-dashboard/profile/update-pc/${data._id}`}>
-          update
-        </Link>
+    <tr className="border-b border-slate-700/50 hover:bg-slate-800/30 transition-colors">
+      <td className="px-4 py-4">
+        <span className="text-slate-400 font-mono text-sm">{number}</span>
       </td>
-      <td className="text-success cursor-pointer">
-        <Link to={`/admin-dashboard/profile/update-ic/${data._id}`}>
-          update
-        </Link>
+      <td className="px-4 py-4">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center font-bold text-sm">
+            {data.name[0].toUpperCase()}
+          </div>
+          <div>
+            <p className="font-medium text-white">{data.name}</p>
+            <p className="text-xs text-slate-400">{data.email}</p>
+          </div>
+        </div>
       </td>
-      <td className="text-success cursor-pointer">
-        <Link to={`/admin-dashboard/profile/update-cc/${data._id}`}>
-          update
-        </Link>
+      <td className="px-4 py-4">
+        <span className="text-slate-300 text-sm">{data.number}</span>
       </td>
-      <td className="text-success cursor-pointer">
-        <Link to={`/admin-dashboard/profile/update-invoice/${data._id}`}>
-          update
-        </Link>
+      <td className="px-4 py-4">
+        <span className="text-slate-400 text-sm">{data.batchNumber || "-"}</span>
       </td>
-      <td className="text-success cursor-pointer">
-        <Link to={`/admin-dashboard/profile/update-user/${data._id}`}>
-          update
-        </Link>
+      <td className="px-4 py-4">
+        <span
+          className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ${isPaid
+              ? "bg-green-500/10 text-green-400 border border-green-500/20"
+              : "bg-red-500/10 text-red-400 border border-red-500/20"
+            }`}
+        >
+          <i className={`bi ${isPaid ? "bi-check-circle-fill" : "bi-x-circle-fill"}`}></i>
+          {isPaid ? "Paid" : "Not Paid"}
+        </span>
       </td>
-      <td className="text-error cursor-pointer" onClick={handleDelete}>
-        delete
+      <td className="px-4 py-4">
+        <div className="flex gap-2">
+          {["update-pc", "update-ic", "update-cc", "update-invoice"].map((path) => (
+            <Link
+              key={path}
+              to={`/admin-dashboard/profile/${path}/${data._id}`}
+              className="px-3 py-1.5 bg-blue-500/10 hover:bg-blue-500/20 text-blue-400 border border-blue-500/20 rounded-lg text-xs font-medium transition-all hover:scale-105"
+            >
+              {path.split("-")[1].toUpperCase()}
+            </Link>
+          ))}
+          <Link
+            to={`/admin-dashboard/profile/update-user/${data._id}`}
+            className="px-3 py-1.5 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/20 rounded-lg text-xs font-medium transition-all hover:scale-105"
+          >
+            <i className="bi bi-pencil-fill"></i>
+          </Link>
+        </div>
+      </td>
+      <td className="px-4 py-4">
+        <button
+          onClick={handleDelete}
+          disabled={isDeleting}
+          className="px-3 py-1.5 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 rounded-lg text-xs font-medium transition-all hover:scale-105 disabled:opacity-50"
+        >
+          {isDeleting ? (
+            <i className="bi bi-arrow-repeat animate-spin"></i>
+          ) : (
+            <i className="bi bi-trash-fill"></i>
+          )}
+        </button>
       </td>
     </tr>
   );
-}
+});
+
+UserRow.displayName = "UserRow";
 
 function AllUsers() {
   const [userData, setUserData] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [searchEmail, setSearchEmail] = useState("");
   const [paidFilter, setPaidFilter] = useState("All");
   const [alert, setAlert] = useState(null);
-  const [progress, setProgress] = useState(100);
 
-  const showAlert = (message, type) => {
-    setAlert({ message, type });
-    setProgress(100);
-  };
-
-  const dismissAlert = () => {
-    setAlert(null);
-    setProgress(100);
-  };
-
-  useEffect(() => {
-    if (alert) {
-      const duration = 3000;
-      const interval = 50;
-      const decrement = (interval / duration) * 100;
-
-      const timer = setInterval(() => {
-        setProgress((prev) => {
-          const newProgress = prev - decrement;
-          if (newProgress <= 0) {
-            dismissAlert();
-            clearInterval(timer);
-            return 0;
-          }
-          return newProgress;
-        });
-      }, interval);
-
-      return () => clearInterval(timer);
-    }
-  }, [alert]);
-
-  async function users() {
+  const fetchUsers = useCallback(async () => {
     try {
-      const response = await axios.get(`${BACKEND_URL}/show-profiles`, {
-        withCredentials: true,
-      });
-      setUserData(response?.data?.data || []);
-    } catch (err) {
-      showAlert("Something went wrong while fetching users.", "error");
+      setLoading(true);
+      const response = await APIService.profile.getAll();
+      const users = response.data?.data || response.data || [];
+      setUserData(Array.isArray(users) ? users : []);
+    } catch {
+      setAlert({ message: "Failed to fetch users", type: "error" });
       setUserData([]);
+    } finally {
+      setLoading(false);
     }
-  }
-
-  useEffect(() => {
-    users();
   }, []);
 
-  const filteredUsers = userData.filter((user) => {
-    const matchesEmail = user.email
-      .toLowerCase()
-      .includes(searchEmail.toLowerCase());
-    const isPaid = user.courses?.length > 1;
-    const matchesPaid =
-      paidFilter === "All" ||
-      (paidFilter === "Paid" && isPaid) ||
-      (paidFilter === "Not Paid" && !isPaid);
-    return matchesEmail && matchesPaid;
-  });
+  useEffect(() => {
+    fetchUsers();
+  }, [fetchUsers]);
+
+  const handleDeleteSuccess = useCallback((deletedId, message, type = "success") => {
+    if (deletedId) {
+      setUserData((prev) => prev.filter((user) => user._id !== deletedId));
+    }
+    setAlert({ message, type });
+    setTimeout(() => setAlert(null), 3000);
+  }, []);
+
+  const filteredUsers = useMemo(() => {
+    return userData.filter((user) => {
+      const matchesEmail = user.email.toLowerCase().includes(searchEmail.toLowerCase());
+      const isPaid = user.courses?.length > 0;
+      const matchesPaid =
+        paidFilter === "All" ||
+        (paidFilter === "Paid" && isPaid) ||
+        (paidFilter === "Not Paid" && !isPaid);
+      return matchesEmail && matchesPaid;
+    });
+  }, [userData, searchEmail, paidFilter]);
+
+  if (loading) {
+    return <Loading message="Loading users..." />;
+  }
 
   return (
-    <div className="h-full w-full overflow-x-auto overflow-y-auto pb-[80px] md:pb-0">
-      {/* Filter Buttons and Search Bar */}
-      <div className="m-2 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-        {/* Search Bar */}
-        <div className="relative w-full md:max-w-sm">
-          <input
-            type="text"
-            placeholder="Search by email..."
-            className="input input-bordered w-full pl-10 pr-4 py-2 shadow-md focus:ring-2 focus:ring-blue-500 transition-all duration-300"
-            value={searchEmail}
-            onChange={(e) => setSearchEmail(e.target.value)}
-          />
-          <svg
-            className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-500"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-            />
-          </svg>
-        </div>
+    <div className="h-full w-full overflow-auto p-6">
+      {/* Header */}
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold text-white mb-2">Users Management</h1>
+        <p className="text-slate-400">Manage and view all registered users</p>
+      </div>
 
-        {/* Filter Buttons */}
-        <div className="flex flex-row space-x-2 mt-3 md:mt-0 justify-center md:justify-end">
-          <button
-            className={`btn btn-sm w-[80px] md:w-auto ${
-              paidFilter === "All" ? "btn-primary" : "btn-outline"
-            }`}
-            onClick={() => setPaidFilter("All")}
-          >
-            All
-          </button>
-          <button
-            className={`btn btn-sm w-[80px] md:w-auto ${
-              paidFilter === "Paid" ? "btn-primary" : "btn-outline"
-            }`}
-            onClick={() => setPaidFilter("Paid")}
-          >
-            Paid
-          </button>
-          <button
-            className={`btn btn-sm w-[80px] md:w-auto ${
-              paidFilter === "Not Paid" ? "btn-primary" : "btn-outline"
-            }`}
-            onClick={() => setPaidFilter("Not Paid")}
-          >
-            Not Paid
-          </button>
+      {/* Filters */}
+      <div className="mb-6 bg-slate-800/30 backdrop-blur-sm rounded-xl border border-slate-700/50 p-6">
+        <div className="flex flex-col md:flex-row gap-4 items-start md:items-center justify-between">
+          {/* Search */}
+          <div className="relative flex-1 max-w-md">
+            <i className="bi bi-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+            <input
+              type="text"
+              placeholder="Search by email..."
+              value={searchEmail}
+              onChange={(e) => setSearchEmail(e.target.value)}
+              className="w-full pl-12 pr-4 py-3 bg-slate-900/50 border border-slate-700/50 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:border-blue-500/50 focus:ring-2 focus:ring-blue-500/20 transition-all"
+            />
+          </div>
+
+          {/* Filter Buttons */}
+          <div className="flex gap-2 bg-slate-900/50 p-1.5 rounded-lg border border-slate-700/50">
+            {["All", "Paid", "Not Paid"].map((filter) => (
+              <button
+                key={filter}
+                onClick={() => setPaidFilter(filter)}
+                className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${paidFilter === filter
+                    ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg"
+                    : "text-slate-400 hover:text-white hover:bg-slate-800/50"
+                  }`}
+              >
+                {filter}
+              </button>
+            ))}
+          </div>
+
+          {/* Count */}
+          <div className="px-4 py-2 bg-slate-900/50 rounded-lg border border-slate-700/50">
+            <span className="text-sm text-slate-400">
+              Total: <span className="font-bold text-white">{filteredUsers.length}</span>
+            </span>
+          </div>
         </div>
       </div>
 
-      <table className="table table-xs table-pin-rows table-pin-cols w-full">
-        <thead>
-          <tr>
-            <th>#</th>
-            <td>Name</td>
-            <td>Email</td>
-            <td>Number</td>
-            <td>B-Number</td>
-            <td>Paid Status</td>
-            <td>P-c</td>
-            <td>I-c</td>
-            <td>C-c</td>
-            <td>Invoice</td>
-            <td>Update</td>
-            <td>Delete</td>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredUsers.length > 0 ? (
-            filteredUsers.map((x, index) => (
-              <Row key={x._id} number={index + 1} data={x} showAlert={showAlert} />
-            ))
-          ) : (
-            <tr>
-              <td colSpan="12" className="text-center">
-                No users found.
-              </td>
-            </tr>
-          )}
-        </tbody>
-        <tfoot>
-          <tr>
-            <th>#</th>
-            <td>Name</td>
-            <td>Email</td>
-            <td>Number</td>
-            <td>B-Number</td>
-            <td>Paid Status</td>
-            <td>P-c</td>
-            <td>I-c</td>
-            <td>C-c</td>
-            <td>Invoice</td>
-            <td>Update</td>
-            <td>Delete</td>
-          </tr>
-        </tfoot>
-      </table>
+      {/* Table */}
+      <div className="bg-slate-800/30 backdrop-blur-sm rounded-xl border border-slate-700/50 overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="bg-slate-900/50 border-b border-slate-700/50">
+                <th className="px-4 py-4 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">#</th>
+                <th className="px-4 py-4 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">User</th>
+                <th className="px-4 py-4 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">Phone</th>
+                <th className="px-4 py-4 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">Batch</th>
+                <th className="px-4 py-4 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">Status</th>
+                <th className="px-4 py-4 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">Actions</th>
+                <th className="px-4 py-4 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">Delete</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredUsers.length > 0 ? (
+                filteredUsers.map((user, index) => (
+                  <UserRow
+                    key={user._id}
+                    number={index + 1}
+                    data={user}
+                    onDelete={handleDeleteSuccess}
+                  />
+                ))
+              ) : (
+                <tr>
+                  <td colSpan="7" className="px-4 py-20 text-center">
+                    <div className="flex flex-col items-center gap-3">
+                      <div className="w-16 h-16 bg-slate-700/30 rounded-full flex items-center justify-center">
+                        <i className="bi bi-people text-3xl text-slate-500"></i>
+                      </div>
+                      <p className="text-slate-400">No users found</p>
+                    </div>
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
 
+      {/* Alert Toast */}
       {alert && (
-        <div
-          className={`fixed bottom-4 right-4 px-4 py-3 rounded-lg text-white shadow-lg transition-all duration-300 z-[50] ${
-            alert.type === "success" ? "bg-green-600" : "bg-red-600"
-          } flex flex-col w-80`}
-        >
-          <div className="flex items-center space-x-2">
-            <span className="flex-1">{alert.message}</span>
-            <button
-              onClick={dismissAlert}
-              className="text-white hover:text-gray-200 focus:outline-none"
-            >
-              <i className="bi bi-x-lg"></i>
-            </button>
-          </div>
-          <div className="w-full h-1 mt-2 bg-white/30 rounded-full overflow-hidden">
-            <div
-              className="h-full bg-white transition-all ease-linear"
-              style={{ width: `${progress}%` }}
-            ></div>
+        <div className="fixed bottom-6 right-6 z-50 animate-slide-up">
+          <div
+            className={`${alert.type === "success"
+                ? "bg-gradient-to-r from-green-600 to-emerald-600"
+                : "bg-gradient-to-r from-red-600 to-rose-600"
+              } text-white px-6 py-4 rounded-xl shadow-2xl min-w-[320px]`}
+          >
+            <div className="flex items-center gap-3">
+              <i
+                className={`${alert.type === "success" ? "bi bi-check-circle-fill" : "bi bi-exclamation-circle-fill"
+                  } text-2xl`}
+              ></i>
+              <p className="font-medium">{alert.message}</p>
+            </div>
           </div>
         </div>
       )}

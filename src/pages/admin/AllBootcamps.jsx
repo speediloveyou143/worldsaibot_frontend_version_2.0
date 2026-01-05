@@ -1,43 +1,46 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import { Link } from 'react-router-dom';
-import { BACKEND_URL } from "../../../config/constant";
+import APIService from '../../services/api';
+import Loading from '../../components/Loading';
 
 function AllBootcamps() {
   const [bootcamps, setBootcamps] = useState([]);
-  const [alert, setAlert] = useState(null); // State for managing alerts
-  const [progress, setProgress] = useState(100); // Progress bar state
+  const [loading, setLoading] = useState(true);
+  const [alert, setAlert] = useState(null);
+  const [progress, setProgress] = useState(100);
+
+  const fetchBootcamps = async () => {
+    try {
+      setLoading(true);
+      const response = await APIService.bootcamps.getAll();
+      const bootcampsData = response?.data?.data || response?.data || [];
+      setBootcamps(Array.isArray(bootcampsData) ? bootcampsData : []);
+    } catch (error) {
+      showAlert('Error fetching bootcamps. Please try again.', 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchBootcamps = async () => {
-      try {
-        const response = await axios.get(`${BACKEND_URL}/all-bootcamps`);
-        setBootcamps(response.data);
-      } catch (error) {
-        showAlert('Error fetching bootcamps. Please try again.', 'error');
-      }
-    };
     fetchBootcamps();
   }, []);
 
-  // Function to show alerts
   const showAlert = (message, type) => {
     setAlert({ message, type });
-    setProgress(100); // Reset progress when new alert is shown
+    setProgress(100);
   };
 
-  // Handle alert dismissal
   const dismissAlert = () => {
     setAlert(null);
     setProgress(100);
   };
 
-  // Progress bar and auto-dismiss logic
   useEffect(() => {
     if (alert) {
-      const duration = 3000; // 3 seconds
-      const interval = 50; // Update every 50ms
-      const decrement = (interval / duration) * 100; // Progress reduction per interval
+      const duration = 3000;
+      const interval = 50;
+      const decrement = (interval / duration) * 100;
 
       const timer = setInterval(() => {
         setProgress((prev) => {
@@ -55,16 +58,32 @@ function AllBootcamps() {
     }
   }, [alert]);
 
-  // Handle delete
   const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this bootcamp?")) return;
+
     try {
-      await axios.delete(`${BACKEND_URL}/delete-bootcamp/${id}`, { withCredentials: true });
+      await APIService.bootcamps.delete(id);
       setBootcamps(bootcamps.filter((bootcamp) => bootcamp._id !== id));
       showAlert('Bootcamp deleted successfully!', 'success');
     } catch (error) {
       showAlert('Error deleting bootcamp. Please try again.', 'error');
     }
   };
+
+  if (loading) {
+    return <Loading message="Loading bootcamps..." />;
+  }
+
+  if (bootcamps.length === 0) {
+    return (
+      <div className="bg-gray-950 min-h-screen p-5 flex flex-col items-center justify-center text-[#ccd6f6]">
+        <h1 className="text-3xl font-bold mb-4">No Bootcamps Found</h1>
+        <Link to="/admin-dashboard/profile/create-bootcamp" className="bg-[#64ffda] text-[#0a192f] px-6 py-2 rounded-lg font-bold">
+          Create Bootcamp
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-gray-950 min-h-screen p-5 text-[#ccd6f6]">
@@ -73,20 +92,24 @@ function AllBootcamps() {
         {bootcamps.map((bootcamp) => (
           <div
             key={bootcamp._id}
-            className="bg-[#112240] p-5 rounded-lg w-72 shadow-lg transition-transform duration-200 cursor-pointer hover:scale-105 text-[#ccd6f6]"
+            className="bg-[#112240] p-5 rounded-lg w-72 shadow-lg transition-transform duration-200 hover:scale-105 text-[#ccd6f6]"
           >
             <h2 className="text-[#64ffda] mb-3 text-xl font-semibold">{bootcamp.courseName}</h2>
-            <p>{bootcamp._id}</p>
+            <div className="text-sm text-gray-400 mb-4 space-y-1">
+              <p>Type: {bootcamp.days} Days</p>
+              <p>Starts: {bootcamp.startDate}</p>
+              <p>ID: <span className="text-xs">{bootcamp._id}</span></p>
+            </div>
             <div className="flex gap-3 mt-5">
               <Link
                 to={`/admin-dashboard/profile/update-bootcamp/${bootcamp._id}`}
-                className="flex-1 text-center no-underline bg-[#64ffda] text-[#0a192f] px-4 py-2 rounded-lg font-bold"
+                className="flex-1 text-center no-underline bg-[#64ffda] text-[#0a192f] px-4 py-2 rounded-lg font-bold hover:opacity-90 transition-opacity"
               >
                 Update
               </Link>
               <button
                 onClick={() => handleDelete(bootcamp._id)}
-                className="flex-1 bg-[#ff4d4d] text-[#0a192f] px-4 py-2 rounded-lg font-bold border-none cursor-pointer"
+                className="flex-1 bg-[#ff4d4d] text-[#0a192f] px-4 py-2 rounded-lg font-bold border-none cursor-pointer hover:opacity-90 transition-opacity"
               >
                 Delete
               </button>
@@ -95,12 +118,10 @@ function AllBootcamps() {
         ))}
       </div>
 
-      {/* Alert Component */}
       {alert && (
         <div
-          className={`fixed bottom-4 right-4 px-4 py-3 rounded-lg text-white shadow-lg transition-all duration-300 ${
-            alert.type === "success" ? "bg-green-600" : "bg-red-600"
-          } flex flex-col w-80`}
+          className={`fixed bottom-4 right-4 px-4 py-3 rounded-lg text-white shadow-lg transition-all duration-300 z-50 ${alert.type === "success" ? "bg-green-600" : "bg-red-600"
+            } flex flex-col w-80`}
         >
           <div className="flex items-center space-x-2">
             <span className="flex-1">{alert.message}</span>

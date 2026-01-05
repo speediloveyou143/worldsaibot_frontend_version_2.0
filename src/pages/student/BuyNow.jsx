@@ -1,12 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import axios from "axios";
 import { BACKEND_URL, RAZORPAY_KEY } from "../../../config/constant";
+import APIService from "../../services/api";
+import { setUser } from "../../redux/userSlice";
 
 function BuyNow() {
   const { id, courseId } = useParams();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const [courseData, setCourseData] = useState(null);
   const [roadmapData, setRoadmapData] = useState(null);
   const [isPaymentSectionVisible, setIsPaymentSectionVisible] = useState(false);
@@ -14,6 +17,12 @@ function BuyNow() {
   const [progress, setProgress] = useState(100);
   const [paymentLoading, setPaymentLoading] = useState(false);
   const [razorpayLoaded, setRazorpayLoaded] = useState(false);
+  const [couponCode, setCouponCode] = useState("");
+  const [couponValid, setCouponValid] = useState(false);
+  const [couponMessage, setCouponMessage] = useState("");
+  const [validatingCoupon, setValidatingCoupon] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [countdown, setCountdown] = useState(0);
 
   const { user } = useSelector((state) => state.user || {});
   const { _id, name, email } = user || {};
@@ -73,8 +82,9 @@ function BuyNow() {
         });
         setRoadmapData(response.data);
       } catch (error) {
+        console.error("Roadmap fetch error:", error);
         showAlert(
-          error.response?.data?.message || "Failed to fetch roadmap details.",
+          error.response?.data?.message || "Failed to fetch course roadmap.",
           "error"
         );
       }
@@ -120,6 +130,91 @@ function BuyNow() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+
+  // Validate coupon code
+  const handleValidateCoupon = async () => {
+    if (!couponCode.trim()) {
+      setCouponMessage("Please enter a coupon code");
+      return;
+    }
+
+    setValidatingCoupon(true);
+    setCouponMessage("");
+
+    try {
+      const response = await APIService.courses.validateCoupon(courseId, couponCode);
+
+      if (response.data.valid) {
+        setCouponValid(true);
+        setCouponMessage(response.data.message || "Coupon is valid! Course is FREE");
+        showAlert("Coupon applied successfully! Course is free.", "success");
+      } else {
+        setCouponValid(false);
+        setCouponMessage(response.data.message || "Invalid coupon code");
+      }
+    } catch (error) {
+      setCouponValid(false);
+      setCouponMessage(error.response?.data?.message || "Invalid coupon code");
+    } finally {
+      setValidatingCoupon(false);
+    }
+  };
+
+  // Handle free enrollment with valid coupon
+  const handleFreeEnrollment = async () => {
+    if (!user || !_id) {
+      showAlert("Please sign in to enroll.", "error");
+      navigate("/signup");
+      return;
+    }
+
+    try {
+      setPaymentLoading(true);
+
+      const courseToAdd = {
+        courseId,
+        courseName: courseData?.courseName,
+        amount: "free",  // Changed to "free" instead of 0
+        purchaseDate: new Date().toISOString(),
+        recordingAccess: true,
+        recordingId: courseData?.recordingId,  // Add recording ID
+        paymentId: couponCode  // Use coupon code as payment ID for tracking
+      };
+
+      const response = await APIService.payment.addCourse(courseToAdd);
+
+      if (response.data) {
+        // Refresh user data
+        const userResponse = await APIService.profile.getMe();
+        dispatch(setUser(userResponse.data));
+
+        // Show celebration modal
+        setShowSuccessModal(true);
+
+        // Start countdown from 1 to 10
+        let count = 1;
+        setCountdown(1);
+
+        const countInterval = setInterval(() => {
+          count++;
+          setCountdown(count);
+
+          if (count >= 10) {
+            clearInterval(countInterval);
+            // Redirect after countdown completes
+            setTimeout(() => {
+              navigate("/student-dashboard/profile/lectures");
+            }, 500);
+          }
+        }, 1000); // 1 second interval
+      }
+    } catch (error) {
+      showAlert(error.response?.data?.error || "Enrollment failed", "error");
+    } finally {
+      setPaymentLoading(false);
+    }
+  };
+
   const handlePayment = () => {
     if (!user || !_id || !name || !email) {
       showAlert("Please sign in to proceed with payment.", "error");
@@ -149,28 +244,33 @@ function BuyNow() {
       image: imageUrl,
       handler: async function (response) {
         const paymentData = {
-          courses: [
-            {
-              transactionId: response.razorpay_payment_id,
-              amount: finalPrice,
-              status: true,
-              email,
-              name,
-              courseName,
-              recordingsId: recordingId,
-            },
-          ],
+          transactionId: response.razorpay_payment_id,
+          amount: finalPrice,
+          courseName,
+          recordingsId: recordingId,
+          courseId: courseId,
+          purchaseDate: new Date().toISOString()
         };
 
         try {
           setPaymentLoading(true);
-          await axios.put(`${BACKEND_URL}/update-user/${_id}`, paymentData, {
-            withCredentials: true,
-          });
-          showAlert(`Payment successful! Payment ID: ${response.razorpay_payment_id}`, "success");
+          // Use APIService for proper JWT authentication
+          const response = await APIService.payment.addCourse(paymentData);
+
+          // Update Redux with new user data
+          if (response.data?.user) {
+            dispatch(setUser(response.data.user));
+          }
+
+          showAlert(`Payment successful! Redirecting...`, "success");
+
+          // Redirect to lectures page after 2 seconds
+          setTimeout(() => {
+            navigate(`/student-dashboard/profile/lectures`);
+          }, 2000);
         } catch (error) {
           showAlert(
-            error.response?.data?.message || "Failed to update payment details.",
+            error.response?.data?.message || "Failed to process payment.",
             "error"
           );
         } finally {
@@ -295,13 +395,76 @@ function BuyNow() {
             <p className="text-lg lg:text-xl font-semibold text-purple-400 mt-2 lg:mt-4">
               Total: ₹{Math.floor((courseData.offerPrice || courseData.price || 0).toFixed(2))}
             </p>
-            <button
-              className="w-full mt-2 lg:mt-6 text-white py-2 lg:py-3 rounded-lg font-semibold transition-all shadow-lg bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 hover:shadow-blue-500/50 disabled:opacity-50"
-              onClick={handlePayment}
-              disabled={paymentLoading || !razorpayLoaded}
-            >
-              {paymentLoading ? "Processing..." : "Buy Now"}
-            </button>
+
+            {/* Coupon Code Section */}
+            <div className="mt-4 p-4 bg-slate-800/30 rounded-lg border border-slate-700/50">
+              <label className="block text-sm font-medium text-white mb-2">
+                Have a Coupon Code?
+              </label>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={couponCode}
+                  onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                  placeholder="Enter coupon code"
+                  className="flex-1 px-3 py-2 bg-slate-900/50 border border-slate-600 rounded text-white placeholder-slate-500 focus:outline-none focus:border-purple-500"
+                  disabled={couponValid}
+                />
+                <button
+                  onClick={handleValidateCoupon}
+                  disabled={validatingCoupon || couponValid || !couponCode.trim()}
+                  className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {validatingCoupon ? "Validating..." : couponValid ? "Applied" : "Apply"}
+                </button>
+              </div>
+              {couponMessage && (
+                <p className={`text-sm mt-2 ${couponValid ? "text-green-400" : "text-red-400"
+                  }`}>
+                  {couponMessage}
+                </p>
+              )}
+            </div>
+
+            {/* Privacy Policy Link */}
+            <div className="mt-4 text-center">
+              <p className="text-xs text-slate-400">
+                By purchasing, you agree to our{' '}
+                <a
+                  href="/privacy-policy"
+                  target="_blank"
+                  className="text-blue-400 hover:text-blue-300 underline"
+                >
+                  Privacy Policy
+                </a>
+              </p>
+            </div>
+
+            {/* Show different buttons based on coupon validity */}
+            {couponValid ? (
+              <button
+                className="w-full mt-2 lg:mt-6 text-white py-2 lg:py-3 rounded-lg font-semibold transition-all shadow-lg bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 hover:shadow-green-500/50 disabled:opacity-50 flex items-center justify-center gap-2"
+                onClick={handleFreeEnrollment}
+                disabled={paymentLoading}
+              >
+                {paymentLoading ? (
+                  <>Processing...</>
+                ) : (
+                  <>
+                    <i className="bi bi-check-circle"></i>
+                    Enroll for FREE
+                  </>
+                )}
+              </button>
+            ) : (
+              <button
+                className="w-full mt-2 lg:mt-6 text-white py-2 lg:py-3 rounded-lg font-semibold transition-all shadow-lg bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 hover:shadow-blue-500/50 disabled:opacity-50"
+                onClick={handlePayment}
+                disabled={paymentLoading || !razorpayLoaded}
+              >
+                {paymentLoading ? "Processing..." : "Buy Now"}
+              </button>
+            )}
           </>
         ) : (
           <p className="text-gray-300">Loading course details...</p>
@@ -321,9 +484,8 @@ function BuyNow() {
 
       {alert && (
         <div
-          className={`fixed bottom-4 right-4 px-4 py-3 rounded-lg text-white shadow-lg transition-all duration-300 z-[50] ${
-            alert.type === "success" ? "bg-green-600" : "bg-red-600"
-          } flex flex-col w-80 ${alert.visible ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+          className={`fixed bottom-4 right-4 px-4 py-3 rounded-lg text-white shadow-lg transition-all duration-300 z-[50] ${alert.type === "success" ? "bg-green-600" : "bg-red-600"
+            } flex flex-col w-80 ${alert.visible ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
         >
           <div className="flex items-center space-x-2">
             <span className="flex-1">{alert.message}</span>
@@ -339,6 +501,54 @@ function BuyNow() {
               className="h-full bg-white transition-all ease-linear"
               style={{ width: `${progress}%` }}
             ></div>
+          </div>
+        </div>
+      )}
+
+      {/* Success Celebration Modal - Clean Design */}
+      {showSuccessModal && (
+        <div className="fixed inset-0 bg-black/90 backdrop-blur-sm z-[9999] flex items-center justify-center p-4">
+          {/* Main Card */}
+          <div className="bg-gradient-to-br from-purple-600 to-pink-600 rounded-2xl p-1 max-w-lg w-full">
+            <div className="bg-gray-900 rounded-xl p-8 md:p-10">
+
+              {/* Countdown */}
+              <div className="text-center mb-8">
+                <div className="inline-flex items-center justify-center w-32 h-32 rounded-full bg-gradient-to-br from-green-400 to-emerald-500 mb-6">
+                  <span className="text-6xl font-black text-white">{countdown}</span>
+                </div>
+                <h2 className="text-4xl font-bold text-white mb-3">
+                  🎉 Success!
+                </h2>
+                <p className="text-xl text-gray-300">
+                  Course enrolled for <span className="text-green-400 font-bold">FREE</span>
+                </p>
+              </div>
+
+              {/* Course Details */}
+              <div className="bg-gray-800 rounded-xl p-6 mb-6">
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-yellow-400 to-orange-500 flex items-center justify-center">
+                    <i className="bi bi-trophy-fill text-2xl text-white"></i>
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm text-gray-400 mb-1">Course Name</p>
+                    <p className="text-lg font-bold text-white">{courseData?.courseName}</p>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between pt-4 border-t border-gray-700">
+                  <span className="text-gray-400">Price Paid</span>
+                  <span className="text-2xl font-bold text-green-400">FREE</span>
+                </div>
+              </div>
+
+              {/* Redirect Message */}
+              <div className="text-center">
+                <p className="text-gray-400 mb-2">Taking you to your courses...</p>
+                <p className="text-white font-semibold">{11 - countdown} seconds</p>
+              </div>
+
+            </div>
           </div>
         </div>
       )}

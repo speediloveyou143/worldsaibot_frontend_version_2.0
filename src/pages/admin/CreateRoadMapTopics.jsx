@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { BACKEND_URL } from "../../../config/constant";
+import APIService from '../../services/api';
 
 function CreateRoadMapTopics() {
   const [roadMapName, setRoadMapName] = useState('');
@@ -60,12 +59,8 @@ function CreateRoadMapTopics() {
     if (!validateForm()) return;
 
     try {
-      const response = await axios.post(
-        `${BACKEND_URL}/create-roadmap-topic`,
-        { roadMapName, id },
-        { withCredentials: true }
-      );
-      if (response.status === 200) {
+      const response = await APIService.roadmapTopics.create({ roadMapName, id });
+      if (response.status === 200 || response.status === 201) {
         showAlert('Roadmap topic created successfully!', 'success');
         setRoadMapName('');
         setId('');
@@ -91,11 +86,10 @@ function CreateRoadMapTopics() {
               id="roadMapName"
               value={roadMapName}
               onChange={(e) => setRoadMapName(e.target.value)}
-              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
-                errors.roadMapName
+              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 ${errors.roadMapName
                   ? 'border-red-500 focus:ring-red-500 bg-gray-700 text-white'
                   : 'border-gray-600 focus:ring-blue-500 bg-gray-700 text-white'
-              }`}
+                }`}
               placeholder="Enter roadmap name"
             />
           </div>
@@ -108,11 +102,10 @@ function CreateRoadMapTopics() {
               id="id"
               value={id}
               onChange={(e) => setId(e.target.value)}
-              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 ${
-                errors.id
+              className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 ${errors.id
                   ? 'border-red-500 focus:ring-red-500 bg-gray-700 text-white'
                   : 'border-gray-600 focus:ring-blue-500 bg-gray-700 text-white'
-              }`}
+                }`}
               placeholder="Enter roadmap ID"
             />
           </div>
@@ -126,9 +119,8 @@ function CreateRoadMapTopics() {
 
         {alert && (
           <div
-            className={`fixed bottom-4 right-4 px-4 py-3 rounded-lg text-white shadow-lg transition-all duration-300 z-[50] ${
-              alert.type === 'success' ? 'bg-green-600' : 'bg-red-600'
-            } flex flex-col w-80`}
+            className={`fixed bottom-4 right-4 px-4 py-3 rounded-lg text-white shadow-lg transition-all duration-300 z-[50] ${alert.type === 'success' ? 'bg-green-600' : 'bg-red-600'
+              } flex flex-col w-80`}
           >
             <div className="flex items-center space-x-2">
               <span className="flex-1">{alert.message}</span>

@@ -52,32 +52,54 @@ function Signup() {
 
   return (
     <div className="min-h-screen flex items-start md:items-center justify-center p-4 bg-black relative overflow-hidden">
-      {/* Cosmic Background with Animated Particles */}
-      <div className="absolute inset-0 z-0 bg-gradient-to-br from-black via-purple-900/5 to-black overflow-hidden">
-        {/* Animated particles */}
-        {[...Array(30)].map((_, i) => (
-          <div 
-            key={i}
-            className="absolute rounded-full bg-white/5"
-            style={{
-              width: `${Math.random() * 5 + 1}px`,
-              height: `${Math.random() * 5 + 1}px`,
-              top: `${Math.random() * 100}%`,
-              left: `${Math.random() * 100}%`,
-              animation: `float ${Math.random() * 20 + 10}s linear infinite`,
-              animationDelay: `${Math.random() * 5}s`
-            }}
-          />
-        ))}
-        
-        {/* Star layers */}
+      {/* Enhanced Starry background with subtle gradient */}
+      <div className="absolute inset-0 z-0 bg-gradient-to-br from-black via-purple-900/10 to-black">
         <div className="stars-layer layer1"></div>
         <div className="stars-layer layer2"></div>
         <div className="stars-layer layer3"></div>
+        <div className="stars-layer layer4"></div>
+
+        {/* UFO Spaceships - Clean and Spacious */}
+        {!isSuccess && (
+          <>
+            <div className="ufo-float ufo1">
+              <div className="text-5xl">🛸</div>
+              <div className="tech-label bg-purple-600 shadow-purple-500/50">AI</div>
+            </div>
+            <div className="ufo-float ufo2">
+              <div className="text-5xl">🛸</div>
+              <div className="tech-label bg-blue-600 shadow-blue-500/50">React</div>
+            </div>
+            <div className="ufo-float ufo3">
+              <div className="text-5xl">🛸</div>
+              <div className="tech-label bg-orange-600 shadow-orange-500/50">Python</div>
+            </div>
+            <div className="ufo-float ufo4">
+              <div className="text-5xl">🛸</div>
+              <div className="tech-label bg-emerald-600 shadow-emerald-500/50">Node</div>
+            </div>
+            <div className="ufo-float ufo5">
+              <div className="text-5xl">🛸</div>
+              <div className="tech-label bg-pink-600 shadow-pink-500/50">ML</div>
+            </div>
+
+            {/* Orange Developer Symbols - Balanced Placement */}
+            <div className="absolute top-12 left-16 text-orange-400/70 text-3xl font-mono animate-float-gentle">{'{'}</div>
+            <div className="absolute top-16 right-24 text-orange-400/70 text-3xl font-mono animate-float-gentle" style={{ animationDelay: '1s' }}>{'}'}</div>
+            <div className="absolute bottom-24 left-20 text-orange-400/70 text-3xl font-mono animate-float-gentle" style={{ animationDelay: '2s' }}>{'</>'}</div>
+            <div className="absolute bottom-16 right-16 text-orange-400/70 text-3xl font-mono animate-float-gentle" style={{ animationDelay: '1.5s' }}>{'()'}</div>
+            <div className="absolute top-1/3 left-12 text-orange-400/70 text-2xl font-mono animate-float-gentle" style={{ animationDelay: '0.5s' }}>{'[]'}</div>
+            <div className="absolute top-1/3 right-12 text-orange-400/70 text-2xl font-mono animate-float-gentle" style={{ animationDelay: '2.5s' }}>{'...'}</div>
+            <div className="absolute bottom-1/3 left-24 text-orange-400/70 text-3xl font-mono animate-float-gentle" style={{ animationDelay: '3s' }}>{'<'}</div>
+            <div className="absolute bottom-1/3 right-24 text-orange-400/70 text-3xl font-mono animate-float-gentle" style={{ animationDelay: '0.8s' }}>{'>'}</div>
+            <div className="absolute top-1/4 left-1/4 text-orange-400/70 text-2xl font-mono animate-float-gentle" style={{ animationDelay: '1.2s' }}>{'=>'}</div>
+            <div className="absolute top-2/3 right-1/3 text-orange-400/70 text-2xl font-mono animate-float-gentle" style={{ animationDelay: '2.2s' }}>{'const'}</div>
+          </>
+        )}
       </div>
 
       {/* Main Container */}
-      <div className="w-full max-w-6xl relative z-10 mx-2 mt-8 md:mt-0">
+      <div className="w-full max-w-4xl relative z-10 mx-2 mt-8 md:mt-0">
         <div className="flex flex-col md:flex-row backdrop-blur-xl rounded-3xl shadow-2xl overflow-hidden bg-gradient-to-br from-gray-900/70 via-gray-800/60 to-gray-900/70 border border-white/10 transition-all duration-500">
           {/* Left Side - Wab AI Description (Hidden on mobile) */}
           <div className="hidden md:block w-full md:w-1/2 p-8">
@@ -86,13 +108,13 @@ function Signup() {
                 <div className="w-20 h-20 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-[50%] flex items-center justify-center mb-6 shadow-lg shadow-purple-500/30 ">
                   <span className="text-white text-3xl font-bold tracking-tighter rotate-[21deg]">W</span>
                 </div>
-                <h1 className="text-4xl font-bold text-white mb-4">
-                  Welcome to <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-purple-500">Wab AI</span>
+                <h1 className="text-3xl font-bold text-white mb-3">
+                  Master <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-purple-500">AI & ML</span>
                 </h1>
-                <p className="text-gray-300/90 text-lg mb-8">
-                  The next generation of AI-powered solutions for your productivity and creativity.
+                <p className="text-gray-300/90 text-base mb-6">
+                  Join thousands of learners building the future with Artificial Intelligence
                 </p>
-                
+
                 <div className="space-y-6">
                   <div className="flex items-start">
                     <div className="flex-shrink-0 mt-1">
@@ -159,236 +181,343 @@ function Signup() {
           <div className="hidden md:block w-px bg-white/10"></div>
 
           {/* Right Side - Form (Always visible) */}
-          <div className="w-full md:w-1/2 p-8 relative z-10" style={isSuccess ? { transform: 'scale(0.95)' } : { transform: 'scale(1)' }}>
+          <div className="w-full md:w-1/2 p-5 relative z-10" style={isSuccess ? { transform: 'scale(0.95)' } : { transform: 'scale(1)' }}>
             {isSuccess ? (
               <div className="flex flex-col items-center justify-center py-12 px-4">
                 {/* Animated Success Checkmark */}
                 <div className="relative mb-8">
                   <div className="w-32 h-32 bg-gradient-to-br from-emerald-400 to-teal-600 rounded-full flex items-center justify-center shadow-lg shadow-emerald-500/30">
-                    <svg 
+                    <svg
                       className="h-20 w-20 text-white animate-checkmark"
-                      viewBox="0 0 52 52" 
+                      viewBox="0 0 52 52"
                       fill="none"
                     >
-                      <circle cx="26" cy="26" r="25" fill="none" stroke="currentColor" strokeWidth="2"/>
-                      <path 
+                      <circle cx="26" cy="26" r="25" fill="none" stroke="currentColor" strokeWidth="2" />
+                      <path
                         className="animate-checkmark-path"
-                        stroke="currentColor" 
-                        strokeWidth="4" 
+                        stroke="currentColor"
+                        strokeWidth="4"
                         strokeLinecap="round"
                         d="M14.1 27.2l7.1 7.2 16.7-16.8"
                       />
-                      </svg>
-                    </div>
-                    <div className="absolute -inset-4 rounded-full border-2 border-teal-400/30 animate-ping-slow opacity-0"></div>
+                    </svg>
                   </div>
-                  
-                  <h2 className="text-3xl font-bold text-white text-center mb-2">
-                    Welcome Aboard!
-                  </h2>
-                  <p className="text-gray-300 text-center max-w-md">
-                    Your account has been successfully created. Redirecting you to sign in...
-                  </p>
-                  
-                  {/* Progress bar */}
-                  <div className="w-full bg-white/10 rounded-full h-1.5 mt-6 overflow-hidden">
-                    <div 
-                      className="bg-gradient-to-r from-emerald-400 to-teal-600 h-1.5 rounded-full animate-progress" 
-                      style={{ animationDuration: '3s' }}
-                    ></div>
-                  </div>
+                  <div className="absolute -inset-4 rounded-full border-2 border-teal-400/30 animate-ping-slow opacity-0"></div>
                 </div>
-              ) : (
-                <>
-                  {/* Logo and Header */}
-                  <div className="text-center mb-8">
-                    <h1 className="text-3xl font-bold text-white mb-2">
-                      Create Your <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-purple-500">Account</span>
-                    </h1>
-                    <p className="text-gray-300/90">
-                      Join our community of learners and innovators
-                    </p>
+
+                <h2 className="text-3xl font-bold text-white text-center mb-2">
+                  Welcome Aboard!
+                </h2>
+                <p className="text-gray-300 text-center max-w-md">
+                  Your account has been successfully created. Redirecting you to sign in...
+                </p>
+
+                {/* Progress bar */}
+                <div className="w-full bg-white/10 rounded-full h-1.5 mt-6 overflow-hidden">
+                  <div
+                    className="bg-gradient-to-r from-emerald-400 to-teal-600 h-1.5 rounded-full animate-progress"
+                    style={{ animationDuration: '3s' }}
+                  ></div>
+                </div>
+              </div>
+            ) : (
+              <>
+                {/* Logo and Header */}
+                <div className="text-center mb-8">
+                  <h1 className="text-xl font-bold text-white mb-2">
+                    <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-purple-500">Learn AI</span> with Us
+                  </h1>
+                  <p className="text-sm text-gray-300/90">
+                    Start your journey into Artificial Intelligence
+                  </p>
+                </div>
+
+                {/* Error Message */}
+                {formError && (
+                  <div className="bg-red-500/10 border border-red-500/30 text-red-300 px-4 py-3 rounded-xl mb-6 text-sm flex items-start">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 mt-0.5 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                    <span>{formError}</span>
+                  </div>
+                )}
+
+                {/* Form Fields */}
+                <div className="space-y-5">
+                  <div className="space-y-1.5">
+                    <label className="text-sm font-medium text-gray-300/90 flex items-center">
+                      Full Name
+                      <span className="text-red-400 ml-1">*</span>
+                    </label>
+                    <div className="flex items-center bg-white/5 border border-white/10 rounded-xl overflow-hidden transition-all duration-200 focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/30 hover:border-white/20">
+                      <span className="px-3 text-gray-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                        </svg>
+                      </span>
+                      <input
+                        type="text"
+                        placeholder="John Doe"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        className="w-full p-2 outline-none bg-transparent text-white text-sm placeholder-gray-400/70"
+                      />
+                    </div>
                   </div>
 
-                  {/* Error Message */}
-                  {formError && (
-                    <div className="bg-red-500/10 border border-red-500/30 text-red-300 px-4 py-3 rounded-xl mb-6 text-sm flex items-start">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 mt-0.5 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                      </svg>
-                      <span>{formError}</span>
+                  <div className="space-y-1.5">
+                    <label className="text-sm font-medium text-gray-300/90 flex items-center">
+                      Mobile Number
+                      <span className="text-red-400 ml-1">*</span>
+                    </label>
+                    <div className="flex items-center bg-white/5 border border-white/10 rounded-xl overflow-hidden transition-all duration-200 focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/30 hover:border-white/20">
+                      <span className="px-3 text-gray-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                          <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
+                        </svg>
+                      </span>
+                      <input
+                        type="tel"
+                        placeholder="1234567890"
+                        value={number}
+                        onChange={(e) => setNumber(e.target.value)}
+                        className="w-full p-2 outline-none bg-transparent text-white text-sm placeholder-gray-400/70"
+                      />
                     </div>
-                  )}
-
-                  {/* Form Fields */}
-                  <div className="space-y-5">
-                    <div className="space-y-1.5">
-                      <label className="text-sm font-medium text-gray-300/90 flex items-center">
-                        Full Name
-                        <span className="text-red-400 ml-1">*</span>
-                      </label>
-                      <div className="flex items-center bg-white/5 border border-white/10 rounded-xl overflow-hidden transition-all duration-200 focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/30 hover:border-white/20">
-                        <span className="px-3 text-gray-400">
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                            <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-                          </svg>
-                        </span>
-                        <input
-                          type="text"
-                          placeholder="John Doe"
-                          value={name}
-                          onChange={(e) => setName(e.target.value)}
-                          className="w-full p-3 outline-none bg-transparent text-white placeholder-gray-400/70"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <label className="text-sm font-medium text-gray-300/90 flex items-center">
-                        Mobile Number
-                        <span className="text-red-400 ml-1">*</span>
-                      </label>
-                      <div className="flex items-center bg-white/5 border border-white/10 rounded-xl overflow-hidden transition-all duration-200 focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/30 hover:border-white/20">
-                        <span className="px-3 text-gray-400">
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                            <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
-                          </svg>
-                        </span>
-                        <input
-                          type="tel"
-                          placeholder="1234567890"
-                          value={number}
-                          onChange={(e) => setNumber(e.target.value)}
-                          className="w-full p-3 outline-none bg-transparent text-white placeholder-gray-400/70"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <label className="text-sm font-medium text-gray-300/90 flex items-center">
-                        Email
-                        <span className="text-red-400 ml-1">*</span>
-                      </label>
-                      <div className="flex items-center bg-white/5 border border-white/10 rounded-xl overflow-hidden transition-all duration-200 focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/30 hover:border-white/20">
-                        <span className="px-3 text-gray-400">
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                            <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
-                            <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
-                          </svg>
-                        </span>
-                        <input
-                          type="email"
-                          placeholder="john@example.com"
-                          value={email}
-                          onChange={(e) => setEmail(e.target.value)}
-                          className="w-full p-3 outline-none bg-transparent text-white placeholder-gray-400/70"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <label className="text-sm font-medium text-gray-300/90 flex items-center">
-                        Password
-                        <span className="text-red-400 ml-1">*</span>
-                      </label>
-                      <div className="flex items-center bg-white/5 border border-white/10 rounded-xl overflow-hidden transition-all duration-200 focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/30 hover:border-white/20">
-                        <span className="px-3 text-gray-400">
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                            <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
-                          </svg>
-                        </span>
-                        <input
-                          type="password"
-                          placeholder="••••••••"
-                          value={password}
-                          onChange={(e) => setPassword(e.target.value)}
-                          className="w-full p-3 outline-none bg-transparent text-white placeholder-gray-400/70"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="space-y-1.5">
-                      <label className="text-sm font-medium text-gray-300/90 flex items-center">
-                        Confirm Password
-                        <span className="text-red-400 ml-1">*</span>
-                      </label>
-                      <div className="flex items-center bg-white/5 border border-white/10 rounded-xl overflow-hidden transition-all duration-200 focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/30 hover:border-white/20">
-                        <span className="px-3 text-gray-400">
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                            <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
-                          </svg>
-                        </span>
-                        <input
-                          type="password"
-                          placeholder="••••••••"
-                          value={cPassword}
-                          onChange={(e) => setCPassword(e.target.value)}
-                          className="w-full p-3 outline-none bg-transparent text-white placeholder-gray-400/70"
-                        />
-                      </div>
-                    </div>
-
-                    {/* Terms and Conditions */}
-                    <div className="flex items-start mt-4">
-                      <div className="flex items-center h-5">
-                        <input
-                          id="terms"
-                          name="terms"
-                          type="checkbox"
-                          className="h-4 w-4 rounded border-white/20 bg-white/5 text-indigo-500 focus:ring-indigo-500"
-                        />
-                      </div>
-                      <div className="ml-3 text-sm">
-                        <label htmlFor="terms" className="text-gray-300/90">
-                          I agree to the{' '}
-                          <a href="#" className="text-indigo-400 hover:text-indigo-300 hover:underline">
-                            Terms of Service
-                          </a>{' '}
-                          and{' '}
-                          <a href="#" className="text-indigo-400 hover:text-indigo-300 hover:underline">
-                            Privacy Policy
-                          </a>
-                        </label>
-                      </div>
-                    </div>
-
-                    {/* Sign Up Button */}
-                    <button
-                      onClick={handleSignUp}
-                      disabled={loading}
-                      className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white py-3.5 rounded-xl font-medium hover:opacity-90 transition-all duration-300 flex items-center justify-center shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/30 mt-4"
-                    >
-                      {loading ? (
-                        <>
-                          <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                          </svg>
-                          Creating Account...
-                        </>
-                      ) : (
-                        "Sign Up Now"
-                      )}
-                    </button>
                   </div>
 
-                  {/* Sign in option (shown on mobile only) */}
-                  <div className="mt-8 pt-6 border-t border-white/10 md:hidden">
-                    <p className="text-gray-300/90 text-center">
-                      Already have an account?{' '}
-                      <Link to="/signin" className="text-indigo-400 hover:text-indigo-300 hover:underline">
-                        Sign in here
-                      </Link>
-                    </p>
+                  <div className="space-y-1.5">
+                    <label className="text-sm font-medium text-gray-300/90 flex items-center">
+                      Email
+                      <span className="text-red-400 ml-1">*</span>
+                    </label>
+                    <div className="flex items-center bg-white/5 border border-white/10 rounded-xl overflow-hidden transition-all duration-200 focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/30 hover:border-white/20">
+                      <span className="px-3 text-gray-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                          <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+                          <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+                        </svg>
+                      </span>
+                      <input
+                        type="email"
+                        placeholder="john@example.com"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className="w-full p-2 outline-none bg-transparent text-white text-sm placeholder-gray-400/70"
+                      />
+                    </div>
                   </div>
-                </>
-              )}
+
+                  <div className="space-y-1.5">
+                    <label className="text-sm font-medium text-gray-300/90 flex items-center">
+                      Password
+                      <span className="text-red-400 ml-1">*</span>
+                    </label>
+                    <div className="flex items-center bg-white/5 border border-white/10 rounded-xl overflow-hidden transition-all duration-200 focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/30 hover:border-white/20">
+                      <span className="px-3 text-gray-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+                        </svg>
+                      </span>
+                      <input
+                        type="password"
+                        placeholder="••••••••"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className="w-full p-2 outline-none bg-transparent text-white text-sm placeholder-gray-400/70"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-sm font-medium text-gray-300/90 flex items-center">
+                      Confirm Password
+                      <span className="text-red-400 ml-1">*</span>
+                    </label>
+                    <div className="flex items-center bg-white/5 border border-white/10 rounded-xl overflow-hidden transition-all duration-200 focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-500/30 hover:border-white/20">
+                      <span className="px-3 text-gray-400">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+                        </svg>
+                      </span>
+                      <input
+                        type="password"
+                        placeholder="••••••••"
+                        value={cPassword}
+                        onChange={(e) => setCPassword(e.target.value)}
+                        className="w-full p-2 outline-none bg-transparent text-white text-sm placeholder-gray-400/70"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Terms and Conditions */}
+                  <div className="flex items-start mt-4">
+                    <div className="flex items-center h-5">
+                      <input
+                        id="terms"
+                        name="terms"
+                        type="checkbox"
+                        className="h-4 w-4 rounded border-white/20 bg-white/5 text-indigo-500 focus:ring-indigo-500"
+                      />
+                    </div>
+                    <div className="ml-3 text-sm">
+                      <label htmlFor="terms" className="text-gray-300/90">
+                        I agree to the{' '}
+                        <a href="#" className="text-indigo-400 hover:text-indigo-300 hover:underline">
+                          Terms of Service
+                        </a>{' '}
+                        and{' '}
+                        <a href="#" className="text-indigo-400 hover:text-indigo-300 hover:underline">
+                          Privacy Policy
+                        </a>
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* Sign Up Button */}
+                  <button
+                    onClick={handleSignUp}
+                    disabled={loading}
+                    className="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white py-3.5 rounded-xl font-medium hover:opacity-90 transition-all duration-300 flex items-center justify-center shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/30 mt-4"
+                  >
+                    {loading ? (
+                      <>
+                        <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        Creating Account...
+                      </>
+                    ) : (
+                      "Sign Up Now"
+                    )}
+                  </button>
+                </div>
+
+                {/* Sign in option (shown on mobile only) */}
+                <div className="mt-8 pt-6 border-t border-white/10 md:hidden">
+                  <p className="text-gray-300/90 text-center">
+                    Already have an account?{' '}
+                    <Link to="/signin" className="text-indigo-400 hover:text-indigo-300 hover:underline">
+                      Sign in here
+                    </Link>
+                  </p>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </div>
 
       {/* CSS Animations */}
-      <style jsx>{`
+      <style>{`
+        .ufo-float {
+          position: absolute;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 4px;
+        }
+
+        .tech-label {
+          font-size: 10px;
+          font-weight: bold;
+          color: white;
+          padding: 2px 8px;
+          border-radius: 9999px;
+          box-shadow: 0 0 10px;
+        }
+
+        .ufo1 {
+          top: 50%;
+          left: 50%;
+          animation: orbit-circle-1 20s linear infinite;
+        }
+
+        .ufo2 {
+          top: 50%;
+          left: 50%;
+          animation: orbit-circle-2 25s linear infinite;
+        }
+
+        .ufo3 {
+          top: 50%;
+          left: 50%;
+          animation: orbit-circle-3 18s linear infinite reverse;
+        }
+
+        .ufo4 {
+          top: 50%;
+          left: 50%;
+          animation: orbit-circle-4 22s linear infinite;
+        }
+
+        .ufo5 {
+          top: 50%;
+          left: 50%;
+          animation: orbit-circle-5 24s linear infinite reverse;
+        }
+
+        @keyframes orbit-circle-1 {
+          from {
+            transform: translate(-50%, -50%) rotate(0deg) translateX(520px) rotate(0deg);
+          }
+          to {
+            transform: translate(-50%, -50%) rotate(360deg) translateX(520px) rotate(-360deg);
+          }
+        }
+
+        @keyframes orbit-circle-2 {
+          from {
+            transform: translate(-50%, -50%) rotate(72deg) translateX(580px) rotate(-72deg);
+          }
+          to {
+            transform: translate(-50%, -50%) rotate(432deg) translateX(580px) rotate(-432deg);
+          }
+        }
+
+        @keyframes orbit-circle-3 {
+          from {
+            transform: translate(-50%, -50%) rotate(144deg) translateX(500px) rotate(-144deg);
+          }
+          to {
+            transform: translate(-50%, -50%) rotate(504deg) translateX(500px) rotate(-504deg);
+          }
+        }
+
+        @keyframes orbit-circle-4 {
+          from {
+            transform: translate(-50%, -50%) rotate(216deg) translateX(550px) rotate(-216deg);
+          }
+          to {
+            transform: translate(-50%, -50%) rotate(576deg) translateX(550px) rotate(-576deg);
+          }
+        }
+
+        @keyframes orbit-circle-5 {
+          from {
+            transform: translate(-50%, -50%) rotate(288deg) translateX(530px) rotate(-288deg);
+          }
+          to {
+            transform: translate(-50%, -50%) rotate(648deg) translateX(530px) rotate(-648deg);
+          }
+        }
+
+        @keyframes float-gentle {
+          0%, 100% {
+            transform: translateY(0);
+            opacity: 0.6;
+          }
+          50% {
+            transform: translateY(-20px);
+            opacity: 0.8;
+          }
+        }
+
+        .animate-float-gentle {
+          animation: float-gentle 4s ease-in-out infinite;
+        }
+
         .stars-layer {
           position: absolute;
           top: 0;

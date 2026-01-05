@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
-import { BACKEND_URL } from "../../../config/constant";
+import APIService from "../../services/api";
 
 function UpdateRoadMap() {
   const { id } = useParams();
@@ -57,10 +56,7 @@ function UpdateRoadMap() {
   useEffect(() => {
     const fetchRoadmap = async () => {
       try {
-        const response = await axios.get(
-          `${BACKEND_URL}/show-roadmap/${id}`,
-          { withCredentials: true }
-        );
+        const response = await APIService.roadmaps.getById(id);
         if (response.status === 200) {
           setRoadmap(response.data);
           setLoading(false);
@@ -164,16 +160,12 @@ function UpdateRoadMap() {
     e.preventDefault();
     if (validate()) {
       try {
-        const response = await axios.put(
-          `${BACKEND_URL}/update-roadmap/${id}`,
-          roadmap,
-          { withCredentials: true }
-        );
+        const response = await APIService.roadmaps.update(id, roadmap);
         if (response.status === 200) {
           showAlert("Roadmap updated successfully!", "success");
           setTimeout(() => {
             navigate("/admin-dashboard/profile/all-roadmaps");
-          }, 1000); // Delay navigation to show alert
+          }, 2000);
         }
       } catch (err) {
         showAlert(err.response?.data?.message || "Failed to update the roadmap.", "error");
@@ -313,9 +305,8 @@ function UpdateRoadMap() {
 
       {alert && (
         <div
-          className={`fixed bottom-4 right-4 px-4 py-3 rounded-lg text-white shadow-lg transition-all duration-300 z-[50] ${
-            alert.type === 'success' ? 'bg-green-600' : 'bg-red-600'
-          } flex flex-col w-80`}
+          className={`fixed bottom-4 right-4 px-4 py-3 rounded-lg text-white shadow-lg transition-all duration-300 z-[50] ${alert.type === 'success' ? 'bg-green-600' : 'bg-red-600'
+            } flex flex-col w-80`}
         >
           <div className="flex items-center space-x-2">
             <span className="flex-1">{alert.message}</span>
