@@ -26,6 +26,7 @@ function AdminDashboard() {
     { to: "/admin-dashboard/profile/create-data", icon: "bi bi-database-fill-add", label: "Create Data" },
     { to: "/admin-dashboard/profile/all-create-data", icon: "bi bi-database-fill", label: "All Data" },
     { to: "/admin-dashboard/profile/all-registers", icon: "bi bi-person-check-fill", label: "All Registers" },
+    { to: "/admin-dashboard/profile/all-feedbacks", icon: "bi bi-chat-heart-fill", label: "User Feedbacks" },
     { to: "/admin-dashboard/profile/create-course", icon: "bi bi-plus-circle-fill", label: "Create Course" },
     { to: "/admin-dashboard/profile/all-courses", icon: "bi bi-journal-code", label: "All Courses" },
     { to: "/admin-dashboard/profile/create-road-map", icon: "bi bi-signpost-split-fill", label: "Create Roadmap" },
